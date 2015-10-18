@@ -63,6 +63,7 @@ function join(channel) {
 	var lastPong = new Date();
 
 	ws.onopen = function() {
+		myNick = localStorageGet('my-nick')
 		if (!(!wasConnected && ($('#auto-login').checked) && myNick))
 			myNick = prompt('Nickname:', myNick);
 		if (myNick) {
