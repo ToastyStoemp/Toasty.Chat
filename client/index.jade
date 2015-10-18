@@ -1,0 +1,42 @@
+doctype html
+html
+	head
+		meta(name="viewport", content="width=device-width, initial-scale=1")
+		meta(charset="utf-8")
+		title hack.chat
+		link(rel="stylesheet", href="/style.css")
+		link(rel="stylesheet", href="/katex/katex.min.css")
+		link#scheme-link(rel="stylesheet", href="/schemes/solarized.css")
+		script(src="/katex/katex.min.js")
+		script(src="/katex/contrib/auto-render.min.js")
+	body
+		article.container
+			#messages.messages
+
+		footer#footer
+			.container
+				form#chatform.messages
+					textarea#chatinput(type="text", autocomplete="off", autofocus)
+
+		nav#sidebar
+			#sidebar-content.hidden
+				p
+					input#pin-sidebar(type="checkbox")
+					label(for="pin-sidebar") Pin sidebar
+				h4 Settings
+				p
+					input#auto-login(type="checkbox")
+					label(for="auto-login") Auto login
+				p
+					input#joined-left(type="checkbox", checked)
+					label(for="joined-left") Join/left notify
+
+				p
+					button#clear-messages Clear messages
+				h4 Color scheme
+				select#scheme-selector
+				h4 Users online
+				p (Click user to invite)
+				ul#users
+
+		script(src="/client.js")
