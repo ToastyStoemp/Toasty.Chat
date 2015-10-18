@@ -25,19 +25,20 @@
   },
   "homepage": "https://github.com/AndrewBelt/hack.chat",
   "dependencies": {
-    "ws": "^0.7.2",
-    "md5": "^2.0.0",
     "atob": "^1.1.2",
     "figlet": "^1.1.1",
     "googleapis": "^2.1.5",
     "mathjs": "^1.7.1",
+    "md5": "^2.0.0",
     "octonode": "^0.7.1",
+    "pastebin": "0.0.1",
     "redwrap": "^0.0.4",
     "request": "^2.60.0",
     "soap": "^0.9.1",
     "unirest": "^0.4.2",
     "weather-js": "^1.0.2",
-    "wikijs": "^0.1.1"
+    "wikijs": "^0.1.1",
+    "ws": "^0.7.2"
   },
   "engines": {
     "node": ">=0.12.0"
