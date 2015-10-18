@@ -1,10 +1,26 @@
+### Credit
+This project is worked around the base of https://hack.chat,
+a beautiful project by Andrew Belt (https://github.com/AndrewBelt)
+
+List of contributors:
+* https://github.com/AndrewBelt
+* https://github.com/zckrs
+* https://github.com/jaflo
+* https://github.com/M4GNV5
+* https://github.com/gkbrk
+* https://github.com/WebFreak001
+* https://github.com/marclundgren
+* https://github.com/maxerize
+* https://github.com/ToastyStoemp
+* https://github.com/icetruckde
+
 ## Local install
 
 ### Server
 
 node v0.12 or higher is required to run the server.
 
-* `git clone https://github.com/ToastyStoemp/hack.chat.git`
+* `git clone https://github.com/ToastyStoemp/Toasty.Chat.git`
 * `cd hack.chat`
 * `npm install`
 * Copy `config-sample.json` to `config.json` and edit if needed.
