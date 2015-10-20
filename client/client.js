@@ -215,9 +215,9 @@ function pushMessage(args) {
 
 		if (args.elementId) { // for referencing special message
 			var oldElement = document.getElementById(args.elementId);
-			if (oldElement) oldElement.id = '';
+			if (oldElement) oldElement.removeAttribute('id');
 			messageEl.id = args.elementId;
-			if (args.replaceIfSameAsLast && oldElement == lastMessageElement)
+			if (oldElement && args.replaceIfSameAsLast && oldElement == lastMessageElement)
 				oldElement.parentNode.removeChild(oldElement);
 		}
 
