@@ -35,7 +35,7 @@ function localStorageSet(key, val) {
 }
 
 var ws
-var myNick
+var myNick = ""
 var myChannel = window.location.search.replace(/^\?/, '')
 var lastSent = [""]
 var lastSentPos = 0
@@ -43,13 +43,31 @@ var disconnectCodes = ['E001', 'E002', 'E003', 'E004', 'E005'];
 var links = [];
 var imageData = [];
 
+// Timeout handling
+var connectTime = 0;
+var joinTryCount = 0; // More delay till reconnect when more errors
+var lastMessageElement = null;
+
 // Ping server every 50 seconds to retain WebSocket connection
 window.setInterval(function() {
 	send({cmd: 'ping'})
 }, 50*1000)
 
+function calculateRejoinTimeout() {
+	switch (joinTryCount) {
+		case 0:
+		case 1: return  2000;
+		case 2: return  3000;
+		case 3: return  6000;
+		case 4: return 12000;
+		case 5: return 22000;
+	}
+	return 30000;
+}
 
 function join(channel) {
+	connectTime = new Date(); // here also for 'normal' connect fails
+	
 	if (document.domain == 'test.com') {
 		// For http://toastystoemp.com/
 		ws = new WebSocket('ws://toastystoemp.com/chat-ws')
@@ -63,8 +81,8 @@ function join(channel) {
 	var lastPong = new Date();
 
 	ws.onopen = function() {
-		myNick = localStorageGet('my-nick')
-		if (!(!wasConnected && ($('#auto-login').checked) && myNick))
+		myNick = localStorageGet('my-nick') || ""
+		if (!(!wasConnected && ($('#auto-login').checked) && myNick != ""))
 			myNick = prompt('Nickname:', myNick);
 		if (myNick) {
 			localStorageSet('my-nick', myNick)
@@ -78,14 +96,14 @@ function join(channel) {
 		wasConnected = true
 	}
 
-function genPass(nick)
-{
-    var gPass = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for( var i=0; i < 24 - nick.length; i++ )
-        gPass += possible.charAt(Math.floor(Math.random() * possible.length));
-    return gPass;
-}
+	function genPass(nick)
+	{
+	    var gPass = "";
+	    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	    for( var i=0; i < 24 - nick.length; i++ )
+	        gPass += possible.charAt(Math.floor(Math.random() * possible.length));
+	    return gPass;
+	}
 
 	var pongCheck = setInterval(function() {
 		var secondsSinceLastPong = (lastPong - new Date()) / 1000;
@@ -97,12 +115,20 @@ function genPass(nick)
 
 	ws.onclose = function() {
 		clearInterval(pongCheck);
-		if (wasConnected) {
-			pushMessage({nick: '!', text: "Disconnected."})
+
+		var secondsSinceConnection = (new Date() - connectTime) / 1000;
+		if (secondsSinceConnection > 2) {
+			joinTryCount = 0;
+		} else {
+			joinTryCount++; // Caused by connection error
 		}
+		var timeout = calculateRejoinTimeout();
+
+		pushMessage({nick: '!', text: "Disconnected. Waiting for "+Math.floor(timeout/1000)+" seconds till retry ("+joinTryCount+").", elementId: 'disconnect_message', replaceIfSameAsLast: true});
+
 		window.setTimeout(function() {
 			join(channel)
-		}, 2000)
+		}, timeout)
 	}
 
 	ws.onmessage = function(message) {
@@ -187,6 +213,14 @@ function pushMessage(args) {
 			messageEl.classList.add('shout')
 		}
 
+		if (args.elementId) { // for referencing special message
+			var oldElement = document.getElementById(args.elementId);
+			if (oldElement) oldElement.id = '';
+			messageEl.id = args.elementId;
+			if (args.replaceIfSameAsLast && oldElement == lastMessageElement)
+				oldElement.parentNode.removeChild(oldElement);
+		}
+
 		//Mentioning
 		if (args.text.indexOf("@" + myNick.split("#")[0] + " ") != -1)
         messageEl.classList.add('mention');
@@ -240,6 +274,7 @@ function pushMessage(args) {
 	// Scroll to bottom
 	var atBottom = isAtBottom()
 	$('#messages').appendChild(messageEl)
+	lastMessageElement = messageEl;
 	if (atBottom) {
 		window.scrollTo(0, document.body.scrollHeight)
 	}
