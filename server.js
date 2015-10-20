@@ -237,11 +237,17 @@ var COMMANDS = {
 			return
 		}
 
-		var score = text.length / 83 / 4
-		if (POLICE.frisk(getAddress(this), score)) {
-			send({cmd: 'warn', errCode: 'E006', text: "You are sending too much text. Wait a moment and try again.\nPress the up arrow key to restore your last message."}, this)
+		if (POLICE.isStfud(getAddress(this))) {
+			send({cmd: 'warn', errCode: 'E006', text: "You are muted.\nPress the up arrow key to restore your last message."}, this)
 			return
 		}
+
+		var score = text.length / 83 / 4
+			send({cmd: 'warn', errCode: 'E006', text: "You are sending too much text. Wait a moment and try again.\nPress the up arrow key to restore your last message."}, this)
+			return
+		if (POLICE.frisk(getAddress(this), score)) {
+		}
+
 
 		var data = {cmd: 'chat', nick: this.nick, trip: this.trip, text: text}
 		if (isAdmin(this)) {
@@ -362,9 +368,38 @@ var COMMANDS = {
 			return
 		}
 
-		POLICE.arrest(getAddress(badClient))
+		POLICE.arrest(getAddress(badClient, args.time))
 		console.log(this.nick + " [" + this.trip + "] banned " + nick + " in " + this.channel)
 		broadcast({cmd: 'info', infoCode: 'I004', nick: nick, text: "Banned " + nick}, this.channel)
+	},
+
+	mute: function(args) {
+		if (!isMod(this)) {
+			return
+		}
+
+		var nick = String(args.nick)
+		if (!this.channel) {
+			return
+		}
+
+		var badClient = server.clients.filter(function(client) {
+			return client.channel == this.channel && client.nick == nick
+		}, this)[0]
+
+		if (!badClient) {
+			send({cmd: 'warn', errCode: 'E009', text: "Could not find " + nick}, this)
+			return
+		}
+
+		if (isMod(badClient)) {
+			send({cmd: 'warn', errCode: 'E010', text: "Cannot ban moderator"}, this)
+			return
+		}
+
+		POLICE.stfu(getAddress(badClient, args.time))
+		console.log(this.nick + " [" + this.trip + "] muted " + nick + " in " + this.channel)
+		broadcast({cmd: 'info', infoCode: 'I004', nick: nick, text: "Muted " + nick}, this.channel)
 	},
 
 	// Admin-only commands below this point
@@ -451,10 +486,12 @@ var POLICE = {
 		return false
 	},
 
-	arrest: function(id) {
+	arrest: function(id, time) {
 		var record = this.search(id)
 		if (record) {
 			record.arrested = true
+			if (time)
+				setTimeout(function(){ record.arrested = false }, time * 1000);
 		}
 	},
 
@@ -464,6 +501,20 @@ var POLICE = {
 			record.dumped = true;
 			setTimeout(function(){ record.dumped = false }, 30 * 1000);
 		}
+	},
+
+	stfu: function(id, time = 60) {
+		var record = this.search(id)
+		if (record) {
+			record.stfud = true;
+			setTimeout(function(){ record.stfud = false }, time * 1000);
+		}
+	},
+
+	isStfud: function(id) {
+		var record = this.search(id)
+		if (record)
+			return record.stfud;
 	},
 }
 
