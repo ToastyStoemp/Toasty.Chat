@@ -393,7 +393,7 @@ var COMMANDS = {
 		}
 
 		if (isMod(badClient)) {
-			send({cmd: 'warn', errCode: 'E010', text: "Cannot ban moderator"}, this)
+			send({cmd: 'warn', errCode: 'E010', text: "Cannot mute moderator"}, this)
 			return
 		}
 
