@@ -186,7 +186,7 @@ var COMMANDS = {
 		for (var client of server.clients) {
 			if (client.channel === channel) {
 				if (client.nick.toLowerCase() === nick.toLowerCase()) {
-					if (client.trip !== this.trip) {
+					if (client.trip !== trip) {
 						send({cmd: 'warn', errCode: 'E005', text: "Nickname taken"}, this)
 						return
 					}
