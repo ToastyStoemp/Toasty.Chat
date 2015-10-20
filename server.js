@@ -503,7 +503,8 @@ var POLICE = {
 		}
 	},
 
-	stfu: function(id, time = 60) {
+	stfu: function(id, time) {
+		time = typeof time !== 'undefined' ? time : 60;
 		var record = this.search(id)
 		if (record) {
 			record.stfud = true;
