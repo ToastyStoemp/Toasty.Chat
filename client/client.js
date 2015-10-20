@@ -67,7 +67,7 @@ function calculateRejoinTimeout() {
 
 function join(channel) {
 	connectTime = new Date(); // here also for 'normal' connect fails
-	
+
 	if (document.domain == 'test.com') {
 		// For http://toastystoemp.com/
 		ws = new WebSocket('ws://toastystoemp.com/chat-ws')
@@ -193,6 +193,7 @@ var COMMANDS = {
 	},
 }
 
+var lastPoster = "";
 
 function pushMessage(args) {
 	var messageEl = document.createElement('div')
@@ -238,14 +239,14 @@ function pushMessage(args) {
 		nickSpanEl.classList.add('nick');
 		messageEl.appendChild(nickSpanEl)
 
-		if (args.trip && !args.admin) {
+		if (args.trip && !args.admin && args.nick && args.nick != lastPoster) {
 			var tripEl = document.createElement('span')
 			tripEl.textContent = args.trip.substr(0,6) + " "
 			tripEl.classList.add('trip')
 			nickSpanEl.appendChild(tripEl)
 		}
 
-		if (args.nick) {
+		if (args.nick && args.nick != lastPoster) {
 			var nickLinkEl = document.createElement('a')
 			nickLinkEl.textContent = args.nick
 			nickLinkEl.onclick = function() {
@@ -279,7 +280,9 @@ function pushMessage(args) {
 		window.scrollTo(0, document.body.scrollHeight)
 	}
 
-	unread += 1
+	lastPoster = args.nick;
+	if (args.nick != '*')
+		unread += 1
 	updateTitle()
 }
 
