@@ -243,9 +243,9 @@ var COMMANDS = {
 		}
 
 		var score = text.length / 83 / 4
+		if (POLICE.frisk(getAddress(this), score)) {
 			send({cmd: 'warn', errCode: 'E006', text: "You are sending too much text. Wait a moment and try again.\nPress the up arrow key to restore your last message."}, this)
 			return
-		if (POLICE.frisk(getAddress(this), score)) {
 		}
 
 
