@@ -47,6 +47,9 @@ html
 
 		script(src="/client.js")
 		script.
-			$("#toggle-viewer").click(function(){
-				$("#theatre").slideToggle();
+			$(function() {
+				$( "#theatre" ).resizable();
+			});
+			$( "#toggle-viewer" ).click(function(){
+				$( "#theatre" ).slideToggle();
 			});
