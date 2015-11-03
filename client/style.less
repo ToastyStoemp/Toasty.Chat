@@ -55,6 +55,13 @@ ul {
 	}
 }
 
+.viewer {
+	width: 70%;
+	height: 100%;
+	position: fixed;
+	border: none;
+}
+
 .hidden {
 	display: none;
 }
@@ -70,6 +77,7 @@ ul {
 
 #messages {
 	padding-top: 2em;
+	margin-bottom: 42px;
 }
 
 .message {
@@ -99,10 +107,21 @@ ul {
 	margin: 0;
 }
 
+.theatre {
+	width: 70%;
+	height: 100%;
+}
+
+#chat {
+	width: 100%;
+	float:right;
+}
+
 #footer {
 	position: fixed;
 	bottom: 0;
-	width: 100%;
+	width: inherit;
+	margin: 0 auto;
 }
 
 #chatform {
@@ -115,13 +134,17 @@ ul {
 	box-sizing: border-box;
 }
 
+.settingsicon {
+	float: right;
+}
+
 #sidebar {
 	position: fixed;
-	top: 0;
-	bottom: 0;
-	right: 0;
+	top: 0.5em;
+	bottom: auto;
+	right: 0.5em;
+	border: none;
 	padding: 1em;
-	border-left: solid 1px;
 	overflow-y: auto;
 }
 
@@ -148,12 +171,6 @@ ul {
 	}
 	.text {
 		display: inline;
-	}
-	#sidebar {
-		top: 0.5em;
-		bottom: auto;
-		right: 0.5em;
-		border: none;
 	}
 }
 

@@ -151,10 +151,10 @@ var COMMANDS = {
 		var trip = hash(String(args.pass));
 
 
-		if (POLICE.frisk(getAddress(this), 2)) {
-			send({cmd: 'warn', errCode: 'E002', text: "You are joining channels too fast. Wait a moment and try again."}, this)
-			return
-		}
+		// if (POLICE.frisk(getAddress(this), 2) && !this.) {
+		// 	send({cmd: 'warn', errCode: 'E002', text: "You are joining channels too fast. Wait a moment and try again."}, this)
+		// 	return
+		// }
 
 		if (this.nick) {
 			// Already joined
@@ -243,7 +243,7 @@ var COMMANDS = {
 		}
 
 		var score = text.length / 83 / 4
-		if (POLICE.frisk(getAddress(this), score)) {
+		if (POLICE.frisk(getAddress(this), score) && !this.admin) {
 			send({cmd: 'warn', errCode: 'E006', text: "You are sending too much text. Wait a moment and try again.\nPress the up arrow key to restore your last message."}, this)
 			return
 		}

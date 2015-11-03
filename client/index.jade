@@ -5,38 +5,48 @@ html
 		meta(charset="utf-8")
 		title hack.chat
 		link(rel="stylesheet", href="/style.css")
-		link(rel="stylesheet", href="/katex/katex.min.css")
+		script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js")
 		link#scheme-link(rel="stylesheet", href="/schemes/solarized.css")
-		script(src="/katex/katex.min.js")
-		script(src="/katex/contrib/auto-render.min.js")
+		
 	body
-		article.container
-			#messages.messages
+		theatre#theatre
+			h4 test
+			
+		chat#chat
+			nav#sidebar
+				img(src="http://toastystoemp.com/public/gear-icon.png").settingsicon
+				#sidebar-content.hidden
+					p
+						input#pin-sidebar(type="checkbox")
+						label(for="pin-sidebar") Pin sidebar
+					h4 Settings
+					p
+						input#auto-login(type="checkbox")
+						label(for="auto-login") Auto login
+					p
+						input#joined-left(type="checkbox", checked)
+						label(for="joined-left") Join/left notify
 
-		footer#footer
-			.container
-				form#chatform.messages
-					textarea#chatinput(type="text", autocomplete="off", autofocus)
+					p
+						button#clear-messages Clear messages
+					p
+						button#toggle-viewer Toggle viewer
+					h4 Color scheme
+					select#scheme-selector
+					h4 Users online
+					p (Click user to invite)
+					ul#users
 
-		nav#sidebar
-			#sidebar-content.hidden
-				p
-					input#pin-sidebar(type="checkbox")
-					label(for="pin-sidebar") Pin sidebar
-				h4 Settings
-				p
-					input#auto-login(type="checkbox")
-					label(for="auto-login") Auto login
-				p
-					input#joined-left(type="checkbox", checked)
-					label(for="joined-left") Join/left notify
+			article.container
+				#messages.messages
 
-				p
-					button#clear-messages Clear messages
-				h4 Color scheme
-				select#scheme-selector
-				h4 Users online
-				p (Click user to invite)
-				ul#users
+			footer#footer
+				.container
+					form#chatform.messages
+						textarea#chatinput(type="text", autocomplete="off", autofocus)
 
 		script(src="/client.js")
+		script.
+			$("#toggle-viewer").click(function(){
+				$("#theatre").slideToggle();
+			});
