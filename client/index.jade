@@ -11,12 +11,19 @@ html
 		link#scheme-link(rel="stylesheet", href="/schemes/solarized.css")
 
 	body
-		theatre#theatre
+		div#theatre
+			linkPop#link-block
+				p Enter link:
+				textarea#link-input(type="text", autocomplete="off", autofocus, data-autoresize)
+				button#load-link load
 
-		chat#chat
+		div#chat
 			nav#sidebar
 				img(src="http://toastystoemp.com/public/settingsicon.png")#settingsicon.settingsicon
 				#sidebar-content.sidebar-extra
+					p
+						a#link(href='https://trello.com/b/HTT7LQW4/toasty-chat', target="_blank") Trello!
+
 					h4 Settings
 					p
 						input#auto-login(type="checkbox")
@@ -41,6 +48,6 @@ html
 			footer#footer
 				.container
 					form#chatform.messages
-						textarea#chatinput(type="text", autocomplete="off", autofocus)
+						textarea#chatinput(type="text", autocomplete="off", autofocus, data-autoresize)
 
 		script(src="/client.js")

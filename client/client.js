@@ -1,3 +1,4 @@
+$("#link-block").hide();
 var frontpage = [
 	" __                                                 ",
 	" /|                 /                  /         /   ",
@@ -18,11 +19,6 @@ var frontpage = [
 	"No message history is retained on the toasty.chat server.",
 ].join("\n")
 
-$( "#toggle-viewer" ).click(function(){
-	var toggleWidth = $("#chat").width() == $( document ).width() ? "25%" : "100%";
-	$('#chat').animate({ width: toggleWidth });
-});
-
 function localStorageGet(key) {
 	try {
 		return window.localStorage[key]
@@ -42,7 +38,7 @@ var myNick = ""
 var myChannel = window.location.search.replace(/^\?/, '')
 var lastSent = [""]
 var lastSentPos = 0
-var disconnectCodes = ['E001', 'E002', 'E003', 'E004', 'E005'];
+var disconnectCodes = ['E002', 'E003', 'E004', 'E005'];
 var links = [];
 var imageData = [];
 
@@ -85,8 +81,10 @@ function join(channel) {
 
 	ws.onopen = function() {
 		myNick = localStorageGet('my-nick') || ""
-		if (!(!wasConnected && ($('#auto-login').is(":checked")) && myNick != ""))
+		if (!(!wasConnected && ($('#auto-login').is(":checked")) && myNick != "")){
+			$("#link-block").hide();
 			myNick = prompt('Nickname:', myNick);
+		}
 		if (myNick) {
 			localStorageSet('my-nick', myNick)
 			var nick = myNick.split("#")[0];
@@ -297,13 +295,12 @@ function pushMessage(args) {
 
 function insertAtCursor(text) {
 	var input = $('#chatinput')
-	var start = input.selectionStart || 0
-	var before = input.value.substr(0, start)
-	var after = input.value.substr(start)
+	var start = input.val().length || 0
+	var before = input.val().substr(0, start)
+	var after = input.val().substr(start)
 	before += text
-	input.value = before + after
-	input.selectionStart = input.selectionEnd = before.length
-	updateInputSize()
+
+	input.val(before + after);
 }
 
 
@@ -591,7 +588,6 @@ $('#chatinput').keydown(function(e) {
 			lastSent[0] = text
 			lastSent.unshift("")
 			lastSentPos = 0
-			updateInputSize()
 		}
 	}
 	else if (e.keyCode == 38 /* UP */) {
@@ -604,7 +600,6 @@ $('#chatinput').keydown(function(e) {
 			lastSentPos += 1
 			e.target.value = lastSent[lastSentPos]
 			e.target.selectionStart = e.target.selectionEnd = e.target.value.length
-			updateInputSize()
 		}
 	}
 	else if (e.keyCode == 40 /* DOWN */) {
@@ -613,7 +608,6 @@ $('#chatinput').keydown(function(e) {
 			lastSentPos -= 1
 			e.target.value = lastSent[lastSentPos]
 			e.target.selectionStart = e.target.selectionEnd = 0
-			updateInputSize()
 		}
 	}
 	else if (e.keyCode == 27 /* ESC */) {
@@ -622,7 +616,6 @@ $('#chatinput').keydown(function(e) {
 		e.target.value = ""
 		lastSentPos = 0
 		lastSent[lastSentPos] = ""
-		updateInputSize()
 	}
 	else if (e.keyCode == 9 /* TAB */) {
 		// Tab complete nicknames starting with @
@@ -644,26 +637,6 @@ $('#chatinput').keydown(function(e) {
 });
 
 
-function updateInputSize() {
-	var atBottom = isAtBottom()
-
-	$('#chatinput').css({"height":$("#chatinput").scrollHeight+ "px"})
-	// input.style.height = 0
-	// input.style.height = input.scrollHeight + 'px'
-	document.body.style.marginBottom = $('#footer').offsetHeight + 'px'
-
-	if (atBottom) {
-		window.scrollTo(0, document.body.scrollHeight)
-	}
-}
-
-$('#chatinput').oninput = function() {
-	updateInputSize()
-}
-
-updateInputSize()
-
-
 /* sidebar */
 var firstSlide = true;
 $('#settingsicon').click(function () {
@@ -679,7 +652,7 @@ $('#settingsicon').click(function () {
 	}
 });
 
-$('#clear-messages').onclick = function() {
+$('#clear-messages').click = function() {
 	// Delete children elements
 	var messages = $('#messages')
 	while (messages.firstChild) {
@@ -689,19 +662,19 @@ $('#clear-messages').onclick = function() {
 
 // Restore settings from localStorage
 
-if (localStorageGet('joined-left') == 'false') {
-	$('#joined-left').is(":checked") = false
-}
 if (localStorageGet('auto-login') == 'true') {
-	$('#auto-login').is(":checked") = true
+	$("#auto-login").prop('checked', true);
+}
+if (localStorageGet('joined-left') == 'false') {
+	$("#joined-left").prop('checked', false);;
 }
 
-$('#joined-left').onchange = function(e) {
+$('#joined-left').change(function(e) {
 	localStorageSet('joined-left', !!e.target.checked)
-}
-$('#auto-login').onchange = function(e) {
+});
+$('#auto-login').change(function(e) {
 	localStorageSet('auto-login', !!e.target.checked)
-}
+});
 
 // User list
 
@@ -778,7 +751,7 @@ var currentScheme = 'solarized'
 
 function setScheme(scheme) {
 	currentScheme = scheme
-	$('#scheme-link').href = "/schemes/" + scheme + ".css"
+	$("#scheme-link").attr("href", "/schemes/" + scheme + ".css");
 	localStorageSet('scheme', scheme)
 }
 
@@ -790,9 +763,9 @@ schemes.forEach(function(scheme) {
 	$('#scheme-selector').append(option)
 })
 
-$('#scheme-selector').onchange = function(e) {
+$('#scheme-selector').change(function(e) {
 	setScheme(e.target.value)
-}
+});
 
 // Load sidebar configaration values from local storage if available
 if (localStorageGet('scheme')) {
@@ -801,9 +774,52 @@ if (localStorageGet('scheme')) {
 
 $('#scheme-selector').value = currentScheme
 
+/*theatre*/
+var isTheatre = false;
+var isLinkWindow = false;
+function handleViewer(link){
+	if (isTheatre) {
+		$( "#viewer" ).remove();
+		isTheatre = false;
+		if (isLinkWindow) {
+			$("#link-block").toggle("hide", function(){$('#chat').animate({ width: "100%" });});
+			isLinkWindow = false;
+			return
+		}
+		$("#theatre").css({height: "0"})
+		$('#chat').animate({ width: "100%" });
+		return
+	}
+	$('#chat').animate({ width: "25%" }, function(){
+		isTheatre = true;
+		if (typeof link == 'undefined') {
+			$("#link-block").toggle("hide");
+			isLinkWindow = true;
+		}
+		else
+			createViewer(link);
+	});
+}
+
+function createViewer(link) {
+	var iframe = document.createElement('iframe');
+	iframe.id = "viewer";
+	iframe.src = link;
+	$("#theatre").append(iframe);
+}
+
+$( "#toggle-viewer" ).click(function(){
+	handleViewer();
+});
+
+$( "#load-link" ).click(function(){
+	createViewer($("#link-input").val());
+	$("#link-block").toggle("hide");
+	isLinkWindow = false;
+});
+
 
 /* main */
-
 if (myChannel == '') {
 	pushMessage({text: frontpage})
 	$('#footer').classList.add('hidden')
@@ -811,4 +827,42 @@ if (myChannel == '') {
 }
 else {
 	join(myChannel)
+}
+
+
+$(window).resize(function(){
+	if (isTheatre) {
+		$("#theatre").css({
+			height: ($(window).height())
+		});
+		$('#link-block').css({
+			position:'absolute',
+			left: ($("#theatre").width() - $('#link-block').width())/2,
+			top: ($("#theatre").height() - $('#link-block').height())/2
+		});
+	}
+	else {
+		$("#theatre").css({
+			height: "0"
+		});
+	}
+});
+
+// To initially run the function:
+$(window).resize();
+
+//AutoResizer
+jQuery.each(jQuery('textarea[data-autoresize]'), function() {
+    var offset = this.offsetHeight - this.clientHeight;
+
+    var resizeTextarea = function(el) {
+        jQuery(el).css('height', 'auto').css('height', el.scrollHeight + offset);
+    };
+    jQuery(this).on('keyup input', function() { resizeTextarea(this); }).removeAttr('data-autoresize');
+});
+
+window.beforeunload = function(){
+  if(isPerformingOperation) {
+    return 'Are you sure you want to leave?';
+  }
 }

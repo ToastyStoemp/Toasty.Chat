@@ -24,6 +24,8 @@ input, textarea {
 	border: none;
 	outline: none;
 	resize: none;
+	-moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 h4 {
@@ -55,7 +57,11 @@ ul {
 	}
 }
 
-.viewer {
+button {
+	width: 100%;
+}
+
+#viewer {
 	width: 70%;
 	height: 100%;
 	position: fixed;
@@ -77,7 +83,7 @@ ul {
 
 #messages {
 	padding-top: 2em;
-	margin-bottom: 42px;
+	margin-bottom: 42px;;
 }
 
 .message {
@@ -107,14 +113,14 @@ ul {
 	margin: 0;
 }
 
-.theatre {
+#theatre {
 	width: 70%;
-	height: 100%;
+	float: left;
 }
 
 #chat {
 	width: 100%;
-	float:right;
+	float: right;
 }
 
 #footer {
@@ -132,6 +138,7 @@ ul {
 	width: 100%;
 	padding: 1em;
 	box-sizing: border-box;
+	padding-bottom: 0em;
 }
 
 .settingsicon {
@@ -154,6 +161,19 @@ ul {
 .sidebar-extra {
 	margin-right: 40px;
 }
+
+#link-block {
+    width: 280px;
+    padding: 1em;
+		display: block;
+		margin: 0 auto;
+}
+
+#link-input {
+	width: 100%;
+	padding: 1em;
+}
+
 
 @media only screen and (max-width: 600px) {
 	.messages {
