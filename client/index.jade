@@ -5,20 +5,18 @@ html
 		meta(charset="utf-8")
 		title hack.chat
 		link(rel="stylesheet", href="/style.css")
+		script(rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css")
 		script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js")
+		script(src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js")
 		link#scheme-link(rel="stylesheet", href="/schemes/solarized.css")
-		
+
 	body
 		theatre#theatre
-			h4 test
-			
+
 		chat#chat
 			nav#sidebar
-				img(src="http://toastystoemp.com/public/gear-icon.png").settingsicon
-				#sidebar-content.hidden
-					p
-						input#pin-sidebar(type="checkbox")
-						label(for="pin-sidebar") Pin sidebar
+				img(src="http://toastystoemp.com/public/settingsicon.png")#settingsicon.settingsicon
+				#sidebar-content.sidebar-extra
 					h4 Settings
 					p
 						input#auto-login(type="checkbox")
@@ -46,10 +44,3 @@ html
 						textarea#chatinput(type="text", autocomplete="off", autofocus)
 
 		script(src="/client.js")
-		script.
-			$(function() {
-				$( "#theatre" ).resizable();
-			});
-			$( "#toggle-viewer" ).click(function(){
-				$( "#theatre" ).slideToggle();
-			});

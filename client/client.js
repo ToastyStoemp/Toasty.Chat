@@ -18,8 +18,10 @@ var frontpage = [
 	"No message history is retained on the toasty.chat server.",
 ].join("\n")
 
-function $(query) {return document.querySelector(query)}
-
+$( "#toggle-viewer" ).click(function(){
+	var toggleWidth = $("#chat").width() == $( document ).width() ? "25%" : "100%";
+	$('#chat').animate({ width: toggleWidth });
+});
 
 function localStorageGet(key) {
 	try {
@@ -83,7 +85,7 @@ function join(channel) {
 
 	ws.onopen = function() {
 		myNick = localStorageGet('my-nick') || ""
-		if (!(!wasConnected && ($('#auto-login').checked) && myNick != ""))
+		if (!(!wasConnected && ($('#auto-login').is(":checked")) && myNick != ""))
 			myNick = prompt('Nickname:', myNick);
 		if (myNick) {
 			localStorageSet('my-nick', myNick)
@@ -181,14 +183,14 @@ var COMMANDS = {
 	onlineAdd: function(args) {
 		var nick = args.nick
 		userAdd(nick)
-		if ($('#joined-left').checked) {
+		if ($('#joined-left').is(":checked")) {
 			pushMessage({nick: '*', text: nick + " joined"})
 		}
 	},
 	onlineRemove: function(args) {
 		var nick = args.nick
 		userRemove(nick)
-		if ($('#joined-left').checked) {
+		if ($('#joined-left').is(":checked")) {
 			pushMessage({nick: '*', text: nick + " left"})
 		}
 	},
@@ -280,7 +282,7 @@ function pushMessage(args) {
 
 	// Scroll to bottom
 	var atBottom = isAtBottom()
-	$('#messages').appendChild(messageEl)
+	$('#messages').append(messageEl)
 	lastMessageElement = messageEl;
 	if (atBottom) {
 		window.scrollTo(0, document.body.scrollHeight)
@@ -573,7 +575,7 @@ $('#footer').onclick = function() {
 	$('#chatinput').focus()
 }
 
-$('#chatinput').onkeydown = function(e) {
+$('#chatinput').keydown(function(e) {
 	if (e.keyCode == 13 /* ENTER */ && !e.shiftKey) {
 		e.preventDefault()
 		// Submit message
@@ -639,15 +641,15 @@ $('#chatinput').onkeydown = function(e) {
 			}
 		}
 	}
-}
+});
 
 
 function updateInputSize() {
 	var atBottom = isAtBottom()
 
-	var input = $('#chatinput')
-	input.style.height = 0
-	input.style.height = input.scrollHeight + 'px'
+	$('#chatinput').css({"height":$("#chatinput").scrollHeight+ "px"})
+	// input.style.height = 0
+	// input.style.height = input.scrollHeight + 'px'
 	document.body.style.marginBottom = $('#footer').offsetHeight + 'px'
 
 	if (atBottom) {
@@ -663,17 +665,19 @@ updateInputSize()
 
 
 /* sidebar */
-
-$('#sidebar').onmouseenter = $('#sidebar').ontouchstart = function(e) {
-	$('#sidebar-content').classList.remove('hidden')
-	e.stopPropagation()
-}
-
-$('#sidebar').onmouseleave = document.ontouchstart = function() {
-	if (!$('#pin-sidebar').checked) {
-		$('#sidebar-content').classList.add('hidden')
+var firstSlide = true;
+$('#settingsicon').click(function () {
+	if (!firstSlide) {
+		$( "#sidebar-content" ).toggle( "fold", {size: "0"} );
+		$( "#sidebar-content" ).toggleClass( "sidebar-extra" );
+		firstSlide = true;
 	}
-}
+	else {
+		 $( "#sidebar-content" ).toggleClass( "sidebar-extra" );
+     $( "#sidebar-content" ).toggle( "fold", {size: "0"} );
+		 firstSlide = false;
+	}
+});
 
 $('#clear-messages').onclick = function() {
 	// Delete children elements
@@ -685,20 +689,13 @@ $('#clear-messages').onclick = function() {
 
 // Restore settings from localStorage
 
-if (localStorageGet('pin-sidebar') == 'true') {
-	$('#pin-sidebar').checked = true
-	$('#sidebar-content').classList.remove('hidden')
-}
 if (localStorageGet('joined-left') == 'false') {
-	$('#joined-left').checked = false
+	$('#joined-left').is(":checked") = false
 }
 if (localStorageGet('auto-login') == 'true') {
-	$('#auto-login').checked = true
+	$('#auto-login').is(":checked") = true
 }
 
-$('#pin-sidebar').onchange = function(e) {
-	localStorageSet('pin-sidebar', !!e.target.checked)
-}
 $('#joined-left').onchange = function(e) {
 	localStorageSet('joined-left', !!e.target.checked)
 }
@@ -719,13 +716,12 @@ function userAdd(nick) {
 	}
 	var userLi = document.createElement('li')
 	userLi.appendChild(user)
-	$('#users').appendChild(userLi)
+	$('#users').append(userLi)
 	onlineUsers.push(nick)
 }
 
 function userRemove(nick) {
-	var users = $('#users')
-	var children = users.children
+	var children = $('#users').children();
 	for (var i = 0; i < children.length; i++) {
 		var user = children[i]
 		if (user.textContent == nick) {
@@ -791,7 +787,7 @@ schemes.forEach(function(scheme) {
 	var option = document.createElement('option')
 	option.textContent = scheme
 	option.value = scheme
-	$('#scheme-selector').appendChild(option)
+	$('#scheme-selector').append(option)
 })
 
 $('#scheme-selector').onchange = function(e) {
