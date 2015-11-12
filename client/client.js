@@ -1,3 +1,4 @@
+$(function() {
 $("#link-block").hide();
 var frontpage = [
 	" __                                                 ",
@@ -866,3 +867,4 @@ window.beforeunload = function(){
     return 'Are you sure you want to leave?';
   }
 }
+});
