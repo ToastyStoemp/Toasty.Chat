@@ -1,5 +1,4 @@
 function ChatClientBase() {
-	this.connectionCounter = 0;
 }
 module.exports = ChatClientBase;
 ChatClientBase.prototype.getId = function() {
