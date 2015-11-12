@@ -5,9 +5,28 @@ var crypto = require('crypto');
 var bot = new (require('./bot.js'))();
 
 
+// Keeps multiple connections for a client
+function MetaClient() {
+	this.clients = [];
+}
+MetaClient.prototype.push = function(client) {
+	this.clients.push(client);
+}
+MetaClient.prototype.remove = function(client) {
+	this.clients.splice(this.clients.indexOf(client), 1);
+}
+MetaClient.prototype.send = function() {
+	var args = arguments;
+	this.clients.forEach(function(c) { c.send.apply(c, args); });
+}
+MetaClient.prototype.setClientConfigurationData = function(channel, nick, trip) {
+	this.channel = channel;
+	this.nick = nick;
+	this.trip = trip;
+};
+
+
 function ChatServerBase() {
-	//this.eventQueue = new (require('./server.EventQueue.js'))();
-	//this.eventQueue.eventLoop();
 	this._connectedClients = {'':0}; // map: channel -> (lowerCaseNick -> ChatClientBase)
 }
 module.exports = function() {
@@ -37,35 +56,33 @@ ChatServerBase.prototype.addClientToChannel = function(channel, client, nick, tr
 		clientsOfChannel = this._connectedClients[channel] = {'':0}; // '' keeps the count of users
 	}
 
-	var existingClient = clientsOfChannel[nick.toLowerCase()];
-	if (existingClient !== void 0) {
-		if (existingClient.trip !== trip)
+	var existingMetaClient = clientsOfChannel[nick.toLowerCase()];
+	if (existingMetaClient !== void 0) {
+		if (existingMetaClient.trip !== trip)
 			return false; // not allowed to log in
-		client.connectionCounter = existingClient.connectionCounter;
 	} else {
 		clientsOfChannel[''] += 1;
-		clientsOfChannel[nick.toLowerCase()] = client;
+		existingMetaClient = clientsOfChannel[nick.toLowerCase()] = new MetaClient();
+		existingMetaClient.setClientConfigurationData(channel, nick, trip); // everything is ok, set data
+		this.broadcast({cmd: 'onlineAdd', nick: nick, trip: trip}, channel);
 	}
 
 	client.setClientConfigurationData(channel, nick, trip); // everything is ok, set data
-	
-	client.connectionCounter += 1;
-	if (client.connectionCounter === 1)
-		this.broadcast({cmd: 'onlineAdd', nick: client.nick, trip: client.trip}, channel);
+
+	existingMetaClient.push(client);
+
 	return true;
 };
 ChatServerBase.prototype.removeClientFromChannel = function(channel, client) {
 	var clientsOfChannel = this._connectedClients[channel];
-	var clientsOfChannel = this._connectedClients[channel];
 	if (clientsOfChannel === void 0) return; // empty - nothing to do
 
-	var client = clientsOfChannel[client.nick.toLowerCase()];
-	if (client !== void 0) {
-		client.connectionCounter -= 1;
-		if (client.connectionCounter <= 0) {
+	var metaClient = clientsOfChannel[client.nick.toLowerCase()];
+	if (metaClient !== void 0) {
+		metaClient.remove(client);
+		if (metaClient.clients.length <= 0) {
 			this.broadcast({cmd: 'onlineRemove', nick: client.nick}, client.channel);
 			delete clientsOfChannel[client.nick.toLowerCase()];
-
 			clientsOfChannel[''] -= 1; // decrease channel count
 			if (clientsOfChannel[''] <= 0) {
 				this._connectedClients[''] -= 1; // decrease user count
