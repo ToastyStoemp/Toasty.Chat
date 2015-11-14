@@ -2,7 +2,7 @@
 This project is worked around the base of https://hack.chat,
 a beautiful project by Andrew Belt (https://github.com/AndrewBelt)
 
-List of contributors:
+List of contributors Hack.Chat:
 * https://github.com/AndrewBelt
 * https://github.com/zckrs
 * https://github.com/jaflo
@@ -11,8 +11,10 @@ List of contributors:
 * https://github.com/WebFreak001
 * https://github.com/marclundgren
 * https://github.com/maxerize
+
+List of contributors Toasty.Chat:
 * https://github.com/ToastyStoemp
-* https://github.com/icetruckde
+* https://github.com/0x17de
 
 ## Local install
 

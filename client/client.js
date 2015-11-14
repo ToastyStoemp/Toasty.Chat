@@ -15,6 +15,10 @@ var frontpage = [
 	"Here is the only channel you will join:",
 	"?programming",
 	"",
+	"You can create any channel you want, just type: ?<Channel Name> behind the url",
+	"",
+	"The chat is now also accessable through IRC, server: chat.toastystoemp.com:6667",
+	"channel: #<Channel Name>"
 	"",
 	"Server and web client released under the GNU General Public License.",
 	"No message history is retained on the toasty.chat server.",
