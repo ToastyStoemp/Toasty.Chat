@@ -846,7 +846,13 @@ jQuery.each(jQuery('textarea[data-autoresize]'), function() {
     var offset = this.offsetHeight - this.clientHeight;
 
     var resizeTextarea = function(el) {
+			// Scroll to bottom
+				var atBottom = isAtBottom()
         jQuery(el).css('height', 'auto').css('height', el.scrollHeight + offset);
+				$('#messages').css('margin-bottom', el.scrollHeight + offset + 5);
+				if (atBottom) {
+					window.scrollTo(0, document.body.scrollHeight)
+				}
     };
     jQuery(this).on('keyup input', function() { resizeTextarea(this); }).removeAttr('data-autoresize');
 });
