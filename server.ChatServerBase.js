@@ -141,6 +141,13 @@ ChatServerBase.prototype.isMod = function(client) {
 	if (this.isAdmin(client)) return true;
 	return this.config.mods && this.config.mods.indexOf(client.trip) >= 0;
 };
+ChatServerBase.prototype.generatePassword = function(nick) {
+	var gPass = "";
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	for(var i=0; i < 21 + nick.length; i++ )
+		gPass += possible.charAt(Math.floor(Math.random() * possible.length));
+	return gPass + "NEW";
+}
 ChatServerBase.prototype.handleCommand = function(command, client, args) {
 	var self = this;
 
@@ -153,7 +160,10 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			var channel = String(args.channel).trim()
 			var nick = String(args.nick).trim();
 			var lowerCaseNick = nick.toLowerCase();
-			var trip = this.hashPassword(String(args.pass));
+
+			// dont allow invalid or empty passwords
+			if ((typeof args.pass) !== 'string' || args.pass === '') args.pass = this.generatePassword(nick);
+			var trip = this.hashPassword(args.pass);
 
 
 			// if (POLICE.frisk(client.getIpAddress(), 2) && !this.) {
