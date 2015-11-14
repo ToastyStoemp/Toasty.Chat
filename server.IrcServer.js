@@ -17,9 +17,9 @@ function ToastyClient(ircClient, channelName) {
 	this.channelName = channelName;
 	this.ircClient = ircClient;
 
-	var data = {cmd:'join', channel: channelName, nick: ircClient.nick};
+	var data = {cmd:'join', channel: channelName, nick: ircClient.nick, pass: ''};
 	if (ircClient.password)
-		data.password = ircClient.password;
+		data.pass = ircClient.password;
 
 	this.ircClient.chatServerBase.onMessage(this, data);
 }

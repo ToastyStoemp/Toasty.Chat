@@ -89,22 +89,11 @@ function join(channel) {
 		if (myNick) {
 			localStorageSet('my-nick', myNick)
 			var nick = myNick.split("#")[0];
-			var pass = myNick.split("#")[1];
-			if (pass === undefined)
-				pass = genPass(nick);
+			var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
 			send({cmd: 'join', channel: channel, nick: nick, pass: pass })
 			myNick = nick;
 		}
 		wasConnected = true
-	}
-
-	function genPass(nick)
-	{
-	    var gPass = "";
-	    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	    for( var i=0; i < 21 - nick.length; i++ )
-	        gPass += possible.charAt(Math.floor(Math.random() * possible.length));
-	    return gPass + "NEW";
 	}
 
 	var pongCheck = setInterval(function() {
