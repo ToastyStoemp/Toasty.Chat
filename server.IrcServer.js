@@ -41,7 +41,6 @@ ToastyClient.prototype._getSystemUser = function() {
 }
 ToastyClient.prototype.send = function(data) {
 	data.time = Date.now(); // Add timestamp to command
-	console.log('ToastyClient.send: '+JSON.stringify(data));
 	switch (data.cmd) {
 		case 'onlineAdd':
 			this.ircClient.write(':'+this._generateIdentifier(data.nick)+' JOIN #'+this.channelName);
@@ -131,11 +130,13 @@ IrcServer.prototype.run = function(chatServerBase) {
 		c.on('end', function() {
 			newIrcClient.close();
 		});
+		c.on('error', function() {
+			newIrcClient.close();
+		});
 	}).listen(this.config.port, this.config.ip);
 	console.log("Started irc server on " + this.config.ip + ":" + this.config.port)
 }
 IrcServer.prototype.handleCommand = function(client, args) {
-	console.log('IrcServer.handleCommand: '+JSON.stringify(args));
 	var command = args[0];
 	switch(command) {
 		case 'CAP':
@@ -211,6 +212,9 @@ IrcServer.prototype.handleCommand = function(client, args) {
 
 			client.chatServerBase.onMessage(toastyClient, {cmd: 'chat', channel: channelName, text: message});
 			return;
+		case 'QUIT':
+			client.close();
+			return;
 	}
 };
 
@@ -234,11 +238,11 @@ IrcClient.prototype.close = function() {
 		this.socket.destroy();
 	for (var i in this.channels)
 		this.channels[i].close(); // cleanup channels
+	this.channels = {};
 	this.channelCount = 0;
 }
 IrcClient.prototype.write = function(data) {
 	if (this.socketClosed) return;
-	console.log('<< '+data); // @DEBUG
 	return this.socket.write(data+'\r\n');
 }
 IrcClient.prototype.getRemoteAddress = function() {
