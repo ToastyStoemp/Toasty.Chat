@@ -20,14 +20,23 @@ function main() {
 	var chatServerBase = require("./server.ChatServerBase.js")();
 	chatServerBase.initialize(config.base);
 
-	var webSocketServer = require("./server.WebSocketServer.js")();
-	webSocketServer.initialize(config.webSocketServer);
-	webSocketServer.run(chatServerBase);
+	if (config.webSocketServer.enabled) {
+		var webSocketServer = require("./server.WebSocketServer.js")();
+		webSocketServer.initialize(config.webSocketServer);
+		webSocketServer.run(chatServerBase);
+	}
+
+	if (config.ircServer.enabled) {
+		var ircServer = require("./server.IrcServer.js")();
+		ircServer.initialize(config.ircServer);
+		ircServer.run(chatServerBase);
+	}
 
 	fs.watchFile(configFileName, {persistent: false}, function() {
 		config = loadConfig(configFileName);
 		chatServerBase.initialize(config.base);
-		webSocketServer.initialize(config.webSocketServer);
+		if (config.webSocketServer.enabled) webSocketServer.initialize(config.webSocketServer);
+		if (config.ircServer.enabled) ircServer.initialize(config.ircServer);
 	});
 }
 

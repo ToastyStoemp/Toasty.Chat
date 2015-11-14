@@ -95,6 +95,7 @@ ChatServerBase.prototype.onClose = function(client) {
 	this.removeClientFromChannel(client.channel, client);
 };
 ChatServerBase.prototype.onMessage = function(client, data) {
+	console.log('ChatServerBase.onMessage: '+JSON.stringify(data));
 	try {
 		if (POLICE.frisk(client.getIpAddress(), 0)) { // probe for rate limit
 			client.send({cmd: 'warn', errCode: 'E001', text: "Your IP is being rate-limited or blocked."});
@@ -105,7 +106,12 @@ ChatServerBase.prototype.onMessage = function(client, data) {
 
 		if (data.length > 65536) return; // ignore large packets
 
-		var args = JSON.parse(data);
+		var args;
+		if ((typeof data) === 'string' || data instanceof String)
+			args = JSON.parse(data);
+		else
+			args = data;
+
 		var cmd = args.cmd;
 		this.handleCommand(cmd, client, args);
 	}
