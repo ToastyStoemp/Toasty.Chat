@@ -156,15 +156,18 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 		case 'ping':
 			client.send({cmd: 'pong'});
 			return;
+		case 'verify':
+				client.send({cmd: 'verify', valid: (args.version == this.config.version)});
+				return;
 		case 'join':
 			var channel = String(args.channel).trim()
 			var nick = String(args.nick).trim();
 			var lowerCaseNick = nick.toLowerCase();
 
 			// dont allow invalid or empty passwords
-			if ((typeof args.pass) !== 'string' || args.pass === '') args.pass = this.generatePassword(nick);
+			if ((typeof args.pass) !== 'string' || args.pass === '')
+				args.pass = this.generatePassword(nick);
 			var trip = this.hashPassword(args.pass);
-
 
 			// if (POLICE.frisk(client.getIpAddress(), 2) && !this.) {
 			// 	send({cmd: 'warn', errCode: 'E002', text: "You are joining channels too fast. Wait a moment and try again."}, this)
@@ -295,7 +298,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			case 'kick':
 				var nick = String(args.nick)
 				if (!client.channel) return;
-				
+
 				var badClient = this.getClientsOfChannel(client.channel)[nick.toLowerCase()];
 				if (!badClient) {
 					client.send({cmd: 'warn', errCode: 'E009', text: "Could not find " + nick});
@@ -347,7 +350,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 				POLICE.stfu(badClient.getIpAddress(), args.time);
 				console.log(client.nick + " [" + client.trip + "] muted " + nick + " in " + client.channel);
 				this.broadcast({cmd: 'info', infoCode: 'I004', nick: nick, text: "Muted " + nick}, client.channel);
-				
+
 				return;
 		}
 	}
@@ -358,7 +361,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			case 'listUsers':
 				var channelNames = this.getChannelNames();
 				var clientCount = 0;
-				
+
 				var lines = [];
 				channelNames.sort();
 				channelNames.forEach(function(channel) {

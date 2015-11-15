@@ -1,4 +1,8 @@
 $(function() {
+
+	//UPDATE THIS ON EVERY COMMIT
+	var versionNumber = '201511140002';
+
 $("#link-block").hide();
 var frontpage = [
 	" __                                                 ",
@@ -18,7 +22,7 @@ var frontpage = [
 	"You can create any channel you want, just type: ?<Channel Name> behind the url",
 	"",
 	"The chat is now also accessable through IRC, server: chat.toastystoemp.com:6667",
-	"channel: #<Channel Name>"
+	"channel: #<Channel Name>",
 	"",
 	"Server and web client released under the GNU General Public License.",
 	"No message history is retained on the toasty.chat server.",
@@ -81,24 +85,12 @@ function join(channel) {
 		ws = new WebSocket('ws://' + document.domain + ':6060')
 	}
 
-	var wasConnected = false
 	var lastPong = new Date();
 
 	ws.onopen = function() {
-		myNick = localStorageGet('my-nick') || ""
-		if (!(!wasConnected && ($('#auto-login').is(":checked")) && myNick != "")){
-			$("#link-block").hide();
-			myNick = prompt('Nickname:', myNick);
-		}
-		if (myNick) {
-			localStorageSet('my-nick', myNick)
-			var nick = myNick.split("#")[0];
-			var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
-			send({cmd: 'join', channel: channel, nick: nick, pass: pass })
-			myNick = nick;
-		}
-		wasConnected = true
+		send({cmd: 'verify', version: versionNumber })
 	}
+
 
 	var pongCheck = setInterval(function() {
 		var secondsSinceLastPong = (lastPong - new Date()) / 1000;
@@ -122,7 +114,7 @@ function join(channel) {
 		pushMessage({nick: '!', text: "Disconnected. Waiting for "+Math.floor(timeout/1000)+" seconds till retry ("+joinTryCount+").", elementId: 'disconnect_message', replaceIfSameAsLast: true});
 
 		window.setTimeout(function() {
-			join(channel)
+			join(this.channel)
 		}, timeout)
 	}
 
@@ -138,10 +130,33 @@ function join(channel) {
 	}
 }
 
+var wasConnected = false;
+function connect(channel)
+{
+	myNick = localStorageGet('my-nick') || ""
+	if (!(!wasConnected && ($('#auto-login').is(":checked")) && myNick != "")){
+		$("#link-block").hide();
+		myNick = prompt('Nickname:', myNick);
+	}
+	if (myNick) {
+		localStorageSet('my-nick', myNick)
+		var nick = myNick.split("#")[0];
+		var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
+		send({cmd: 'join', channel: channel, nick: nick, pass: pass})
+		myNick = nick;
+	}
+	wasConnected = true
+}
 
 var COMMANDS = {
 	pong: function(args) {
 		// nothing to do
+	},
+	verify: function(args) {
+		if (args.valid == true)
+			connect(myChannel);
+		else
+			pushMessage({nick: 'warn', errCode: 'E000', text: "You have an outdated client, CTRL + F5 to load the latest verison"});
 	},
 	chat: function(args) {
 		if (ignoredUsers.indexOf(args.nick) >= 0) {
