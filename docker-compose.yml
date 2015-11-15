@@ -1,0 +1,17 @@
+web:
+   build: .
+   ports:
+    - "8080:8080"
+   volumes:
+    - .:/data
+   command: bash -c "cd /data/client; if [ ! -x index.html ]; then jade index.jade; fi; http-server"
+
+chat:
+   build: .
+   ports:
+    - "6060:6060"
+    - "6667:6667"
+   volumes:
+    - .:/data
+   command: bash -c "cd /data; if [ ! -x node_modules ]; then npm install; fi; nodejs server.js"
+
