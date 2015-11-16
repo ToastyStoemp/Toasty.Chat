@@ -2,7 +2,6 @@
 /* jshint esnext: true */
 
 var crypto = require('crypto');
-var bot = new (require('./bot.js'))();
 
 
 // Keeps multiple connections for a client
@@ -28,6 +27,7 @@ MetaClient.prototype.setClientConfigurationData = function(channel, nick, trip) 
 
 function ChatServerBase() {
 	this._connectedClients = {'':0}; // map: channel -> (lowerCaseNick -> ChatClientBase)
+	this.bot = new (require('./bot.js'))(this);
 }
 module.exports = function() {
 	return new ChatServerBase();
@@ -238,7 +238,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			if (this.isAdmin(client)) data.admin = true;
 
 			this.broadcast(data, client.channel);
-			bot.send = function(text)
+			this.bot.send = function(text)
 			{
 				var botData = {
 				  cmd: 'chat',
@@ -247,7 +247,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 				};
 				self.broadcast(botData, client.channel);
 			}
-			bot.parseCmd(data);
+			this.bot.parseCmd(data);
 
 			return;
 		case 'invite':
