@@ -2,7 +2,7 @@ var userIgnore; // public function
 $(function() {
 
 	//UPDATE THIS ON EVERY COMMIT
-	var versionNumber = '201511200004';
+	var versionNumber = '201511200006';
 
 $("#link-block").hide();
 var frontpage = [
@@ -152,7 +152,6 @@ function connect(channel)
 		localStorageSet('my-nick', myNick)
 		var nick = myNick.split("#")[0];
 		var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
-		if (nick == 'M4GNV5') nick = 'Komputar_Kid';
 		send({cmd: 'join', channel: channel, nick: nick, pass: pass})
 		myNick = nick;
 	}
@@ -278,6 +277,8 @@ function pushMessage(args, usePre) {
 				tripEl.textContent = "Admin ";
 			else if (args.trip.substr(0,6) == "KFbgGV")
 				tripEl.textContent = "00010111 ";
+			else if (args.trip.substr(0,6) == "fen7JY")
+				tripEl.textContent = "3600 ";
 			else
 				tripEl.textContent = args.trip.substr(0,6) + " "
 			tripEl.classList.add('trip')
@@ -866,6 +867,10 @@ else {
 	join(myChannel)
 }
 
+window.onbeforeunload = confirmExit;
+function confirmExit() {
+	return "You have attempted to leave this page. Are you sure?";
+}
 
 $(window).resize(function(){
 	if (isTheatre) {

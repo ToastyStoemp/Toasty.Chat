@@ -254,7 +254,11 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 				};
 				self.broadcast(botData, client.channel);
 			}
-			this.bot.parseCmd(data);
+			try {
+				this.bot.parseCmd(data);
+			} catch(e) {
+				console.warn(e.stack);
+			}
 
 			return;
 		case 'invite':
