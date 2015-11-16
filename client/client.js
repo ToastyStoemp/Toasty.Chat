@@ -289,22 +289,27 @@ function pushMessage(args, usePre) {
 
 	// Text
 	var textEl;
+	var parsedMd;
 	if(usePre !== false) {
 		textEl = document.createElement('pre')
 		textEl.textContent = args.text || ''
+		var parsedMd = markdown.toHTML(textEl.innerHTML);
 	}
 	else {
 		textEl = document.createElement('div')
 		textEl.innerHTML = args.text || ''
+		parsedMd = textEl.innerHTML;
 	}
-	textEl.classList.add('text')
+	textEl.classList.add('text');
 
 	links = [];
-	//textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks)
 
-	textEl.innerHTML = markdown.toHTML(textEl.innerHTML);
+	if(parsedMd == textEl.innerHTML)
+		textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks);
+	else
+		textEl.innerHTML = parsedMd;
 
-	messageEl.appendChild(textEl)
+	messageEl.appendChild(textEl);
 
 	if (links.length != 0) {
 		messageEl.appendChild(parseMedia());
@@ -322,6 +327,7 @@ function pushMessage(args, usePre) {
 	if (args.nick != '*')
 		unread += 1
 	updateTitle()
+	$(".text img").css("max-width", $(".text").width());
 }
 
 
