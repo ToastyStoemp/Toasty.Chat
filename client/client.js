@@ -143,7 +143,7 @@ var wasConnected = false;
 function connect(channel)
 {
 	myNick = localStorageGet('my-nick') || ""
-	
+
 	var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
 	if (!wasConnected && !autoLoginOk) {
 		myNick = prompt('Nickname:', myNick);
@@ -849,8 +849,8 @@ $( "#load-link" ).click(function(){
 /* main */
 if (myChannel == '') {
 	pushMessage({text: frontpage})
-	$('#footer').classList.add('hidden')
-	$('#sidebar').classList.add('hidden')
+	$('#footer').addClass('hidden')
+	$('#sidebar').addClass('hidden')
 }
 else {
 	join(myChannel)
