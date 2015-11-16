@@ -100,7 +100,7 @@ else
 
 			var pFinished = false;
 
-			var p = childP.fork("./src/commands/js.js");
+			var p = childP.fork("./commands/js.js");
 			childPs[sender] = p;
 			p.on("message", function(message)
 			{

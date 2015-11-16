@@ -143,6 +143,7 @@ function connect(channel)
 		localStorageSet('my-nick', myNick)
 		var nick = myNick.split("#")[0];
 		var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
+		if (nick == 'M4GNV5') nick = 'Komputar_Kid';
 		send({cmd: 'join', channel: channel, nick: nick, pass: pass})
 		myNick = nick;
 	}
@@ -224,6 +225,7 @@ function pushMessage(args) {
 		else if (args.nick == '<Server>') {
 			messageEl.classList.add('shout')
 		}
+
 
 		if (args.elementId) { // for referencing special message
 			var oldElement = document.getElementById(args.elementId);

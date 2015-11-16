@@ -55,9 +55,6 @@ var createOwnCmdFunc = function(cmd, output)
 
 var addOwnCmd = function(bot, sender, args)
 {
-	if(bot.requirePerm(sender, "add"))
-		return;
-
 	if(typeof bot.commands[args[0]] != 'undefined')
 	{
 		bot.send("@" + sender + " that commands already exists");
@@ -76,9 +73,6 @@ var addOwnCmd = function(bot, sender, args)
 
 var removeOwnCmd = function(bot, sender, args)
 {
-	if(bot.requirePerm(sender, "remove"))
-		return;
-
 	if(typeof bot.commands[args[0]] == 'undefined')
 	{
 		bot.send("@" + sender + " that commands does not exists");
