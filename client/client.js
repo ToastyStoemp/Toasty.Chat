@@ -1,3 +1,4 @@
+var userIgnore; // public function
 $(function() {
 
 	//UPDATE THIS ON EVERY COMMIT
@@ -717,10 +718,7 @@ function userRemove(nick) {
 }
 
 function usersClear() {
-	var users = $('#users')
-	while (users.firstChild) {
-		users.removeChild(users.firstChild)
-	}
+	$('#users li').remove();
 	onlineUsers.length = 0
 }
 
@@ -728,7 +726,8 @@ function userInvite(nick) {
 	send({cmd: 'invite', nick: nick})
 }
 
-function userIgnore(nick) {
+// set global var
+userIgnore = function(nick) {
 	ignoredUsers.push(nick)
 }
 
