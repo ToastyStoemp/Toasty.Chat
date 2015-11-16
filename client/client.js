@@ -110,13 +110,21 @@ function join(channel) {
 		} else {
 			joinTryCount++; // Caused by connection error
 		}
-		var timeout = calculateRejoinTimeout();
+		var timeout = calculateRejoinTimeout() / 1000;
 
-		pushMessage({nick: '!', text: "Disconnected. Waiting for "+Math.floor(timeout/1000)+" seconds till retry ("+joinTryCount+").", elementId: 'disconnect_message', replaceIfSameAsLast: true});
+		pushMessage({nick: '!', text: "Disconnected. Waiting for <span id=\"reconnectTimer\">"+timeout+"</span> seconds till retry ("+joinTryCount+").", elementId: 'disconnect_message', replaceIfSameAsLast: true}, false);
 
-		window.setTimeout(function() {
-			join(this.channel)
-		}, timeout)
+		var timerEl = document.getElementById("reconnectTimer");
+		var reconnectInterval = window.setInterval(function() {
+			timeout -= 1;
+			timerEl.innerHTML = timeout;
+
+			if(timeout <= 0) {
+				clearInterval(reconnectInterval);
+				timerEl.id = "oldReconnectTimer";
+				join(this.channel);
+			}
+		}, 1000)
 	}
 
 	ws.onmessage = function(message) {
@@ -207,7 +215,7 @@ var COMMANDS = {
 
 var lastPoster = "";
 
-function pushMessage(args) {
+function pushMessage(args, usePre) {
 	var messageEl = document.createElement('div')
 		messageEl.classList.add('message')
 		if (args.admin) {
@@ -277,11 +285,18 @@ function pushMessage(args) {
 		}
 
 	// Text
-	var textEl = document.createElement('pre')
+	var textEl;
+	if(usePre !== false) {
+		textEl = document.createElement('pre')
+		textEl.textContent = args.text || ''
+	}
+	else {
+		textEl = document.createElement('div')
+		textEl.innerHTML = args.text || ''
+	}
 	textEl.classList.add('text')
 
 	links = [];
-	textEl.textContent = args.text || ''
 	textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks)
 
 	messageEl.appendChild(textEl)
