@@ -135,8 +135,9 @@ var wasConnected = false;
 function connect(channel)
 {
 	myNick = localStorageGet('my-nick') || ""
-	if (!(!wasConnected && ($('#auto-login').is(":checked")) && myNick != "")){
-		$("#link-block").hide();
+	
+	var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
+	if (!wasConnected && !autoLoginOk) {
 		myNick = prompt('Nickname:', myNick);
 	}
 	if (myNick) {
@@ -147,6 +148,7 @@ function connect(channel)
 		send({cmd: 'join', channel: channel, nick: nick, pass: pass})
 		myNick = nick;
 	}
+	// if !myNick: do nothing - reload continued to try again
 	wasConnected = true
 }
 
