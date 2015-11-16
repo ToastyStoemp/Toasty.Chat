@@ -2,7 +2,7 @@ var userIgnore; // public function
 $(function() {
 
 	//UPDATE THIS ON EVERY COMMIT
-	var versionNumber = '201511200003';
+	var versionNumber = '201511200004';
 
 $("#link-block").hide();
 var frontpage = [
@@ -266,6 +266,8 @@ function pushMessage(args, usePre) {
 				tripEl.textContent = "Admin ";
 			else if (args.trip.substr(0,6) == "KFbgGV")
 				tripEl.textContent = "00010111 ";
+			else if(args.trip.substr(0, 6) == "sVZeuG")
+				tripEl.textContent = "M4GNV5 ";
 			else
 				tripEl.textContent = args.trip.substr(0,6) + " "
 			tripEl.classList.add('trip')
