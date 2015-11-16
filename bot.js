@@ -3,7 +3,8 @@ var path = require("path");
 var events = require("events");
 var util = require('util');
 
-function Bot() {
+function Bot(chatServerBase) {
+  this.chatServerBase = chatServerBase;
   events.EventEmitter.call(this);
   var that = this;
   fs.readdir("./commands", function(err, files) {
