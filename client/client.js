@@ -2,7 +2,7 @@ var userIgnore; // public function
 $(function() {
 
 	//UPDATE THIS ON EVERY COMMIT
-	var versionNumber = '201511200003';
+	var versionNumber = '201511200004';
 
 $("#link-block").hide();
 var frontpage = [
