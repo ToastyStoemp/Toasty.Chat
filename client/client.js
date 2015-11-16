@@ -432,7 +432,7 @@ function createvideoElement(link, media) {
 
 function createYouTubeElement(link, media) {
   var iframe = document.createElement('iframe')
-  iframe.setAttribute('src', "http://www.youtube.com/embed/" + link + "?version=3&enablejsapi=1");
+  iframe.setAttribute('src', "https://www.youtube.com/embed/" + link + "?version=3&enablejsapi=1");
   iframe.setAttribute('width', "640");
   iframe.setAttribute('height', "385");
   iframe.setAttribute('frameborder', "0");
