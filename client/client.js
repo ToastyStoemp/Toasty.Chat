@@ -2,7 +2,7 @@ var userIgnore; // public function
 $(function() {
 
 	//UPDATE THIS ON EVERY COMMIT
-	var versionNumber = '201511200004';
+	var versionNumber = '201511200005';
 
 $("#link-block").hide();
 var frontpage = [
@@ -143,7 +143,7 @@ var wasConnected = false;
 function connect(channel)
 {
 	myNick = localStorageGet('my-nick') || ""
-	
+
 	var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
 	if (!wasConnected && !autoLoginOk) {
 		myNick = prompt('Nickname:', myNick);
@@ -152,7 +152,6 @@ function connect(channel)
 		localStorageSet('my-nick', myNick)
 		var nick = myNick.split("#")[0];
 		var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
-		if (nick == 'M4GNV5') nick = 'Komputar_Kid';
 		send({cmd: 'join', channel: channel, nick: nick, pass: pass})
 		myNick = nick;
 	}
@@ -268,8 +267,8 @@ function pushMessage(args, usePre) {
 				tripEl.textContent = "Admin ";
 			else if (args.trip.substr(0,6) == "KFbgGV")
 				tripEl.textContent = "00010111 ";
-			else if(args.trip.substr(0, 6) == "sVZeuG")
-				tripEl.textContent = "M4GNV5 ";
+			else if (args.trip.substr(0,6) == "fen7JY")
+				tripEl.textContent = "3600 ";
 			else
 				tripEl.textContent = args.trip.substr(0,6) + " "
 			tripEl.classList.add('trip')
