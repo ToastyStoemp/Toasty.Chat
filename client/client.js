@@ -2,7 +2,7 @@ var userIgnore; // public function
 $(function() {
 
 	//UPDATE THIS ON EVERY COMMIT
-	var versionNumber = '201511140002';
+	var versionNumber = '201511200003';
 
 $("#link-block").hide();
 var frontpage = [
@@ -79,7 +79,7 @@ function join(channel) {
 
 	if (document.domain == 'chat.toastystoemp.com') {
 		// For http://toastystoemp.com/
-		ws = new WebSocket('ws://chat.toastystoemp.com/chatws')
+		ws = new WebSocket('wss://chat.toastystoemp.com/chatws')
 	}
 	else {
 		// for local installs
