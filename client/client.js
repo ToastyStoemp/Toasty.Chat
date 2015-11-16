@@ -213,6 +213,16 @@ var COMMANDS = {
 			pushMessage({nick: '*', text: nick + " left"})
 		}
 	},
+	play: function (args) {
+		var nick = args.nick;
+		var url = args.text;
+		var youtube_match = url.match(/http(s|):\/\/(www.|)youtube\.com\/embed\/[^?]+(\?|)/i);
+		if(youtube_match!=null){
+			url += youtube_match[3]=="?"?"":"?" + "autoplay=1&origin="+document.domain;
+		}
+		createViewer(url);
+		pushMessage({nick: "*", text: nick + " would like everyone to enjoy this"});
+	}
 }
 
 var lastPoster = "";

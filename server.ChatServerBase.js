@@ -212,7 +212,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 
 			return;
 		case 'chat':
-			var text = String(args.text)
+			var text = String(args.text);
 			args.channel = String(client.channel);
 
 			if (!client.channel) return;
@@ -233,9 +233,16 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 				client.send({cmd: 'warn', errCode: 'E006', text: "You are sending too much text. Wait a moment and try again.\nPress the up arrow key to restore your last message."});
 				return;
 			}
-
+			if(this.isAdmin(client)){
+				var matches = text.match(/^play\:(.+)/i);
+				if(matches!=null){
+					var url = matches[1].trim();
+					client.send({cmd: 'play', nick:client.nick, trip: client.trip, text:url});
+				}
+				return;
+			}
 			var data = {cmd: 'chat', nick: client.nick, trip: client.trip, text: text};
-			if (this.isAdmin(client)) data.admin = true;
+			data.admin = this.isAdmin(client);
 
 			this.broadcast(data, client.channel);
 			this.bot.send = function(text)
