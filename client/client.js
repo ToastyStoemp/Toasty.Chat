@@ -2,7 +2,7 @@ var userIgnore; // public function
 $(function() {
 
 	//UPDATE THIS ON EVERY COMMIT
-	var versionNumber = '201511200005';
+	var versionNumber = '201511200006';
 
 $("#link-block").hide();
 var frontpage = [
@@ -143,7 +143,7 @@ var wasConnected = false;
 function connect(channel)
 {
 	myNick = localStorageGet('my-nick') || ""
-	
+
 	var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
 	if (!wasConnected && !autoLoginOk) {
 		myNick = prompt('Nickname:', myNick);
@@ -857,6 +857,10 @@ else {
 	join(myChannel)
 }
 
+window.onbeforeunload = confirmExit;
+function confirmExit() {
+	return "You have attempted to leave this page. Are you sure?";
+}
 
 $(window).resize(function(){
 	if (isTheatre) {
