@@ -1,24 +1,22 @@
 var fs = require('fs');
 
-function loadConfig(filename) {
-	var config = null;
+function loadFile(filename) {
+	var file = null;
 
-	try {
-		config = JSON.parse(fs.readFileSync(filename, 'utf8'));
-		console.log("Loaded config '" + filename + "'");
-	} catch (e) {
-		console.warn(e);
-	}
-
-	return config;
+	file = fs.readFileSync(filename, 'utf8');
+	console.log("Loaded '" + filename + "'");
+	return file;
 }
 
 function main() {
 	var configFileName = "config.json";
-	var config = loadConfig(configFileName);
+	var versionFileName = "./client/version.js"
+	var config = JSON.parse(loadFile(configFileName));
+	var version = loadFile(versionFileName).match(/"([0-9]+)"/)[1];
+	console.log("Running version " + version);
 
 	var chatServerBase = require("./server.ChatServerBase.js")();
-	chatServerBase.initialize(config.base);
+	chatServerBase.initialize(config.base, version);
 
 	if (config.webSocketServer.enabled) {
 		var webSocketServer = require("./server.WebSocketServer.js")();
@@ -33,11 +31,18 @@ function main() {
 	}
 
 	fs.watchFile(configFileName, {persistent: false}, function() {
-		config = loadConfig(configFileName);
-		chatServerBase.initialize(config.base);
+		config = JSON.parse(loadFile(configFileName));
+                chatServerBase.initialize(config.base, version);
 		if (config.webSocketServer.enabled) webSocketServer.initialize(config.webSocketServer);
 		if (config.ircServer.enabled) ircServer.initialize(config.ircServer);
 	});
+	fs.watchFile(versionFileName, {persistent: false}, function() {
+                version = loadFile(versionFileName).match(/"([0-9]+)"/)[1];
+		console.log("Running version " + version);
+                chatServerBase.initialize(config.base, version);
+                if (config.webSocketServer.enabled) webSocketServer.initialize(config.webSocketServer);
+                if (config.ircServer.enabled) ircServer.initialize(config.ircServer);
+        });
 }
 
 main();

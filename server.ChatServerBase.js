@@ -32,8 +32,9 @@ function ChatServerBase() {
 module.exports = function() {
 	return new ChatServerBase();
 };
-ChatServerBase.prototype.initialize = function(config) {
+ChatServerBase.prototype.initialize = function(config, version) {
 	this.config = config;
+	this.version = version;
 }
 ChatServerBase.prototype.getEventQueue = function() {
 	return this.eventQueue;
@@ -157,7 +158,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			client.send({cmd: 'pong'});
 			return;
 		case 'verify':
-				client.send({cmd: 'verify', valid: (args.version == this.config.version)});
+				client.send({cmd: 'verify', valid: (args.version == this.version)});
 				return;
 		case 'join':
 			var channel = String(args.channel).trim()

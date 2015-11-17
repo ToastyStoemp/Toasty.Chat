@@ -1,8 +1,6 @@
 var userIgnore; // public function
 $(function() {
 
-	//UPDATE THIS ON EVERY COMMIT
-	var versionNumber = '201511200006';
 
 $("#link-block").hide();
 var frontpage = [
@@ -89,7 +87,7 @@ function join(channel) {
 	var lastPong = new Date();
 
 	ws.onopen = function() {
-		send({cmd: 'verify', version: versionNumber })
+		send({cmd: 'verify', version: webClientVersion});
 	}
 
 
@@ -307,6 +305,8 @@ function pushMessage(args, usePre) {
 	links = [];
 	textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks)
 
+	//textEl.innerHTML = markdown.toHTML(textEl.innerHTML);
+
 	messageEl.appendChild(textEl)
 
 	if (links.length != 0) {
@@ -330,12 +330,15 @@ function pushMessage(args, usePre) {
 
 function insertAtCursor(text) {
 	var input = $('#chatinput')
-	var start = input.val().length || 0
+	var start = input[0].selectionStart || input.val().length || 0;
 	var before = input.val().substr(0, start)
 	var after = input.val().substr(start)
 	before += text
 
 	input.val(before + after);
+	
+	if (input[0].selectionStart)
+		input[0].selectionEnd = input[0].selectionStart = before.length;
 }
 
 
@@ -713,38 +716,36 @@ $('#auto-login').change(function(e) {
 
 // User list
 
-var onlineUsers = []
-var ignoredUsers = []
+var onlineUsers = [];
+var ignoredUsers = [];
 
 function userAdd(nick) {
-	var user = document.createElement('a')
-	user.textContent = nick
-	user.onclick = function(e) {
-		userInvite(nick)
+	var user = document.createElement('a');
+	user.textContent = nick;
+	user.onclick = function(e){
+		userInvite(nick);
 	}
-	var userLi = document.createElement('li')
-	userLi.appendChild(user)
-	$('#users').append(userLi)
-	onlineUsers.push(nick)
+	var userLi = document.createElement('li');
+	userLi.appendChild(user);
+	$('#users').append(userLi);
+	onlineUsers.push(nick);
 }
 
 function userRemove(nick) {
 	var children = $('#users').children();
 	for (var i = 0; i < children.length; i++) {
-		var user = children[i]
-		if (user.textContent == nick) {
-			users.removeChild(user)
-		}
+		var user = children[i];
+		if (user.textContent == nick)
+			users.removeChild(user);
 	}
 	var index = onlineUsers.indexOf(nick)
-	if (index >= 0) {
-		onlineUsers.splice(index, 1)
-	}
+	if (index >= 0)
+		onlineUsers.splice(index, 1);
 }
 
 function usersClear() {
 	$('#users li').remove();
-	onlineUsers.length = 0
+	onlineUsers.length = 0;
 }
 
 function userInvite(nick) {
@@ -753,7 +754,7 @@ function userInvite(nick) {
 
 // set global var
 userIgnore = function(nick) {
-	ignoredUsers.push(nick)
+	ignoredUsers.push(nick);
 }
 
 /* color scheme switcher */
@@ -842,7 +843,10 @@ function createViewer(link) {
 }
 
 $( "#toggle-viewer" ).click(function(){
+	var atBottom = isAtBottom()
 	handleViewer();
+	if (atBottom)
+                window.scrollTo(0, document.body.scrollHeight);
 });
 
 $( "#load-link" ).click(function(){
