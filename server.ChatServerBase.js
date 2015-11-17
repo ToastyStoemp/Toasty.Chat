@@ -234,14 +234,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 				client.send({cmd: 'warn', errCode: 'E006', text: "You are sending too much text. Wait a moment and try again.\nPress the up arrow key to restore your last message."});
 				return;
 			}
-			if(this.isAdmin(client)){
-				var matches = text.match(/^play\:(.+)/i);
-				if(matches!=null){
-					var url = matches[1].trim();
-					client.send({cmd: 'play', nick:client.nick, trip: client.trip, text:url});
-				}
-				return;
-			}
+
 			var data = {cmd: 'chat', nick: client.nick, trip: client.trip, text: text};
 			data.admin = this.isAdmin(client);
 
@@ -370,6 +363,10 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 	// Commands usable by all admins
 	if (this.isAdmin(client)) {
 		switch (command) {
+			case 'play':
+				var url = args.url.trim();
+				client.send({cmd: 'play', nick:client.nick, trip: client.trip, url:url});
+				return;
 			case 'listUsers':
 				var channelNames = this.getChannelNames();
 				var clientCount = 0;

@@ -1,4 +1,5 @@
 var userIgnore; // public function
+var send;
 $(function() {
 
 
@@ -212,7 +213,7 @@ var COMMANDS = {
 	},
 	play: function (args) {
 		var nick = args.nick;
-		createViewer("https://www.youtube.com/embed/"+parse_yturl(args.text)+"?autoplay=1&origin="+document.domain);
+		handleViewer("https://www.youtube.com/embed/"+parse_yturl(args.url)+"?autoplay=1&origin="+document.domain);
 		pushMessage({nick: "*", text: nick + " would like everyone to enjoy this"});
 	}
 }
@@ -336,13 +337,13 @@ function insertAtCursor(text) {
 	before += text
 
 	input.val(before + after);
-	
+
 	if (input[0].selectionStart)
 		input[0].selectionEnd = input[0].selectionStart = before.length;
 }
 
 
-function send(data) {
+send = function(data) {
 	if (ws && ws.readyState == ws.OPEN) {
 		ws.send(JSON.stringify(data))
 	}
