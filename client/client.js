@@ -250,10 +250,6 @@ function pushMessage(args, usePre) {
 				oldElement.parentNode.removeChild(oldElement);
 		}
 
-		//Mentioning
-		if (args.text.indexOf("@" + myNick) != -1 || args.text.indexOf("@*") != -1)
-        messageEl.classList.add('mention');
-
 		// Nickname
 		var nickSpanEl = document.createElement('span')
 		if (args.trip && !args.admin)
@@ -304,7 +300,21 @@ function pushMessage(args, usePre) {
 
 	//textEl.innerHTML = markdown.toHTML(textEl.innerHTML);
 
-	messageEl.appendChild(textEl)
+	messageEl.appendChild(textEl);
+
+	//Mentioning
+	if (args.text.indexOf("@" + myNick) != -1 || args.text.indexOf("@*") != -1)
+			messageEl.classList.add('mention');
+	else if (!(args.nick == '!' || args.nick == '*' || args.nick == '<Server>')) {
+		for(var nick in onlineUsers) {
+			if (args.text.indexOf(nick) != -1) {
+				var user = document.createElement('span');
+				user.textContent = "@" + nick;
+				user.style.color = onlineUsers[nick];
+				textEl.outerHTML = textEl.outerHTML.replace("@" + nick, user.outerHTML);
+			}
+		}
+	}
 
 	if (links.length != 0) {
 		messageEl.appendChild(parseMedia());
@@ -343,6 +353,13 @@ send = function(data) {
 	if (ws && ws.readyState == ws.OPEN) {
 		ws.send(JSON.stringify(data))
 	}
+}
+
+function parseNicks(g0) {
+	var a = document.createElement('a')
+	a.innerHTML = g0
+	a.style.color = onlineUsers[args.nick];
+	return a.outerHTML
 }
 
 function parseLinks(g0) {
@@ -661,11 +678,16 @@ $('#chatinput').keydown(function(e) {
 		if (index >= 0) {
 			var stub = text.substring(index + 1, pos).toLowerCase()
 			// Search for nick beginning with stub
-			var nicks = onlineUsers.filter(function(nick) {
-				return nick.toLowerCase().indexOf(stub) == 0
-			})
+			// var nicks = onlineUsers.filter(function(nick) {
+			// 	return nick.toLowerCase().indexOf(stub) == 0
+			// })
+			var nicks = [];
+			for (var nick in onlineUsers){
+				if (nick.toLowerCase().indexOf(stub) == 0)
+					nicks.push(nick);
+			}
 			if (nicks.length == 1) {
-				insertAtCursor(nicks[0].substr(stub.length) + " ")
+				insertAtCursor(nicks[0].substr(stub.length) + " ");
 			}
 		}
 	}
