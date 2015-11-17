@@ -934,7 +934,7 @@ jQuery.each(jQuery('textarea[data-autoresize]'), function() {
 });
 
 window.beforeunload = function(){
-  if(isPerformingOperation) {
+  if(isPerformingOperation && wasConnected) {
     return 'Are you sure you want to leave?';
   }
 }
