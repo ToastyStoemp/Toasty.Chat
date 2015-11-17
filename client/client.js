@@ -214,7 +214,7 @@ var COMMANDS = {
 
 var lastPoster = "";
 
-function pushMessage(args, usePre) {
+function pushMessage(args, usePre, ignoreMarkdown) {
 	var messageEl = document.createElement('div')
 		messageEl.classList.add('message')
 		if (args.admin) {
@@ -287,6 +287,7 @@ function pushMessage(args, usePre) {
 
 	// Text
 	var textEl;
+	var parsedMd;
 	if(usePre !== false) {
 		textEl = document.createElement('pre')
 		textEl.textContent = args.text || ''
@@ -295,14 +296,18 @@ function pushMessage(args, usePre) {
 		textEl = document.createElement('div')
 		textEl.innerHTML = args.text || ''
 	}
-	textEl.classList.add('text')
+	textEl.classList.add('text');
+
+	var content = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks);
+
+	if(ignoreMarkdown !== false)
+		content = basicMarkdown(content);
+
+	textEl.innerHTML = content;
 
 	links = [];
-	textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks)
 
-	//textEl.innerHTML = markdown.toHTML(textEl.innerHTML);
-
-	messageEl.appendChild(textEl)
+	messageEl.appendChild(textEl);
 
 	if (links.length != 0) {
 		messageEl.appendChild(parseMedia());
@@ -331,7 +336,7 @@ function insertAtCursor(text) {
 	before += text
 
 	input.val(before + after);
-	
+
 	if (input[0].selectionStart)
 		input[0].selectionEnd = input[0].selectionStart = before.length;
 }
@@ -356,6 +361,38 @@ function parseLinks(g0) {
 		links.push(g0);
 	}
 	return a.outerHTML
+}
+
+function basicMarkdown(src) {
+
+	function formatMd(startLen, endLen, start, end) {
+		return function(val) {
+			return start + val.substring(startLen, val.length - endLen) + end;
+		};
+	}
+
+	src = src.replace(/\*\*[^*]+\*\*/g, formatMd(2, 2, "<b>", "</b>"));
+	src = src.replace(/\*[^*]+\*/g, formatMd(1, 1, "<i>", "</i>"));
+	src = src.replace(/\#\#\#[^\n]+/g, formatMd(3, 0, "<h5>", "</h5>"));
+	src = src.replace(/\#\#[^\n]+/g, formatMd(2, 0, "<h3>", "</h3>"));
+	src = src.replace(/\#[^\n]+/g, formatMd(1, 0, "<h1>", "</h1>"));
+	src = src.replace(/```[^```]+```/g, parseCode);
+
+	return src;
+}
+
+//https://github.com/ToastyStoemp/Hack.Chat-Enhancement-kit/blob/master/Chrome/src/main.js#L384-L393
+function parseCode(code) {
+	var codeEl = document.createElement('code')
+	codeEl.innerHTML = code.substr(4, code.length - 8);
+	var lineCount = code.split(/\r\n|\r|\n/).length;
+
+	if (lineCount > 15)
+		codeEl.classList.add('largeScript');
+	else
+		codeEl.classList.add('script');
+
+	return codeEl.outerHTML;
 }
 
 function checkURL(url) {
@@ -853,7 +890,7 @@ $( "#load-link" ).click(function(){
 
 /* main */
 if (myChannel == '') {
-	pushMessage({text: frontpage})
+	pushMessage({text: frontpage}, true, false)
 	$('#footer').classList.add('hidden')
 	$('#sidebar').classList.add('hidden')
 }
