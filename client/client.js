@@ -311,7 +311,12 @@ function pushMessage(args, usePre) {
 				var user = document.createElement('span');
 				user.textContent = "@" + nick;
 				user.style.color = onlineUsers[nick];
-				textEl.outerHTML = textEl.outerHTML.replace("@" + nick, user.outerHTML);
+				try{
+					textEl.outerHTML = textEl.outerHTML.replace("@" + nick, user.outerHTML);
+				}
+				catch(err) {
+					console.log(err.message);
+				}
 			}
 		}
 	}
