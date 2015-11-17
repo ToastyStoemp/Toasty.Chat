@@ -708,38 +708,35 @@ $('#auto-login').change(function(e) {
 
 // User list
 
-var onlineUsers = []
-var ignoredUsers = []
+var onlineUsers = [];
+var ignoredUsers = [];
 
 function userAdd(nick) {
-	var user = document.createElement('a')
-	user.textContent = nick
-	user.onclick = function(e) {
-		userInvite(nick)
-	}
-	var userLi = document.createElement('li')
-	userLi.appendChild(user)
-	$('#users').append(userLi)
-	onlineUsers.push(nick)
+	var user = document.createElement('a');
+	user.textContent = nick;
+	user.onclick = function(e)
+		userInvite(nick);
+	var userLi = document.createElement('li');
+	userLi.appendChild(user);
+	$('#users').append(userLi);
+	onlineUsers.push(nick);
 }
 
 function userRemove(nick) {
 	var children = $('#users').children();
 	for (var i = 0; i < children.length; i++) {
-		var user = children[i]
-		if (user.textContent == nick) {
-			users.removeChild(user)
-		}
+		var user = children[i];
+		if (user.textContent == nick)
+			users.removeChild(user);
 	}
 	var index = onlineUsers.indexOf(nick)
-	if (index >= 0) {
-		onlineUsers.splice(index, 1)
-	}
+	if (index >= 0)
+		onlineUsers.splice(index, 1);
 }
 
 function usersClear() {
 	$('#users li').remove();
-	onlineUsers.length = 0
+	onlineUsers.length = 0;
 }
 
 function userInvite(nick) {
@@ -748,7 +745,7 @@ function userInvite(nick) {
 
 // set global var
 userIgnore = function(nick) {
-	ignoredUsers.push(nick)
+	ignoredUsers.push(nick);
 }
 
 /* color scheme switcher */
@@ -837,7 +834,10 @@ function createViewer(link) {
 }
 
 $( "#toggle-viewer" ).click(function(){
+	var atBottom = isAtBottom()
 	handleViewer();
+	if (atBottom)
+                window.scrollTo(0, document.body.scrollHeight);
 });
 
 $( "#load-link" ).click(function(){
