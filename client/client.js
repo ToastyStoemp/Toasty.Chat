@@ -325,12 +325,15 @@ function pushMessage(args, usePre) {
 
 function insertAtCursor(text) {
 	var input = $('#chatinput')
-	var start = input.val().length || 0
+	var start = input[0].selectionStart || input.val().length || 0;
 	var before = input.val().substr(0, start)
 	var after = input.val().substr(start)
 	before += text
 
 	input.val(before + after);
+	
+	if (input[0].selectionStart)
+		input[0].selectionEnd = input[0].selectionStart = before.length;
 }
 
 
