@@ -1,8 +1,6 @@
 var userIgnore; // public function
 $(function() {
 
-	//UPDATE THIS ON EVERY COMMIT
-	var versionNumber = '201511200006';
 
 $("#link-block").hide();
 var frontpage = [
@@ -89,7 +87,7 @@ function join(channel) {
 	var lastPong = new Date();
 
 	ws.onopen = function() {
-		send({cmd: 'verify', version: versionNumber })
+		send({cmd: 'verify', version: webClientVersion});
 	}
 
 
