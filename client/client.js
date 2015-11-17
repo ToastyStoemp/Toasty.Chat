@@ -714,8 +714,9 @@ var ignoredUsers = [];
 function userAdd(nick) {
 	var user = document.createElement('a');
 	user.textContent = nick;
-	user.onclick = function(e)
+	user.onclick = function(e){
 		userInvite(nick);
+	}
 	var userLi = document.createElement('li');
 	userLi.appendChild(user);
 	$('#users').append(userLi);
