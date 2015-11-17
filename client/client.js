@@ -1,4 +1,5 @@
 var userIgnore; // public function
+var send;
 $(function() {
 
 
@@ -210,6 +211,11 @@ var COMMANDS = {
 			pushMessage({nick: '*', text: nick + " left"})
 		}
 	},
+	play: function (args) {
+		var nick = args.nick;
+		handleViewer("https://www.youtube.com/embed/"+parse_yturl(args.url)+"?autoplay=1&origin="+document.domain);
+		pushMessage({nick: "*", text: nick + " would like everyone to enjoy this"});
+	}
 }
 
 var lastPoster = "";
@@ -331,13 +337,13 @@ function insertAtCursor(text) {
 	before += text
 
 	input.val(before + after);
-	
+
 	if (input[0].selectionStart)
 		input[0].selectionEnd = input[0].selectionStart = before.length;
 }
 
 
-function send(data) {
+send = function(data) {
 	if (ws && ws.readyState == ws.OPEN) {
 		ws.send(JSON.stringify(data))
 	}
@@ -854,8 +860,8 @@ $( "#load-link" ).click(function(){
 /* main */
 if (myChannel == '') {
 	pushMessage({text: frontpage})
-	$('#footer').classList.add('hidden')
-	$('#sidebar').classList.add('hidden')
+	$('#footer').addClass('hidden')
+	$('#sidebar').addClass('hidden')
 }
 else {
 	join(myChannel)

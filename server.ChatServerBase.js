@@ -213,7 +213,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 
 			return;
 		case 'chat':
-			var text = String(args.text)
+			var text = String(args.text);
 			args.channel = String(client.channel);
 
 			if (!client.channel) return;
@@ -236,7 +236,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			}
 
 			var data = {cmd: 'chat', nick: client.nick, trip: client.trip, text: text};
-			if (this.isAdmin(client)) data.admin = true;
+			data.admin = this.isAdmin(client);
 
 			this.broadcast(data, client.channel);
 			this.bot.send = function(text)
@@ -363,6 +363,10 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 	// Commands usable by all admins
 	if (this.isAdmin(client)) {
 		switch (command) {
+			case 'play':
+				var url = args.url.trim();
+				client.send({cmd: 'play', nick:client.nick, trip: client.trip, url:url});
+				return;
 			case 'listUsers':
 				var channelNames = this.getChannelNames();
 				var clientCount = 0;
