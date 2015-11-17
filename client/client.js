@@ -251,9 +251,8 @@ function pushMessage(args, usePre) {
 		}
 
 		//Mentioning
-		if (args.text.indexOf("@" + myNick.split("#")[0] + " ") != -1)
+		if (args.text.indexOf("@" + myNick) != -1 || args.text.indexOf("@*") != -1)
         messageEl.classList.add('mention');
-
 
 		// Nickname
 		var nickSpanEl = document.createElement('span')
