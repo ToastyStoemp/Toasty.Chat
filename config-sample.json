@@ -5,8 +5,7 @@
 		"mods": [
 			"add-mod-tripcodes-here"
 		],
-		"salt": "insert-randomly-generated-string-here",
-		"version": "201511200005"
+		"salt": "insert-randomly-generated-string-here"
 	},
 	"webSocketServer": {
 		"enabled": true,

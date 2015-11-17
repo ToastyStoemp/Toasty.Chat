@@ -1,8 +1,6 @@
 var userIgnore; // public function
 $(function() {
 
-	//UPDATE THIS ON EVERY COMMIT
-	var versionNumber = '201511200005';
 
 $("#link-block").hide();
 var frontpage = [
@@ -89,7 +87,7 @@ function join(channel) {
 	var lastPong = new Date();
 
 	ws.onopen = function() {
-		send({cmd: 'verify', version: versionNumber })
+		send({cmd: 'verify', version: webClientVersion});
 	}
 
 
@@ -216,7 +214,7 @@ var COMMANDS = {
 
 var lastPoster = "";
 
-function pushMessage(args, usePre) {
+function pushMessage(args, usePre, ignoreMarkdown) {
 	var messageEl = document.createElement('div')
 		messageEl.classList.add('message')
 		if (args.admin) {
@@ -293,21 +291,21 @@ function pushMessage(args, usePre) {
 	if(usePre !== false) {
 		textEl = document.createElement('pre')
 		textEl.textContent = args.text || ''
-		var parsedMd = markdown.toHTML(textEl.innerHTML);
 	}
 	else {
 		textEl = document.createElement('div')
 		textEl.innerHTML = args.text || ''
-		parsedMd = textEl.innerHTML;
 	}
 	textEl.classList.add('text');
 
-	links = [];
+	var content = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks);
 
-	if(parsedMd == textEl.innerHTML)
-		textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks);
-	else
-		textEl.innerHTML = parsedMd;
+	if(ignoreMarkdown !== false)
+		content = basicMarkdown(content);
+
+	textEl.innerHTML = content;
+
+	links = [];
 
 	messageEl.appendChild(textEl);
 
@@ -327,18 +325,20 @@ function pushMessage(args, usePre) {
 	if (args.nick != '*')
 		unread += 1
 	updateTitle()
-	$(".text img").css("max-width", $(".text").width());
 }
 
 
 function insertAtCursor(text) {
 	var input = $('#chatinput')
-	var start = input.val().length || 0
+	var start = input[0].selectionStart || input.val().length || 0;
 	var before = input.val().substr(0, start)
 	var after = input.val().substr(start)
 	before += text
 
 	input.val(before + after);
+
+	if (input[0].selectionStart)
+		input[0].selectionEnd = input[0].selectionStart = before.length;
 }
 
 
@@ -361,6 +361,38 @@ function parseLinks(g0) {
 		links.push(g0);
 	}
 	return a.outerHTML
+}
+
+function basicMarkdown(src) {
+
+	function formatMd(startLen, endLen, start, end) {
+		return function(val) {
+			return start + val.substring(startLen, val.length - endLen) + end;
+		};
+	}
+
+	src = src.replace(/\*\*[^*]+\*\*/g, formatMd(2, 2, "<b>", "</b>"));
+	src = src.replace(/\*[^*]+\*/g, formatMd(1, 1, "<i>", "</i>"));
+	src = src.replace(/\#\#\#[^\n]+/g, formatMd(3, 0, "<h5>", "</h5>"));
+	src = src.replace(/\#\#[^\n]+/g, formatMd(2, 0, "<h3>", "</h3>"));
+	src = src.replace(/\#[^\n]+/g, formatMd(1, 0, "<h1>", "</h1>"));
+	src = src.replace(/```[^```]+```/g, parseCode);
+
+	return src;
+}
+
+//https://github.com/ToastyStoemp/Hack.Chat-Enhancement-kit/blob/master/Chrome/src/main.js#L384-L393
+function parseCode(code) {
+	var codeEl = document.createElement('code')
+	codeEl.innerHTML = code.substr(4, code.length - 8);
+	var lineCount = code.split(/\r\n|\r|\n/).length;
+
+	if (lineCount > 15)
+		codeEl.classList.add('largeScript');
+	else
+		codeEl.classList.add('script');
+
+	return codeEl.outerHTML;
 }
 
 function checkURL(url) {
@@ -716,38 +748,36 @@ $('#auto-login').change(function(e) {
 
 // User list
 
-var onlineUsers = []
-var ignoredUsers = []
+var onlineUsers = [];
+var ignoredUsers = [];
 
 function userAdd(nick) {
-	var user = document.createElement('a')
-	user.textContent = nick
-	user.onclick = function(e) {
-		userInvite(nick)
+	var user = document.createElement('a');
+	user.textContent = nick;
+	user.onclick = function(e){
+		userInvite(nick);
 	}
-	var userLi = document.createElement('li')
-	userLi.appendChild(user)
-	$('#users').append(userLi)
-	onlineUsers.push(nick)
+	var userLi = document.createElement('li');
+	userLi.appendChild(user);
+	$('#users').append(userLi);
+	onlineUsers.push(nick);
 }
 
 function userRemove(nick) {
 	var children = $('#users').children();
 	for (var i = 0; i < children.length; i++) {
-		var user = children[i]
-		if (user.textContent == nick) {
-			users.removeChild(user)
-		}
+		var user = children[i];
+		if (user.textContent == nick)
+			users.removeChild(user);
 	}
 	var index = onlineUsers.indexOf(nick)
-	if (index >= 0) {
-		onlineUsers.splice(index, 1)
-	}
+	if (index >= 0)
+		onlineUsers.splice(index, 1);
 }
 
 function usersClear() {
 	$('#users li').remove();
-	onlineUsers.length = 0
+	onlineUsers.length = 0;
 }
 
 function userInvite(nick) {
@@ -756,7 +786,7 @@ function userInvite(nick) {
 
 // set global var
 userIgnore = function(nick) {
-	ignoredUsers.push(nick)
+	ignoredUsers.push(nick);
 }
 
 /* color scheme switcher */
@@ -845,7 +875,10 @@ function createViewer(link) {
 }
 
 $( "#toggle-viewer" ).click(function(){
+	var atBottom = isAtBottom()
 	handleViewer();
+	if (atBottom)
+                window.scrollTo(0, document.body.scrollHeight);
 });
 
 $( "#load-link" ).click(function(){
@@ -857,7 +890,7 @@ $( "#load-link" ).click(function(){
 
 /* main */
 if (myChannel == '') {
-	pushMessage({text: frontpage})
+	pushMessage({text: frontpage}, true, false)
 	$('#footer').classList.add('hidden')
 	$('#sidebar').classList.add('hidden')
 }
