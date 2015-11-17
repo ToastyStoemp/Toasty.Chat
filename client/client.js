@@ -300,9 +300,9 @@ function pushMessage(args, usePre) {
 	textEl.classList.add('text')
 
 	links = [];
-	//textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks)
+	textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks)
 
-	textEl.innerHTML = markdown.toHTML(textEl.innerHTML);
+	//textEl.innerHTML = markdown.toHTML(textEl.innerHTML);
 
 	messageEl.appendChild(textEl)
 
