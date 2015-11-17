@@ -190,16 +190,18 @@ var COMMANDS = {
 		}
 	},
 	onlineSet: function(args) {
-		var nicks = args.nicks
+		var nicks = args.nicks;
+		var trips = args.trips;
 		usersClear()
-		nicks.forEach(function(nick) {
-			userAdd(nick)
-		})
+		for (var i = 0; i < nicks.length; i++) {
+			userAdd(nicks[i], trips[i]);
+		}
 		pushMessage({nick: '*', text: "Users online: " + nicks.join(", ")})
 	},
 	onlineAdd: function(args) {
-		var nick = args.nick
-		userAdd(nick)
+		var nick = args.nick;
+		var trip = args.trip;
+		userAdd(nick, trip)
 		if ($('#joined-left').is(":checked")) {
 			pushMessage({nick: '*', text: nick + " joined"})
 		}
@@ -255,13 +257,8 @@ function pushMessage(args, usePre) {
 
 		// Nickname
 		var nickSpanEl = document.createElement('span')
-		if (args.trip && !args.admin) {
-			var color1 = (Math.floor((args.trip[0].charCodeAt(0) - 33) * 2.865)).toString(16);
-			var color3 = (Math.floor((args.trip[1].charCodeAt(0) - 33) * 2.865)).toString(16);
-			var color2 = (Math.floor((args.trip[2].charCodeAt(0) - 33) * 2.865)).toString(16);
-			var color = "#" + color1 + color2 + color3;
-			nickSpanEl.style.color = color;
-		}
+		if (args.trip && !args.admin)
+			nickSpanEl.style.color = onlineUsers[args.nick];
 		nickSpanEl.classList.add('nick');
 		messageEl.appendChild(nickSpanEl)
 
@@ -717,10 +714,10 @@ $('#auto-login').change(function(e) {
 
 // User list
 
-var onlineUsers = [];
+var onlineUsers = {};
 var ignoredUsers = [];
 
-function userAdd(nick) {
+function userAdd(nick, trip) {
 	var user = document.createElement('a');
 	user.textContent = nick;
 	user.onclick = function(e){
@@ -729,7 +726,7 @@ function userAdd(nick) {
 	var userLi = document.createElement('li');
 	userLi.appendChild(user);
 	$('#users').append(userLi);
-	onlineUsers.push(nick);
+	onlineUsers[nick] = colorRender(trip);
 }
 
 function userRemove(nick) {
@@ -739,9 +736,7 @@ function userRemove(nick) {
 		if (user.textContent == nick)
 			users.removeChild(user);
 	}
-	var index = onlineUsers.indexOf(nick)
-	if (index >= 0)
-		onlineUsers.splice(index, 1);
+	delete onlineUsers[nick];
 }
 
 function usersClear() {
@@ -752,6 +747,14 @@ function usersClear() {
 function userInvite(nick) {
 	send({cmd: 'invite', nick: nick})
 }
+
+function colorRender(trip) {
+	var color1 = (Math.floor((trip[0].charCodeAt(0) - 33) * 2.865)).toString(16);
+	var color3 = (Math.floor((trip[1].charCodeAt(0) - 33) * 2.865)).toString(16);
+	var color2 = (Math.floor((trip[2].charCodeAt(0) - 33) * 2.865)).toString(16);
+	return "#" + color1 + color2 + color3;
+}
+
 
 // set global var
 userIgnore = function(nick) {
