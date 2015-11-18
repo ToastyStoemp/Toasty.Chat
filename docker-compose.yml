@@ -13,5 +13,5 @@ chat:
     - "6667:6667"
    volumes:
     - .:/data
-   command: bash -c "cd /data; if [ ! -x node_modules ]; then npm install; fi; nodejs server.js"
+   command: bash -c "cd /data; if [ ! -x config.json ]; then cp config-sample.json config.json; fi; if [ ! -x node_modules ]; then npm install; fi; nodejs server.js"
 
