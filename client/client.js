@@ -628,7 +628,7 @@ $('#footer').onclick = function() {
 
 $('#chatinput').keydown(function(e) {
 	if (e.keyCode == 13 /* ENTER */ && !e.shiftKey) {
-		e.preventDefault(;)
+		e.preventDefault();
 		// Submit message
 		if (e.target.value != '') {
 			var text = e.target.value;

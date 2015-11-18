@@ -10,7 +10,7 @@ function loadFile(filename) {
 
 function main() {
 	var configFileName = "config.json";
-	var versionFileName = "./client/version.js"
+	var versionFileName = "./client/data.js"
 	var config = JSON.parse(loadFile(configFileName));
 	var version = loadFile(versionFileName).match(/"([0-9]+)"/)[1];
 	console.log("Running version " + version);
