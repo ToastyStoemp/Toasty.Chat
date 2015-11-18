@@ -28,9 +28,6 @@ var init = function(bot)
 
 var configCmd = function(bot, sender, args)
 {
-	if(bot.requirePerm(sender, "config"))
-		return;
-
 	args[0] = args[0] || "";
 
 	if(args[0] == "set" && typeof args[1] != 'undefined' && typeof args[2] != 'undefined')
