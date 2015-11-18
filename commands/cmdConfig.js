@@ -84,7 +84,7 @@ var configCmd = function(bot, sender, args)
 			if(!bot.config.hasOwnProperty(key))
 				continue;
 
-			fs.writeFile("./src/data/" + key + ".json", JSON.stringify(bot.config[key], undefined, 4), function(err)
+			fs.writeFile("./data/" + key + ".json", JSON.stringify(bot.config[key], undefined, 4), function(err)
 			{
 				if(err)
 					throw err;
