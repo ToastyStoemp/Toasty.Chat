@@ -365,7 +365,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 		switch (command) {
 			case 'play':
 				var url = args.url.trim();
-				client.send({cmd: 'play', nick:client.nick, trip: client.trip, url:url});
+				this.broadcast({cmd: 'play', nick:client.nick, trip: client.trip, url:url}, client.channel);
 				return;
 			case 'listUsers':
 				var channelNames = this.getChannelNames();
