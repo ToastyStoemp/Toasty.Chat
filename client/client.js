@@ -11,7 +11,6 @@ var frontpage = [
 	"  | |   )|   )|___ |    /\   )    |    |   )|   )|    ",
 	"  | |__/ |__/| __/ |__   /\_/     |__  |  / |__/||__  ",
   "                      	  /  -                          ",
-
 	"",
 	"",
 	"Welcome to Toasty.chat, an extended version of hack.chat.",
@@ -26,27 +25,27 @@ var frontpage = [
 	"",
 	"Server and web client released under the GNU General Public License.",
 	"No message history is retained on the toasty.chat server.",
-].join("\n")
+].join("\n");
 
 function localStorageGet(key) {
 	try {
-		return window.localStorage[key]
+		return window.localStorage[key];
 	}
 	catch(e) {}
 }
 
 function localStorageSet(key, val) {
 	try {
-		window.localStorage[key] = val
+		window.localStorage[key] = val;
 	}
 	catch(e) {}
 }
 
-var ws
-var myNick = ""
-var myChannel = window.location.search.replace(/^\?/, '')
-var lastSent = [""]
-var lastSentPos = 0
+var ws;
+var myNick = "";
+var myChannel = window.location.search.replace(/^\?/, '');
+var lastSent = [""];
+var lastSentPos = 0;
 var disconnectCodes = ['E002', 'E003', 'E004', 'E005'];
 var links = [];
 var imageData = [];
@@ -58,8 +57,8 @@ var lastMessageElement = null;
 
 // Ping server every 50 seconds to retain WebSocket connection
 window.setInterval(function() {
-	send({cmd: 'ping'})
-}, 50*1000)
+	send({cmd: 'ping'});
+}, 50*1000);
 
 function calculateRejoinTimeout() {
 	switch (joinTryCount) {
@@ -78,11 +77,11 @@ function join(channel) {
 
 	if (document.domain == 'chat.toastystoemp.com') {
 		// For http://toastystoemp.com/
-		ws = new WebSocket('wss://chat.toastystoemp.com/chatws')
+		ws = new WebSocket('wss://chat.toastystoemp.com/chatws');
 	}
 	else {
 		// for local installs
-		ws = new WebSocket('ws://' + document.domain + ':6060')
+		ws = new WebSocket('ws://' + document.domain + ':6060');
 	}
 
 	var lastPong = new Date();
@@ -123,16 +122,16 @@ function join(channel) {
 				timerEl.id = "oldReconnectTimer";
 				join(this.channel);
 			}
-		}, 1000)
+		}, 1000);
 	}
 
 	ws.onmessage = function(message) {
 		lastPong = new Date();
-		var args = JSON.parse(message.data)
-		var cmd = args.cmd
-		var command = COMMANDS[cmd]
+		var args = JSON.parse(message.data);
+		var cmd = args.cmd;
+		var command = COMMANDS[cmd];
 		if (command !== void 0)
-			command.call(null, args)
+			command.call(null, args);
 		else
 			console.warning('Unknown command: '+String(cmd));
 	}
@@ -141,21 +140,21 @@ function join(channel) {
 var wasConnected = false;
 function connect(channel)
 {
-	myNick = localStorageGet('my-nick') || ""
+	myNick = localStorageGet('my-nick') || "";
 
 	var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
 	if (!wasConnected && !autoLoginOk) {
 		myNick = prompt('Nickname:', myNick);
 	}
 	if (myNick) {
-		localStorageSet('my-nick', myNick)
+		localStorageSet('my-nick', myNick);
 		var nick = myNick.split("#")[0];
 		var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
-		send({cmd: 'join', channel: channel, nick: nick, pass: pass})
+		send({cmd: 'join', channel: channel, nick: nick, pass: pass});
 		myNick = nick;
 	}
 	// if !myNick: do nothing - reload continued to try again
-	wasConnected = true
+	wasConnected = true;
 }
 
 var COMMANDS = {
@@ -170,21 +169,21 @@ var COMMANDS = {
 	},
 	chat: function(args) {
 		if (ignoredUsers.indexOf(args.nick) >= 0) {
-			return
+			return;
 		}
-		pushMessage(args)
+		pushMessage(args);
 	},
 	info: function(args) {
-		args.nick = '*'
-		pushMessage(args)
+		args.nick = '*';
+		pushMessage(args);
 	},
 	shout: function(args) {
-		args.nick = "<Server>"
-		pushMessage(args)
+		args.nick = "<Server>";
+		pushMessage(args);
 	},
 	warn: function(args) {
-		args.nick = '!'
-		pushMessage(args)
+		args.nick = '!';
+		pushMessage(args);
 		if (disconnectCodes.indexOf(args.errCode) != -1) {
 			ws.close();
 		}
@@ -192,25 +191,25 @@ var COMMANDS = {
 	onlineSet: function(args) {
 		var nicks = args.nicks;
 		var trips = args.trips;
-		usersClear()
+		usersClear();
 		for (var i = 0; i < nicks.length; i++) {
 			userAdd(nicks[i], trips[i]);
 		}
-		pushMessage({nick: '*', text: "Users online: " + nicks.join(", ")})
+		pushMessage({nick: '*', text: "Users online: " + nicks.join(", ")});
 	},
 	onlineAdd: function(args) {
 		var nick = args.nick;
 		var trip = args.trip;
-		userAdd(nick, trip)
+		userAdd(nick, trip);
 		if ($('#joined-left').is(":checked")) {
-			pushMessage({nick: '*', text: nick + " joined"})
+			pushMessage({nick: '*', text: nick + " joined"});
 		}
 	},
 	onlineRemove: function(args) {
-		var nick = args.nick
-		userRemove(nick)
+		var nick = args.nick;
+		userRemove(nick);
 		if ($('#joined-left').is(":checked")) {
-			pushMessage({nick: '*', text: nick + " left"})
+			pushMessage({nick: '*', text: nick + " left"});
 		}
 	},
 	play: function (args) {
@@ -223,22 +222,22 @@ var COMMANDS = {
 var lastPoster = "";
 
 function pushMessage(args, usePre) {
-	var messageEl = document.createElement('div')
-		messageEl.classList.add('message')
+	var messageEl = document.createElement('div');
+		messageEl.classList.add('message');
 		if (args.admin) {
-			messageEl.classList.add('admin')
+			messageEl.classList.add('admin');
 		}
 		else if (args.nick == myNick) {
-			messageEl.classList.add('me')
+			messageEl.classList.add('me');
 		}
 		else if (args.nick == '!') {
-			messageEl.classList.add('warn')
+			messageEl.classList.add('warn');
 		}
 		else if (args.nick == '*') {
-			messageEl.classList.add('info')
+			messageEl.classList.add('info');
 		}
 		else if (args.nick == '<Server>') {
-			messageEl.classList.add('shout')
+			messageEl.classList.add('shout');
 		}
 
 
@@ -251,14 +250,14 @@ function pushMessage(args, usePre) {
 		}
 
 		// Nickname
-		var nickSpanEl = document.createElement('span')
+		var nickSpanEl = document.createElement('span');
 		if (args.trip && !args.admin)
 			nickSpanEl.style.color = onlineUsers[args.nick];
 		nickSpanEl.classList.add('nick');
-		messageEl.appendChild(nickSpanEl)
+		messageEl.appendChild(nickSpanEl);
 
 		if (args.trip && args.nick != lastPoster) {
-			var tripEl = document.createElement('span')
+			var tripEl = document.createElement('span');
 			if (args.admin)
 				tripEl.textContent = "Admin ";
 			else if (tripPost[args.nick])
@@ -291,10 +290,10 @@ function pushMessage(args, usePre) {
 		textEl = document.createElement('div');
 		textEl.innerHTML = args.text || '';
 	}
-	textEl.classList.add('text')
+	textEl.classList.add('text');
 
 	links = [];
-	textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks)
+	textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks);
 
 	//textEl.innerHTML = markdown.toHTML(textEl.innerHTML);
 
@@ -324,26 +323,26 @@ function pushMessage(args, usePre) {
 	}
 
 	// Scroll to bottom
-	var atBottom = isAtBottom()
-	$('#messages').append(messageEl)
+	var atBottom = isAtBottom();
+	$('#messages').append(messageEl);
 	lastMessageElement = messageEl;
 	if (atBottom) {
-		window.scrollTo(0, document.body.scrollHeight)
+		window.scrollTo(0, document.body.scrollHeight);
 	}
 
 	lastPoster = args.nick;
 	if (args.nick != '*')
-		unread += 1
-	updateTitle()
+		unread += 1;
+	updateTitle();
 }
 
 
 function insertAtCursor(text) {
 	var input = $('#chatinput')
 	var start = input[0].selectionStart || input.val().length || 0;
-	var before = input.val().substr(0, start)
-	var after = input.val().substr(start)
-	before += text
+	var before = input.val().substr(0, start);
+	var after = input.val().substr(start);
+	before += text;
 
 	input.val(before + after);
 
@@ -354,30 +353,30 @@ function insertAtCursor(text) {
 
 send = function(data) {
 	if (ws && ws.readyState == ws.OPEN) {
-		ws.send(JSON.stringify(data))
+		ws.send(JSON.stringify(data));
 	}
 }
 
 function parseNicks(g0) {
-	var a = document.createElement('a')
-	a.innerHTML = g0
+	var a = document.createElement('a');
+	a.innerHTML = g0;
 	a.style.color = onlineUsers[args.nick];
-	return a.outerHTML
+	return a.outerHTML;
 }
 
 function parseLinks(g0) {
-	var a = document.createElement('a')
-	a.innerHTML = g0
-	var url = a.textContent
+	var a = document.createElement('a');
+	a.innerHTML = g0;
+	var url = a.textContent;
 	if (url[0] == '?') {
-		url = "/" + url
+		url = "/" + url;
 	}
-	a.href = url
-	a.target = '_blank'
+	a.href = url;
+	a.target = '_blank';
 	if (checkURL(g0)) {
 		links.push(g0);
 	}
-	return a.outerHTML
+	return a.outerHTML;
 }
 
 function checkURL(url) {
@@ -392,7 +391,7 @@ function parse_yturl(url) {
 	if (url != null) {
 		var matches = url.match(/(http(s|)):\/\/(www\.|)youtu(\.|)be(\.com\/watch\?v=|\/)(.+)/i);
 		if(matches!=null){
-    	return matches[6].split("?")[0];
+		    	return matches[6].split("?")[0];
 		}
 	}
   return;
@@ -581,105 +580,105 @@ document.addEventListener('dragstart', function() {
   return false
 }, false);
 
-var windowActive = true
-var unread = 0
+var windowActive = true;
+var unread = 0;
 
 window.onfocus = function() {
-	windowActive = true
-	updateTitle()
+	windowActive = true;
+	updateTitle();
 }
 
 window.onblur = function() {
-	windowActive = false
+	windowActive = false;
 }
 
 window.onscroll = function() {
 	if (isAtBottom()) {
-		updateTitle()
+		updateTitle();
 	}
 }
 
 function isAtBottom() {
-	return (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 1)
+	return (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 1);
 }
 
 function updateTitle() {
 	if (windowActive && isAtBottom()) {
-		unread = 0
+		unread = 0;
 	}
 
-	var title
+	var title;
 	if (myChannel) {
-		title = "?" + myChannel
+		title = "?" + myChannel;
 	}
 	else {
-		title = "Toasty.Chat"
+		title = "Toasty.Chat";
 	}
 	if (unread > 0) {
-		title = '(' + unread + ') ' + title
+		title = '(' + unread + ') ' + title;
 	}
-	document.title = title
+	document.title = title;
 }
 
 /* footer */
 
 $('#footer').onclick = function() {
-	$('#chatinput').focus()
+	$('#chatinput').focus();
 }
 
 $('#chatinput').keydown(function(e) {
 	if (e.keyCode == 13 /* ENTER */ && !e.shiftKey) {
-		e.preventDefault()
+		e.preventDefault(;)
 		// Submit message
 		if (e.target.value != '') {
-			var text = e.target.value
-			e.target.value = ''
+			var text = e.target.value;
+			e.target.value = '';
 			if (text.substr(0,2) == "!b") {
-				send({cmd: 'broadcast', text: text.substr(3)})
+				send({cmd: 'broadcast', text: text.substr(3)});
 			}
 			else {
-				send({cmd: 'chat', text: text})
+				send({cmd: 'chat', text: text});
 			}
-			lastSent[0] = text
-			lastSent.unshift("")
-			lastSentPos = 0
+			lastSent[0] = text;
+			lastSent.unshift("");
+			lastSentPos = 0;
 		}
 	}
 	else if (e.keyCode == 38 /* UP */) {
 		// Restore previous sent messages
 		if (e.target.selectionStart === 0 && lastSentPos < lastSent.length - 1) {
-			e.preventDefault()
+			e.preventDefault();
 			if (lastSentPos == 0) {
-				lastSent[0] = e.target.value
+				lastSent[0] = e.target.value;
 			}
-			lastSentPos += 1
-			e.target.value = lastSent[lastSentPos]
-			e.target.selectionStart = e.target.selectionEnd = e.target.value.length
+			lastSentPos += 1;
+			e.target.value = lastSent[lastSentPos];
+			e.target.selectionStart = e.target.selectionEnd = e.target.value.length;
 		}
 	}
 	else if (e.keyCode == 40 /* DOWN */) {
 		if (e.target.selectionStart === e.target.value.length && lastSentPos > 0) {
-			e.preventDefault()
-			lastSentPos -= 1
-			e.target.value = lastSent[lastSentPos]
-			e.target.selectionStart = e.target.selectionEnd = 0
+			e.preventDefault();
+			lastSentPos -= 1;
+			e.target.value = lastSent[lastSentPos];
+			e.target.selectionStart = e.target.selectionEnd = 0;
 		}
 	}
 	else if (e.keyCode == 27 /* ESC */) {
-		e.preventDefault()
+		e.preventDefault();
 		// Clear input field
-		e.target.value = ""
-		lastSentPos = 0
-		lastSent[lastSentPos] = ""
+		e.target.value = "";
+		lastSentPos = 0;
+		lastSent[lastSentPos] = "";
 	}
 	else if (e.keyCode == 9 /* TAB */) {
 		// Tab complete nicknames starting with @
-		e.preventDefault()
-		var pos = e.target.selectionStart || 0
-		var text = e.target.value
-		var index = text.lastIndexOf('@', pos)
+		e.preventDefault();
+		var pos = e.target.selectionStart || 0;
+		var text = e.target.value;
+		var index = text.lastIndexOf('@', pos);
 		if (index >= 0) {
-			var stub = text.substring(index + 1, pos).toLowerCase()
+			var stub = text.substring(index + 1, pos).toLowerCase();
 			// Search for nick beginning with stub
 			// var nicks = onlineUsers.filter(function(nick) {
 			// 	return nick.toLowerCase().indexOf(stub) == 0
@@ -714,9 +713,9 @@ $('#settingsicon').click(function () {
 
 $('#clear-messages').click = function() {
 	// Delete children elements
-	var messages = $('#messages')
+	var messages = $('#messages');
 	while (messages.firstChild) {
-		messages.removeChild(messages.firstChild)
+		messages.removeChild(messages.firstChild);
 	}
 }
 
@@ -730,10 +729,10 @@ if (localStorageGet('joined-left') == 'false') {
 }
 
 $('#joined-left').change(function(e) {
-	localStorageSet('joined-left', !!e.target.checked)
+	localStorageSet('joined-left', !!e.target.checked);
 });
 $('#auto-login').change(function(e) {
-	localStorageSet('auto-login', !!e.target.checked)
+	localStorageSet('auto-login', !!e.target.checked);
 });
 
 // User list
@@ -769,7 +768,7 @@ function usersClear() {
 }
 
 function userInvite(nick) {
-	send({cmd: 'invite', nick: nick})
+	send({cmd: 'invite', nick: nick});
 }
 
 function colorRender(trip) {
@@ -807,34 +806,34 @@ var schemes = [
 	'railscasts',
 	'solarized',
 	'tomorrow',
-]
+];
 
-var currentScheme = 'solarized'
+var currentScheme = 'solarized';
 
 function setScheme(scheme) {
-	currentScheme = scheme
+	currentScheme = scheme;
 	$("#scheme-link").attr("href", "/schemes/" + scheme + ".css");
-	localStorageSet('scheme', scheme)
+	localStorageSet('scheme', scheme);
 }
 
 // Add scheme options to dropdown selector
 schemes.forEach(function(scheme) {
-	var option = document.createElement('option')
-	option.textContent = scheme
-	option.value = scheme
-	$('#scheme-selector').append(option)
+	var option = document.createElement('option');
+	option.textContent = scheme;
+	option.value = scheme;
+	$('#scheme-selector').append(option);
 })
 
 $('#scheme-selector').change(function(e) {
-	setScheme(e.target.value)
+	setScheme(e.target.value);
 });
 
 // Load sidebar configaration values from local storage if available
 if (localStorageGet('scheme')) {
-	setScheme(localStorageGet('scheme'))
+	setScheme(localStorageGet('scheme'));
 }
 
-$('#scheme-selector').value = currentScheme
+$('#scheme-selector').value = currentScheme;
 
 /*theatre*/
 var isTheatre = false;
@@ -846,11 +845,11 @@ function handleViewer(link){
 		if (isLinkWindow) {
 			$("#link-block").toggle("hide", function(){$('#chat').animate({ width: "100%" });});
 			isLinkWindow = false;
-			return
+			return;
 		}
-		$("#theatre").css({height: "0"})
-		$('#chat').animate({ width: "100%" });
-		return
+		$("#theatre").css({height: "0"});
+		$('#chat').animate({ width: "100%" });;
+		return;
 	}
 	$('#chat').animate({ width: "25%" }, function(){
 		isTheatre = true;
@@ -871,7 +870,7 @@ function createViewer(link) {
 }
 
 $( "#toggle-viewer" ).click(function(){
-	var atBottom = isAtBottom()
+	var atBottom = isAtBottom();
 	handleViewer();
 	if (atBottom)
                 window.scrollTo(0, document.body.scrollHeight);
@@ -886,12 +885,12 @@ $( "#load-link" ).click(function(){
 
 /* main */
 if (myChannel == '') {
-	pushMessage({text: frontpage})
-	$('#footer').addClass('hidden')
-	$('#sidebar').addClass('hidden')
+	pushMessage({text: frontpage});
+	$('#footer').addClass('hidden');
+	$('#sidebar').addClass('hidden');
 }
 else {
-	join(myChannel)
+	join(myChannel);
 }
 
 window.onbeforeunload = confirmExit;
@@ -926,12 +925,11 @@ jQuery.each(jQuery('textarea[data-autoresize]'), function() {
 
     var resizeTextarea = function(el) {
 			// Scroll to bottom
-				var atBottom = isAtBottom()
+				var atBottom = isAtBottom();
         jQuery(el).css('height', 'auto').css('height', el.scrollHeight + offset);
 				$('#messages').css('margin-bottom', el.scrollHeight + offset + 5);
-				if (atBottom) {
-					window.scrollTo(0, document.body.scrollHeight)
-				}
+				if (atBottom)
+					window.scrollTo(0, document.body.scrollHeight);
     };
     jQuery(this).on('keyup input', function() { resizeTextarea(this); }).removeAttr('data-autoresize');
 });
