@@ -261,37 +261,35 @@ function pushMessage(args, usePre) {
 			var tripEl = document.createElement('span')
 			if (args.admin)
 				tripEl.textContent = "Admin ";
-			else if (args.trip.substr(0,6) == "KFbgGV")
-				tripEl.textContent = "00010111 ";
-			else if (args.trip.substr(0,6) == "fen7JY")
-				tripEl.textContent = "3600 ";
+			else if (tripPost[args.nick])
+				tripsEl.textContent = tripPost[args.nick];
 			else
-				tripEl.textContent = args.trip.substr(0,6) + " "
-			tripEl.classList.add('trip')
-			nickSpanEl.appendChild(tripEl)
+				tripEl.textContent = args.trip.substr(0,6) + " ";
+			tripEl.classList.add('trip');
+			nickSpanEl.appendChild(tripEl);
 		}
 
 		if (args.nick && args.nick != lastPoster) {
-			var nickLinkEl = document.createElement('a')
-			nickLinkEl.textContent = args.nick
+			var nickLinkEl = document.createElement('a');
+			nickLinkEl.textContent = args.nick;
 			nickLinkEl.onclick = function() {
-				insertAtCursor("@" + args.nick + " ")
-				$('#chatinput').focus()
+				insertAtCursor("@" + args.nick + " ");
+				$('#chatinput').focus();
 			}
-			var date = new Date(args.time || Date.now())
-			nickLinkEl.title = date.toLocaleString()
-			nickSpanEl.appendChild(nickLinkEl)
+			var date = new Date(args.time || Date.now());
+			nickLinkEl.title = date.toLocaleString();
+			nickSpanEl.appendChild(nickLinkEl);
 		}
 
 	// Text
 	var textEl;
 	if(usePre !== false) {
-		textEl = document.createElement('pre')
-		textEl.textContent = args.text || ''
+		textEl = document.createElement('pre');
+		textEl.textContent = args.text || '';
 	}
 	else {
-		textEl = document.createElement('div')
-		textEl.innerHTML = args.text || ''
+		textEl = document.createElement('div');
+		textEl.innerHTML = args.text || '';
 	}
 	textEl.classList.add('text')
 
