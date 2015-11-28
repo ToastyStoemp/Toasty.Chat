@@ -136,7 +136,7 @@ IrcServer.prototype.run = function(chatServerBase) {
 			newIrcClient.close();
 		});
 	}).listen(this.config.port, this.config.ip);
-	console.log("Started irc server on " + this.config.ip + ":" + this.config.port)
+	console.log("Started irc server on " + this.config.ip + ":" + this.config.port);
 }
 IrcServer.prototype.handleCommand = function(client, args) {
 	var command = args[0];

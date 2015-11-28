@@ -158,8 +158,8 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			client.send({cmd: 'pong'});
 			return;
 		case 'verify':
-				client.send({cmd: 'verify', valid: (args.version == this.version)});
-				return;
+			client.send({cmd: 'verify', valid: (args.version == this.version)});
+			return;
 		case 'join':
 			var channel = String(args.channel).trim()
 			var nick = String(args.nick).trim();

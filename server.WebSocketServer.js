@@ -1,7 +1,7 @@
 /* jshint asi: true */
 /* jshint esnext: true */
 
-var fs = require('fs')
+
 var ws = require('ws')
 var ChatClientBase = require('./server.ChatClientBase.js');
 var util = require("util");
