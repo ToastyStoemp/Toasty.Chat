@@ -72,8 +72,9 @@ RestClient.prototype.close = function() {
 	this.chatServerBase.onClose(this);
 	delete this.clients[this.token];
 };
-RestClient.prototype.send = null; // is set before login
-
+RestClient.prototype.send = function(data) {
+	this.addToStorage(data);
+};
 
 function RestApiServer() {
 }
@@ -100,6 +101,7 @@ RestApiServer.prototype.run = function(chatServerBase) {
 		},
 		secret: secret,
 		resave: true,
+		rolling: true,
 		saveUninitialized: true
 	}));
 
@@ -110,9 +112,6 @@ RestApiServer.prototype.run = function(chatServerBase) {
 		var client = clients[req.session.id] = new RestClient(chatServerBase, clients, req);
 		client.updateTimeout(req);
 		client.updateIp(req, self.config.x_forwarded_for);
-		client.send = function(data) {
-			client.addToStorage(data);
-		};
 		res.send(JSON.stringify({results:[{login:'ok'}]}));
 	});
 	app.get('/logout', function(req, res) {
