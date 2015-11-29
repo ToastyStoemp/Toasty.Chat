@@ -26,8 +26,14 @@
   "homepage": "https://github.com/AndrewBelt/hack.chat",
   "dependencies": {
     "atob": "^1.1.2",
+    "express": "^4.13.3",
+    "express-session": "^1.12.1",
     "figlet": "^1.1.1",
+    "fs": "0.0.2",
     "googleapis": "^2.1.5",
+    "jade": "^1.11.0",
+    "less": "^2.5.3",
+    "less-middleware": "^2.0.1",
     "mathjs": "^1.7.1",
     "md5": "^2.0.0",
     "octonode": "^0.7.1",
@@ -38,9 +44,7 @@
     "unirest": "^0.4.2",
     "weather-js": "^1.0.2",
     "wikijs": "^0.1.1",
-    "ws": "^0.7.2",
-    "express": "^4.13.3",
-    "express-session": "^1.12.1"
+    "ws": "^0.7.2"
   },
   "engines": {
     "node": ">=0.12.0"

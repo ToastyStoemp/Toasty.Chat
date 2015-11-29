@@ -1,17 +1,9 @@
-web:
-   build: .
-   ports:
-    - "8080:8080"
-   volumes:
-    - .:/data
-   command: bash -c "cd /data/client; make; http-server"
-
 chat:
    build: .
    ports:
     - "6060:6060"
     - "6667:6667"
+    - "8080:8080"
    volumes:
     - .:/data
    command: bash -c "cd /data; if [ ! -x config.json ]; then cp config-sample.json config.json; fi; if [ ! -x node_modules ]; then npm install; fi; nodejs server.js"
-
