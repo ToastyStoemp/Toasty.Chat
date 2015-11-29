@@ -411,7 +411,7 @@ function parseMedia(){
 		//else if (localLinks[i].match(/\.(ogg|webm|mp4)$/) != null)
 			//p.appendChild(createvideoElement(localLinks[i], media));
 	 	if (links[i].match(/(http(s|)):\/\/(www\.|)(prntscr|)\.com\/([^.]+)/i) != null) {
-			var test=document.getElementById(links[i]).innerHTML;
+			//var test=document.getElementById(links[i]).innerHTML;
 			// if ((localLinks[i].match(/(http(s|)):\/\/(www\.prntscr)\.com\/([^.]+)/i) != null)
 			// {
 			// 	//Get imugr url
