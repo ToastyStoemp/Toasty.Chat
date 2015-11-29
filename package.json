@@ -33,7 +33,6 @@
     "googleapis": "^2.1.5",
     "jade": "^1.11.0",
     "less": "^2.5.3",
-    "less-middleware": "^2.0.1",
     "mathjs": "^1.7.1",
     "md5": "^2.0.0",
     "octonode": "^0.7.1",

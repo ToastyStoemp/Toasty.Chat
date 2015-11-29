@@ -81,7 +81,7 @@ function join(channel) {
 	}
 	else {
 		// for local installs
-		ws = new WebSocket('ws://' + document.domain + ':8888');
+		ws = new WebSocket('ws://' + document.domain + ':6060');
 	}
 
 	var lastPong = new Date();
