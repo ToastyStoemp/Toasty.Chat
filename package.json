@@ -36,6 +36,7 @@
     "mathjs": "^1.7.1",
     "md5": "^2.0.0",
     "octonode": "^0.7.1",
+    "parrot": "^0.3.1",
     "pastebin": "0.0.1",
     "redwrap": "^0.0.4",
     "request": "^2.60.0",

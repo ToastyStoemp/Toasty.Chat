@@ -9,6 +9,7 @@ Client.prototype.run = function () {
   console.log("Started client on " + this.config.host + ":" + this.config.port);
   var express = require('express');
   var app = express();
+  var ejs = require('ejs');
   var fs = require('fs');
   try{
   fs.mkdirSync(__dirname + "/client/schemes");
@@ -30,6 +31,10 @@ Client.prototype.run = function () {
   less.render(fs.readFileSync(__dirname + "/client/style.less").toString(), function (e, output) {
     fs.writeFileSync(__dirname + "/client/style.css", output.css);
   });
+  var port = this.config.socketPort;
+  var domain = this.config.domain;
+  var input = fs.readFileSync(__dirname + "/client/client.tpl").toString();
+  fs.writeFileSync(__dirname + "/client/client.js",ejs.render(input, {domain: domain, port: port}));
   app.set('views', __dirname + '/client');
   app.set("view engine", "jade");
   app.use(express.static(__dirname + '/client'));

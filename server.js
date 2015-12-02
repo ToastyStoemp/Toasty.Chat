@@ -33,8 +33,9 @@ function main() {
     restApiServer.initialize(config.restApiServer);
     restApiServer.run(chatServerBase);
   }
-  if (config.client && config.client.enabled) {
+  if (config.webSocketServer && config.webSocketServer.enabled && config.client && config.client.enabled) {
 		var client = require("./server.client.js")();
+		config.client.socketPort = config.webSocketServer.port;
 		client.initialize(config.client);
 		client.run();
   }
