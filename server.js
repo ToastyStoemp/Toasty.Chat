@@ -3,8 +3,18 @@ var fs = require('fs');
 function loadFile(filename) {
   var file = null;
 
-  file = fs.readFileSync(filename, 'utf8');
-  console.log("Loaded '" + filename + "'");
+  if (fs.existsSync(filename)) {
+    file = fs.readFileSync(filename, 'utf8');
+    console.log("Loaded '" + filename + "'");
+    return file;
+  }
+  else if (filename == "config.json") {
+    file = fs.readFileSync("config-sample.json", 'utf8');
+    console.log("Loaded default config-sample.json file");
+    return file;
+  }
+
+  console.log("File " + filename + "does not exists");
   return file;
 }
 
