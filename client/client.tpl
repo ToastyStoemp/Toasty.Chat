@@ -303,7 +303,7 @@ function pushMessage(args, usePre) {
 	//Mentioning
 	if (args.text.indexOf("@" + myNick) != -1){
 		messageEl.classList.add('mention');
-		if ($('#joined-left').is(":checked") && !document.hasFocus()) {
+		if ($('#notifications').is(":checked") && !document.hasFocus()) {
 			notifyMe(args.nick + " mentioned you", args.text, false);
 		}
 	}
