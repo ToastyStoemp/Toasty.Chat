@@ -725,14 +725,20 @@ if (localStorageGet('auto-login') == 'true') {
 	$("#auto-login").prop('checked', true);
 }
 if (localStorageGet('joined-left') == 'false') {
-	$("#joined-left").prop('checked', false);;
+	$("#joined-left").prop('checked', false);
+}
+if (localStorageGet('leave-warning') == 'false') {
+	$("#leave-warning").prop('checked', false);
 }
 
+$('#auto-login').change(function(e) {
+	localStorageSet('auto-login', !!e.target.checked);
+});
 $('#joined-left').change(function(e) {
 	localStorageSet('joined-left', !!e.target.checked);
 });
-$('#auto-login').change(function(e) {
-	localStorageSet('auto-login', !!e.target.checked);
+$('#leave-warning').change(function(e) {
+	localStorageSet('leave-warning', !!e.target.checked);
 });
 
 // User list
@@ -893,11 +899,6 @@ else {
 	join(myChannel);
 }
 
-window.onbeforeunload = confirmExit;
-function confirmExit() {
-	return "You have attempted to leave this page. Are you sure?";
-}
-
 $(window).resize(function(){
 	if (isTheatre) {
 		$("#theatre").css({
@@ -934,8 +935,8 @@ jQuery.each(jQuery('textarea[data-autoresize]'), function() {
     jQuery(this).on('keyup input', function() { resizeTextarea(this); }).removeAttr('data-autoresize');
 });
 
-window.beforeunload = function(){
-  if(isPerformingOperation && wasConnected && myChannel != '') {
+window.onbeforeunload = function(){
+  if(wasConnected && myChannel != '' && $('#leave-warning').is(":checked")) {
     return 'Are you sure you want to leave?';
   }
 }
