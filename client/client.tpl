@@ -2,6 +2,7 @@ var userIgnore; // public function
 var send;
 $(function() {
 
+var notifySound = new Audio('https://dl.dropboxusercontent.com/u/54596938/Hack.Chat%20Enhancement%20kit/notificationSound.wav');
 
 $("#link-block").hide();
 var frontpage = [
@@ -300,8 +301,15 @@ function pushMessage(args, usePre) {
 	messageEl.appendChild(textEl);
 
 	//Mentioning
-	if (args.text.indexOf("@" + myNick) != -1 || args.text.indexOf("@*") != -1)
-			messageEl.classList.add('mention');
+	if (args.text.indexOf("@" + myNick) != -1){
+		messageEl.classList.add('mention');
+		if ($('#joined-left').is(":checked")) {
+			notifyMe(args.nick + " mentioned you", args.text, false);
+		}
+	}
+	else if (args.text.indexOf("@*") != -1) {
+		messageEl.classList.add('mention');
+	}
 	else if (!(args.nick == '!' || args.nick == '*' || args.nick == '<Server>')) {
 		for(var nick in onlineUsers) {
 			if (args.text.indexOf(nick) != -1) {
@@ -730,6 +738,9 @@ if (localStorageGet('joined-left') == 'false') {
 if (localStorageGet('leave-warning') == 'false') {
 	$("#leave-warning").prop('checked', false);
 }
+if (localStorageGet('notifications') == 'false') {
+	$("#notifications").prop('checked', false);
+}
 
 $('#auto-login').change(function(e) {
 	localStorageSet('auto-login', !!e.target.checked);
@@ -739,6 +750,9 @@ $('#joined-left').change(function(e) {
 });
 $('#leave-warning').change(function(e) {
 	localStorageSet('leave-warning', !!e.target.checked);
+});
+$('#notifications').change(function(e) {
+	localStorageSet('notifications', !!e.target.checked);
 });
 
 // User list
@@ -782,6 +796,34 @@ function colorRender(trip) {
 	var color3 = (Math.floor((trip[1].charCodeAt(0) - 33) * 2.865)).toString(16);
 	var color2 = (Math.floor((trip[2].charCodeAt(0) - 33) * 2.865)).toString(16);
 	return "#" + color1 + color2 + color3;
+}
+
+if (!Notification)
+	console.log('Desktop notifications not available in your browser. Try Chrome.');
+else if (Notification.permission !== "granted")
+	Notification.requestPermission();
+
+function notifyMe(title, text, channel) {
+  if (typeof text != 'undefined') {
+		notifySound.play();
+    var Channel = channel;
+    var not = new Notification(title, {
+      body: text,
+      icon: 'http://i.imgur.com/44B3G6a.png'
+    });
+
+    not.onclick = function() {
+      if (Channel) {
+        window.open('https://chat.toastystoemp.com/?' + Channel, '_blank');
+      } else
+        window.focus()
+    };
+    setTimeout(function() {
+      not.close();
+      notifications.splice(notifications.indexOf(not), 1);
+    }, 8000);
+    notifications.push(not);
+  }
 }
 
 
