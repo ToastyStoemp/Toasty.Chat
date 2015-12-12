@@ -11,11 +11,13 @@ Client.prototype.run = function () {
   var app = express();
   var ejs = require('ejs');
   var fs = require('fs');
-  try{
-  fs.mkdirSync(__dirname + "/client/schemes");
-  }
-  catch(e){
-    console.log(e);
+  if (!fs.existsSync(__dirname + "/client/schemes")) {
+    try{
+      fs.mkdirSync(__dirname + "/client/schemes");
+    }
+    catch(e){
+      console.log(e);
+    }
   }
   var less = require('less');
   var files = fs.readdirSync(__dirname + "/client/base16");
