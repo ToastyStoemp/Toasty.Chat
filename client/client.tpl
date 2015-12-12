@@ -303,7 +303,7 @@ function pushMessage(args, usePre) {
 	//Mentioning
 	if (args.text.indexOf("@" + myNick) != -1){
 		messageEl.classList.add('mention');
-		if ($('#joined-left').is(":checked")) {
+		if ($('#joined-left').is(":checked") && !document.hasFocus()) {
 			notifyMe(args.nick + " mentioned you", args.text, false);
 		}
 	}
@@ -593,7 +593,13 @@ var unread = 0;
 
 window.onfocus = function() {
 	windowActive = true;
-	updateTitle();
+  for (var i = 0; i < notifications.length; i++) {
+    notifications[i].close();
+  }
+  notifications = [];
+  unread = 0;
+  updateTitle();
+  $('#chatinput').focus();
 }
 
 window.onblur = function() {
@@ -802,6 +808,8 @@ if (!Notification)
 	console.log('Desktop notifications not available in your browser. Try Chrome.');
 else if (Notification.permission !== "granted")
 	Notification.requestPermission();
+
+var notifications = [];
 
 function notifyMe(title, text, channel) {
   if (typeof text != 'undefined') {
