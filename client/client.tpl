@@ -2,7 +2,7 @@ var userIgnore; // public function
 var send;
 $(function() {
 
-var notifySound = new Audio('https://dl.dropboxusercontent.com/u/54596938/Hack.Chat%20Enhancement%20kit/notificationSound.wav');
+var notifySound = new Audio('https://toastystoemp.com/public/notifi-sound.wav');
 
 $("#link-block").hide();
 var frontpage = [
@@ -809,7 +809,7 @@ function notifyMe(title, text, channel) {
     var Channel = channel;
     var not = new Notification(title, {
       body: text,
-      icon: 'http://i.imgur.com/44B3G6a.png'
+      icon: 'https://toastystoemp.com/public/notifi-icon.png'
     });
 
     not.onclick = function() {
