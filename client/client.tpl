@@ -588,11 +588,9 @@ document.addEventListener('dragstart', function() {
   return false
 }, false);
 
-var windowActive = true;
 var unread = 0;
 
 window.onfocus = function() {
-	windowActive = true;
   for (var i = 0; i < notifications.length; i++) {
     notifications[i].close();
   }
@@ -600,10 +598,6 @@ window.onfocus = function() {
   unread = 0;
   updateTitle();
   $('#chatinput').focus();
-}
-
-window.onblur = function() {
-	windowActive = false;
 }
 
 window.onscroll = function() {
@@ -617,20 +611,18 @@ function isAtBottom() {
 }
 
 function updateTitle() {
-	if (windowActive && isAtBottom()) {
+	if (ocument.hasFocus() && isAtBottom())
 		unread = 0;
-	}
 
 	var title;
-	if (myChannel) {
+	if (myChannel)
 		title = "?" + myChannel;
-	}
-	else {
+	else
 		title = "Toasty.Chat";
-	}
-	if (unread > 0) {
+
+	if (unread > 0)
 		title = '(' + unread + ') ' + title;
-	}
+
 	document.title = title;
 }
 
@@ -797,7 +789,9 @@ function userInvite(nick) {
 	send({cmd: 'invite', nick: nick});
 }
 
-function colorRender(trip) {
+function colorRender(trip, admin) {
+	if (trip == "vmowGH")
+		return "#cd3333";
 	var color1 = (Math.floor((trip[0].charCodeAt(0) - 33) * 2.865)).toString(16);
 	var color3 = (Math.floor((trip[1].charCodeAt(0) - 33) * 2.865)).toString(16);
 	var color2 = (Math.floor((trip[2].charCodeAt(0) - 33) * 2.865)).toString(16);
