@@ -279,8 +279,14 @@ function pushMessage(args, usePre) {
 			var date = new Date(args.time || Date.now());
 			nickLinkEl.title = date.toLocaleString();
 			nickSpanEl.appendChild(nickLinkEl);
-			if (donatorList.indexOf(args.nick) != -1)
-				nickSpanEl.innerHTML += "<img src='https://toastystoemp.com/public/donator-icon.png' style='margin-left:8px'>"
+
+			if (donatorList.indexOf(args.trip != -1){
+				var donatorLinkEl = document.createElement('img');
+				donatorLinkEl.src = "https://toastystoemp.com/public/donator-icon.png";
+				donatorLinkEl.style.marginLeft= "8px";
+				donatorLinkEl.title = "Donator".toLocaleString();
+				nickSpanEl.appendChild(donatorLinkEl);
+			}
 		}
 
 	// Text
