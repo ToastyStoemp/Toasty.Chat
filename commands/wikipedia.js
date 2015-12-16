@@ -11,7 +11,7 @@ var wikiCallback = function(bot, sender, args, data, client)
 
 		if(typeof page == 'undefined')
 		{
-			bot.send("No results found!", client);
+			bot.sendClient("No results found!", client);
 			return;
 		}
 
@@ -25,7 +25,7 @@ var wikiCallback = function(bot, sender, args, data, client)
 				}
 				summary += " - " + page.fullurl;
 
-				bot.send(summary, client);
+				bot.sendAll(summary, client);
 			});
 		});
 	});

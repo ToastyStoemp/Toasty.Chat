@@ -1,6 +1,9 @@
 {
-  "mute"  : 1,
-  "kick"  : 1,
-  "ban"   : 1,
-  "bot"   : 1
+    "add": 2,
+    "remove": 2,
+    "config": 2,
+    "mute": 1,
+    "kick": 1,
+    "ban": 1,
+    "bot": 1
 }

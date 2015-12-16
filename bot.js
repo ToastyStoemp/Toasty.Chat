@@ -11,6 +11,8 @@ function Bot(chatServerBase) {
     if (err)
       throw err;
 
+    that.perm = require('./data/requiredPerm.json');
+
     that.commands = {};
     var init = [];
 
@@ -38,14 +40,31 @@ function Bot(chatServerBase) {
 
   this.parseCmd = function(data, client) {
     var msg = data.text;
-    if (msg[0] == "!") {
-      var cmd = msg.substr(1).split(" ")[0];
-      var args = msg.substr(2 + cmd.length).split(" ");
+    var cmd = msg.substr(1).split(" ")[0];
+    var args = msg.substr(2 + cmd.length).split(" ");
 
-      if (typeof that.commands[cmd] == 'function' && that.commands.hasOwnProperty(cmd))
+    if (typeof that.commands[cmd] == 'function' && that.commands.hasOwnProperty(cmd))
+      if (that.verify(that, cmd, data, client))
         return that.commands[cmd](that, data.nick, args, data, client);
-    }
+      else
+        that.sendClient("You do not have the right permissions for this command", client);
     return;
+  }
+
+  this.verify = function (that, cmd, data, client) {
+    if (that.perm[cmd] > 0){
+     if(data.mod || data.admin)
+      return true;
+    else
+      return false;
+    }
+    if (that.perm[cmd] > 1){
+      if (data.admin)
+        return true;
+      else
+        return false;
+    }
+    return true;
   }
 
   this.sendAll = function(text, client)

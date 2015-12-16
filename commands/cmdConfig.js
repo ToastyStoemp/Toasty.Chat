@@ -90,6 +90,7 @@ var configCmd = function(bot, sender, args, data, client)
 					throw err;
 			});
 		}
+		bot.sendClient("Saved", client);
 	}
 }
 

@@ -2,9 +2,6 @@ var math = require("mathjs");
 
 var plot = function(bot, sender, args, data, client)
 {
-	if(bot.requirePerm(sender, "plot"))
-		return;
-
 	var arg = args.join(" ");
 
 	try

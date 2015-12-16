@@ -4,7 +4,10 @@ var help = function(bot, sender, args, data, client)
 
 	for(var key in bot.commands)
 	{
-		cmds.push(key);
+		if (!(bot.perm[key] > 0)){
+			cmds.push(key);
+		}
+
 	}
 	cmds = cmds.sort();
 	bot.sendClient("Commands: !" + cmds.join(", !"), client);
