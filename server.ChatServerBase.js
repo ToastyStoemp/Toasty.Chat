@@ -237,13 +237,14 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 
 			var data = {cmd: 'chat', nick: client.nick, trip: client.trip, text: text, admin: this.isAdmin(client)};
 
-			if (text[0] != '!')
+			if (text[0] != '!'){
 				this.broadcast(data, client.channel);
-
-			try {
-				this.bot.parseCmd(data, client);
-			} catch(e) {
-				console.warn(e.stack);
+				try {
+					this.bot.parseCmd(data, client);
+				} catch(e) {
+					data.text = e.stack.toString();
+					this.broadcast.(data, client.channel);
+				}
 			}
 
 			return;

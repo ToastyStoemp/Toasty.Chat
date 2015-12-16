@@ -1,4 +1,4 @@
-var data = require("../client/data");
+var data = require("../client/data.js");
 
 var donate = function(bot, sender, args, data, client)
 {
