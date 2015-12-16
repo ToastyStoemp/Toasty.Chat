@@ -1,21 +1,18 @@
 var ascii = require("figlet");
 
-var createAsciiArt = function(bot, sender, args)
+var createAsciiArt = function(bot, sender, args, data, client)
 {
-	if(bot.requirePerm(sender, "ascii"))
-		return;
-
 	var text = args.join(" ");
 
-	ascii(text, function(err, data)
+	ascii(text, function(err, result)
 	{
 		if(err)
 		{
-			bot.send("Error creating ascii art :(");
+			bot.sendClient("Error creating ascii art :(", client);
 			return;
 		}
 
-		bot.send(data);
+		bot.sendAll(result, client);
 	});
 }
 

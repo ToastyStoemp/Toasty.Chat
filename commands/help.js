@@ -1,4 +1,4 @@
-var help = function(bot, sender, args)
+var help = function(bot, sender, args, data, client)
 {
 	var cmds = [];
 
@@ -7,7 +7,7 @@ var help = function(bot, sender, args)
 		cmds.push(key);
 	}
 	cmds = cmds.sort();
-	bot.send("Commands: !" + cmds.join(", !"));
+	bot.sendClient("Commands: !" + cmds.join(", !"), client);
 }
 
 module.exports = { h: help, help: help };

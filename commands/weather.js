@@ -1,6 +1,6 @@
 var weather = require("weather-js");
 
-var weatherCommand = function(bot, sender, args)
+var weatherCommand = function(bot, sender, args, data, client)
 {
 	var degreeType = "C";
 	var location;
@@ -19,7 +19,7 @@ var weatherCommand = function(bot, sender, args)
 	{
 		if(err)
 		{
-			bot.send("Error retrieving weather. Usage: !weather <location ...> [C|F]");
+			bot.sendClient("Error retrieving weather. Usage: !weather <location ...> [C|F]", client);
 			return;
 		}
 
@@ -34,8 +34,7 @@ var weatherCommand = function(bot, sender, args)
 			var data = result.forecast[i];
 			message += data.day + ": " + data.low + degree + " to " + data.high + degree + " - " + data.skytextday + "\n";
 		}
-
-		bot.send(message);
+		bot.sendClient(message, client);
 	});
 };
 

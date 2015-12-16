@@ -1,19 +1,12 @@
 var data = require("../client/data");
 
-var donate = function(bot, sender, args)
+var donate = function(bot, sender, args, data, client)
 {
-	try
-	{
-		var text = "Feel free to make a donation to this BTC-wallet:\n1L4wsdovW42KYNfQ1UE7jyZJPk4XiJJTHS\n\nList of previous donators:\n"
-		for (var i in data.donatorNames) {
-			text += "*" + data.donatorNames[i] + "\n";
-		}
-		bot.send(text);
+	var text = "Feel free to make a donation to this BTC-wallet:\n1L4wsdovW42KYNfQ1UE7jyZJPk4XiJJTHS\n\nList of previous donators:\n"
+	for (var i in data.donatorNames) {
+		text += "*" + data.donatorNames[i] + "\n";
 	}
-	catch(e)
-	{
-		bot.send(e.toString());
-	}
+	bot.sendAll(text, client);
 };
 
 module.exports = {donate: donate};

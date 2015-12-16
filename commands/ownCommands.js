@@ -22,7 +22,7 @@ var init = function(bot)
 
 var createOwnCmdFunc = function(cmd, output)
 {
-	return function(bot, sender, args)
+	return function(bot, sender, args, data, client)
 	{
 		var _output = output;
 
@@ -44,20 +44,20 @@ var createOwnCmdFunc = function(cmd, output)
 		}
 		if(/%[0-9]+%/g.test(_output))
 		{
-			bot.send("@" + sender + " not enough arguments!");
+			bot.sendClient("@" + sender + " not enough arguments!", client);
 			return;
 		}
 
 
-		bot.send(_output);
+		bot.sendAll(_output, client);
 	};
 };
 
-var addOwnCmd = function(bot, sender, args)
+var addOwnCmd = function(bot, sender, args, data, client)
 {
 	if(typeof bot.commands[args[0]] != 'undefined')
 	{
-		bot.send("@" + sender + " that commands already exists");
+		bot.sendClient("@" + sender + " that commands already exists", client);
 	}
 	else
 	{
@@ -67,21 +67,21 @@ var addOwnCmd = function(bot, sender, args)
 		bot.commands[name] = createOwnCmdFunc(name, output);
 		bot.config.ownCommands[name] = output;
 
-		bot.send("@" + sender + " added command " + name);
+		bot.sendClient("@" + sender + " added command " + name, client);
 	}
 };
 
-var removeOwnCmd = function(bot, sender, args)
+var removeOwnCmd = function(bot, sender, args, data, client)
 {
 	if(typeof bot.commands[args[0]] == 'undefined')
 	{
-		bot.send("@" + sender + " that commands does not exists");
+		bot.sendClient("@" + sender + " that commands does not exists", client);
 	}
 	else
 	{
 		delete bot.commands[args[0]];
 		delete bot.config.ownCommands[args[0]];
-		bot.send("@" + sender + " removed command " + args[0]);
+		bot.sendClient("@" + sender + " removed command " + args[0], client);
 	}
 };
 

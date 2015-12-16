@@ -1,6 +1,6 @@
 var math = require("mathjs");
 
-var plot = function(bot, sender, args)
+var plot = function(bot, sender, args, data, client)
 {
 	if(bot.requirePerm(sender, "plot"))
 		return;
@@ -35,11 +35,11 @@ var plot = function(bot, sender, args)
 		{
 			out.push(lines[i]);
 		}
-		bot.send(out.join("\n"));
+		bot.sendAll(out.join("\n"), client);
 	}
 	catch(e)
 	{
-		bot.send(e.toString());
+		bot.sendClient(e.toString(), client);
 	}
 };
 

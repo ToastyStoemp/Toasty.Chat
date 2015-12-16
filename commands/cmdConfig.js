@@ -26,7 +26,7 @@ var init = function(bot)
 	});
 };
 
-var configCmd = function(bot, sender, args)
+var configCmd = function(bot, sender, args, data, client)
 {
 	args[0] = args[0] || "";
 
@@ -43,7 +43,7 @@ var configCmd = function(bot, sender, args)
 		{
 			if(typeof obj[split[i]] == 'undefined')
 			{
-				bot.send("@" + sender + " " + split[i - 1] + " has no property " + split[i]);
+				bot.sendClient("@" + sender + " " + split[i - 1] + " has no property " + split[i], client);
 				return;
 			}
 
@@ -59,7 +59,7 @@ var configCmd = function(bot, sender, args)
 		{
 			if(typeof out[split[i]] == 'undefined')
 			{
-				bot.send("@" + sender + " could not read property " + split[i]);
+				bot.sendClient("@" + sender + " could not read property " + split[i], client);
 				return;
 			}
 			else
@@ -70,11 +70,11 @@ var configCmd = function(bot, sender, args)
 
 		try
 		{
-			bot.send(JSON.stringify(out, undefined, 2));
+			bot.sendClient(JSON.stringify(out, undefined, 2), client);
 		}
 		catch(e)
 		{
-			bot.send("@" + sender + " error parsing json (maybe circular object?)");
+			bot.sendClient("@" + sender + " error parsing json (maybe circular object?)", client);
 		}
 	}
 	else if(args[0] == "save")

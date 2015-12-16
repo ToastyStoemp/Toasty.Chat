@@ -1,6 +1,6 @@
 var unirest = require("unirest");
 
-var quote = function (bot, sender, args, data) {
+var quote = function (bot, sender, args, data, client) {
     unirest.post("https://andruxnet-random-famous-quotes.p.mashape.com/cat=movies")
         .header("X-Mashape-Key", "54pyT5Ih3Vmsh7yUVh3vC3Nf2FuAp1MbTcjjsnj0of8Htcq5G2")
         .header("Content-Type", "application/x-www-form-urlencoded")
@@ -12,7 +12,7 @@ var quote = function (bot, sender, args, data) {
             var form_quote = quote.replace(/[ ]/gi, "\\ ");
             var form_author = author.replace(/[ ]/gi, "\\ ");
             var text = "$$ \\large{" + form_quote + "}\\ \\small {by}\\ {" + form_author + "} $$";
-            return bot.send(text);
+            return bot.sendAll(text, client);
         });
 
 }

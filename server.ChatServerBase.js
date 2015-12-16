@@ -235,21 +235,13 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 				return;
 			}
 
-			var data = {cmd: 'chat', nick: client.nick, trip: client.trip, text: text};
-			data.admin = this.isAdmin(client);
+			var data = {cmd: 'chat', nick: client.nick, trip: client.trip, text: text, admin: this.isAdmin(client)};
 
-			this.broadcast(data, client.channel);
-			this.bot.send = function(text)
-			{
-				var botData = {
-				  cmd: 'chat',
-				  text: text,
-				  nick: 'Bot'
-				};
-				self.broadcast(botData, client.channel);
-			}
+			if (text[0] != '!')
+				this.broadcast(data, client.channel);
+
 			try {
-				this.bot.parseCmd(data);
+				this.bot.parseCmd(data, client);
 			} catch(e) {
 				console.warn(e.stack);
 			}

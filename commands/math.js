@@ -1,6 +1,6 @@
 var math = require("mathjs");
 
-var mathCommand = function(bot, sender, args)
+var mathCommand = function(bot, sender, args, data, client)
 {
 	try
 	{
@@ -9,15 +9,15 @@ var mathCommand = function(bot, sender, args)
 
 		if(typeof result == 'function')
 		{
-			bot.send("Cannot output function. Try " + arg + "; " + result.name + "(...)");
+			bot.sendClient("Cannot output function. Try " + arg + "; " + result.name + "(...)", client);
 			return;
 		}
 
-		bot.send("Result: " + result.toString());
+		bot.sendAll("Result: " + result.toString(), client);
 	}
 	catch(e)
 	{
-		bot.send(e.toString());
+		bot.sendClient(e.toString(), client);
 	}
 };
 

@@ -1,6 +1,6 @@
 var request = require("request");
 
-function bfInterpreter(bot, sender, args, data)
+function bfInterpreter(bot, sender, args, data, client)
 {
     if(args[0] == "pastebin")
     {
@@ -9,12 +9,12 @@ function bfInterpreter(bot, sender, args, data)
         {
             if(err)
             {
-                bot.send("@" + sender + " " + err.toString());
+                bot.sendClient("@" + sender + " " + err.toString(), client);
                 return;
             }
 
             var result = bfRun(code);
-            bot.send("@" + sender + " " + result.output);
+            bot.sendAll("@" + sender + " " + result.output, client);
         });
     }
     else if(args[0] == "debug")
@@ -23,9 +23,9 @@ function bfInterpreter(bot, sender, args, data)
         var result = bfRun(code);
 
         if(typeof result.error != 'undefined')
-            bot.send("@" + sender + " " + createErrorMessage(result.output, code, result.error));
+            bot.sendClient("@" + sender + " " + createErrorMessage(result.output, code, result.error),client);
         else
-            bot.send("@" + sender + " " + result.output + "\nVariables: " + JSON.stringify(result.variables));
+            bot.sendClient("@" + sender + " " + result.output + "\nVariables: " + JSON.stringify(result.variables),client);
     }
     else
     {
@@ -33,9 +33,9 @@ function bfInterpreter(bot, sender, args, data)
         var result = bfRun(code);
 
         if(typeof result.error != 'undefined')
-            bot.send("@" + sender + " " + createErrorMessage(result.output, code, result.error));
+            bot.sendClient("@" + sender + " " + createErrorMessage(result.output, code, result.error), client);
         else
-            bot.send("@" + sender + " " + result.output);
+            bot.sendAll("@" + sender + " " + result.output, client);
     }
 }
 

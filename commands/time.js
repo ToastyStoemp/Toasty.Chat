@@ -1,6 +1,6 @@
 var weather = require("weather-js");
 
-var time = function(bot, sender, args)
+var time = function(bot, sender, args, data, client)
 {
 	var arg = args.join(" ");
 
@@ -11,7 +11,7 @@ var time = function(bot, sender, args)
 
 		var there = new Date(current.getTime() + offset + diff);
 
-		bot.send(there.toLocaleTimeString() + " - " + location);
+		bot.sendClient(there.toLocaleTimeString() + " - " + location, client);
 	}
 
 	if(typeof bot.config.timezones[args[0]] != 'undefined')
@@ -26,7 +26,7 @@ var time = function(bot, sender, args)
 		{
 			if(err)
 			{
-				bot.send("Error retrieving timezone. Usage !time <location> or !time <timezone>");
+				bot.sendClient("Error retrieving timezone. Usage !time <location> or !time <timezone>");
 				return;
 			}
 

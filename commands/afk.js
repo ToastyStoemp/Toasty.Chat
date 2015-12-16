@@ -30,17 +30,17 @@ var init = function(bot)
 	});
 };
 
-var afk = function(bot, sender, args)
+var afk = function(bot, sender, args, data, client)
 {
 	var index = bot.afks.indexOf(sender);
 	if(index !== -1)
 	{
 		bot.afks.splice(index, 1);
-		bot.send("Welcome back @" + sender + "");
+		bot.sendAll("Welcome back @" + sender + "", client);
 	}
 	else
 	{
-		bot.send("User @" + sender + " is now AFK");
+		bot.sendAll("User @" + sender + " is now AFK", client);
 		bot.afks.push(sender);
 	}
 };

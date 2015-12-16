@@ -50,11 +50,11 @@ else
 		});
 	}
 
-	var jsCommand = function(bot, sender, args)
+	var jsCommand = function(bot, sender, args, data, client)
 	{
 		if(typeof childPs[sender] != 'undefined')
 		{
-			bot.send("@" + sender + " only one !js command every 3 seconds");
+			bot.sendClient("@" + sender + " only one !js command every 3 seconds", client);
 			return;
 		}
 
@@ -67,7 +67,7 @@ else
 		}
 		else if(args.length == 0 || args.join("").trim() == "" || args[0] == "help")
 		{
-			bot.send("Usage: !js <code>, !js pastebin <id>, !js clear, !js help");
+			bot.sendClient("Usage: !js <code>, !js pastebin <id>, !js clear, !js help", client);
 		}
 		else if(args[0] == "pastebin")
 		{
@@ -76,7 +76,7 @@ else
 			{
 				if(err)
 				{
-					bot.send("@" + sender + " " + err.toString());
+					bot.sendAll("@" + sender + " " + err.toString(), client);
 					return;
 				}
 
@@ -106,7 +106,7 @@ else
 			{
 				if(message.out.length < 500 && message.out.split("\n").length < 5)
 				{
-					bot.send("@" + sender + " Output: " + message.out);
+					bot.sendAll("@" + sender + " Output: " + message.out, client);
 				}
 				else if(typeof bot.config.js.devKey == 'string' && bot.config.js.devKey.trim() != "")
 				{
@@ -116,14 +116,14 @@ else
 					_pastebin.new({title: postName, content: message.out, expire: expire}, function (err, ret)
 					{
 						if(err)
-							bot.send("@" + sender + " Error: " + err.toString());
+							bot.sendClient("@" + sender + " Error: " + err.toString(), client);
 						else
-							bot.send("@" + sender + " Output: " + ret);
+							bot.sendClient("@" + sender + " Output: " + ret, client);
 					});
 				}
 				else
 				{
-					bot.send("@" + sender + " Output too long! Not showing anything");
+					bot.sendClient("@" + sender + " Output too long! Not showing anything", client);
 				}
 
 				userContexts[sender] = message.context;
@@ -137,7 +137,7 @@ else
 				p.kill();
 				delete childPs[sender];
 				if(!pFinished)
-					bot.send("@" + sender + " terminated! Execution took too long");
+					bot.sendClient("@" + sender + " terminated! Execution took too long", client);
 			}, 3000);
 		}
 	}

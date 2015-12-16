@@ -1,7 +1,7 @@
 var Wiki = require("wikijs");
 var wiki = new Wiki();
 
-var wikiCallback = function(bot, sender, args)
+var wikiCallback = function(bot, sender, args, data, client)
 {
 	var input = args.join(" ");
 
@@ -11,7 +11,7 @@ var wikiCallback = function(bot, sender, args)
 
 		if(typeof page == 'undefined')
 		{
-			bot.send("No results found!");
+			bot.send("No results found!", client);
 			return;
 		}
 
@@ -25,11 +25,10 @@ var wikiCallback = function(bot, sender, args)
 				}
 				summary += " - " + page.fullurl;
 
-				bot.send(summary);
+				bot.send(summary, client);
 			});
 		});
 	});
 };
 
 module.exports = { wiki: wikiCallback };
-

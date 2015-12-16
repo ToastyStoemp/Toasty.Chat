@@ -36,16 +36,27 @@ function Bot(chatServerBase) {
     }
   });
 
-  this.parseCmd = function(data) {
+  this.parseCmd = function(data, client) {
     var msg = data.text;
     if (msg[0] == "!") {
       var cmd = msg.substr(1).split(" ")[0];
       var args = msg.substr(2 + cmd.length).split(" ");
 
       if (typeof that.commands[cmd] == 'function' && that.commands.hasOwnProperty(cmd))
-        return that.commands[cmd](that, data.nick, args, data);
+        return that.commands[cmd](that, data.nick, args, data, client);
     }
     return;
+  }
+
+  this.sendAll = function(text, client)
+  {
+  	var botData = {cmd: 'chat', text: text, nick: 'Bot'};
+  	this.chatServerBase.broadcast(botData, client.channel);
+  }
+  this.sendClient = function(text, client)
+  {
+  	var botData = {cmd: 'chat', text: text, nick: 'Bot'};
+  	client.send(botData);
   }
 }
 util.inherits(Bot, events.EventEmitter);
