@@ -48,6 +48,8 @@ function Bot(chatServerBase) {
         return that.commands[cmd](that, data.nick, args, data, client);
       else
         that.sendClient("You do not have the right permissions for this command", client);
+    else
+      that.sendClient("Unknown command, type !help or !h for a list of available commands", client);
     return;
   }
 
