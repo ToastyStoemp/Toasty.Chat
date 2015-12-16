@@ -279,6 +279,8 @@ function pushMessage(args, usePre) {
 			var date = new Date(args.time || Date.now());
 			nickLinkEl.title = date.toLocaleString();
 			nickSpanEl.appendChild(nickLinkEl);
+			if (donatorList.indexOf(args.nick) != -1)
+				nickSpanEl.innerHTML += "<img src='https://toastystoemp.com/public/donator-icon.png' style='margin-left:8px'>"
 		}
 
 	// Text
@@ -611,7 +613,7 @@ function isAtBottom() {
 }
 
 function updateTitle() {
-	if (ocument.hasFocus() && isAtBottom())
+	if (document.hasFocus() && isAtBottom())
 		unread = 0;
 
 	var title;
