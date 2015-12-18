@@ -5,5 +5,6 @@
     "mute": 1,
     "kick": 1,
     "ban": 1,
-    "bot": 1
+    "bot": 1,
+    "hide": 1
 }

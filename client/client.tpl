@@ -658,12 +658,7 @@ $('#chatinput').keydown(function(e) {
 		if (e.target.value != '') {
 			var text = e.target.value;
 			e.target.value = '';
-			if (text.substr(0,2) == "!b") {
-				send({cmd: 'broadcast', text: text.substr(3)});
-			}
-			else {
-				send({cmd: 'chat', text: text});
-			}
+			send({cmd: 'chat', text: text});
 			lastSent[0] = text;
 			lastSent.unshift("");
 			lastSentPos = 0;
