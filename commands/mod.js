@@ -36,11 +36,21 @@ var hide = function(bot, sender, args, data, client)
 	// }
 };
 
+var broadcast = function(bot, sender, args, data, client)
+{
+	if (args[0] != '')
+		bot.chatServerBase.handleCommand('broadcast', client, args);
+	else
+		bot.sendClient("Usage is '!b [text]' or '!broadcast [text]''", client);
+};
+
 
 module.exports =
 {
 	mute: mute,
 	kick: kick,
 	ban: ban,
-	hide: hide
+	hide: hide,
+	b: broadcast,
+	broadcast: broadcast
 };
