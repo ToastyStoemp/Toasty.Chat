@@ -280,7 +280,7 @@ function pushMessage(args, usePre) {
 			nickLinkEl.title = date.toLocaleString();
 			nickSpanEl.appendChild(nickLinkEl);
 
-			if (donatorList.indexOf(args.trip) != -1){
+			if (args.donator){
 				var donatorLinkEl = document.createElement('img');
 				donatorLinkEl.src = "https://toastystoemp.com/public/donator-icon.png";
 				donatorLinkEl.style.marginLeft= "8px";
