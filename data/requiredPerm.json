@@ -1,4 +1,6 @@
 {
+    "donateadd": 2,
+    "donateremove": 2,
     "add": 2,
     "remove": 2,
     "config": 2,
