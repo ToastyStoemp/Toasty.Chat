@@ -126,6 +126,17 @@ ChatServerBase.prototype.broadcast = function(data, channel) {
 			clientsOfChannel[i].send(data);
 	}
 };
+ChatServerBase.prototype.broadcastAll = function(data) {
+	var channelNames = this.getChannelNames();
+	for(var i in channelNames)
+	{
+		var clientsOfChannel = this.getClientsOfChannel(channelNames[i]);
+		for(var k in clientsOfChannel) {
+			if (k !== '')
+				clientsOfChannel[k].send(data);
+		}
+	}
+};
 ChatServerBase.prototype.validateNickName = function(nick) {
 	return /^[a-zA-Z0-9_]{1,24}$/.test(nick); // Allow letters, numbers, and underscores
 };
@@ -384,8 +395,8 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 
 				return;
 			case 'broadcast':
-				var text = String(args.text);
-				this.broadcast({cmd: 'shout', infoCode: 'S001', text: "Server broadcast: " + text});
+				var text = args.join(' ');
+				this.broadcastAll({cmd: 'shout', infoCode: 'S001', text: "Server broadcast: " + text});
 				return;
 		}
 	}
