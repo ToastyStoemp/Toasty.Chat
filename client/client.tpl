@@ -261,8 +261,6 @@ function pushMessage(args, usePre) {
 			var tripEl = document.createElement('span');
 			if (args.admin)
 				tripEl.textContent = "Admin ";
-			else if (tripPost[args.nick])
-				tripsEl.textContent = tripPost[args.nick];
 			else
 				tripEl.textContent = args.trip.substr(0,6) + " ";
 			tripEl.classList.add('trip');
