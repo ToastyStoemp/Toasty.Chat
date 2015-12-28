@@ -21,7 +21,7 @@ var donateadd = function(bot, sender, args, data, client)
 			return;
 		}
 
-	donatorList[bot.commands['gettrip'](bot, data.nick, args, data, client)] = args[0];
+	donatorList[bot.commands['tripget'](bot, data.nick, args, data, client)] = args[0];
 	bot.sendAll(args[0] + " has been added to the list of donators! Thank you for your donation", client);
 };
 
@@ -33,7 +33,7 @@ var donateremove = function(bot, sender, args, data, client)
 	}
 	for (var i in donatorList)
 		if (donatorList[i] == args[0]) {
-			delete donatorList[bot.commands['gettrip'](bot, data.nick, args, data, client)];
+			delete donatorList[bot.commands['tripget'](bot, data.nick, args, data, client)];
 			bot.sendAll(args[0] + " has been removed from the list of donators!", client);
 			return;
 		}

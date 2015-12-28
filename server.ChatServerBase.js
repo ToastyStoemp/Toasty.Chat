@@ -2,8 +2,8 @@
 /* jshint esnext: true */
 
 var crypto = require('crypto');
-var donators = require("./data/donators.json");
-
+var donatorlist = require("./data/donators.json");
+var triplist = require("./data/trips.json");
 
 // Keeps multiple connections for a client
 function MetaClient() {
@@ -163,7 +163,7 @@ ChatServerBase.prototype.isMod = function(client) {
 	return this.config.mods && this.config.mods.indexOf(client.trip) >= 0;
 };
 ChatServerBase.prototype.isDonator = function(client) {
-	return typeof donators[client.trip] != 'undefined';
+	return typeof donatorlist[client.trip] != 'undefined';
 };
 ChatServerBase.prototype.generatePassword = function(nick) {
 	var gPass = "";
@@ -259,6 +259,8 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			}
 
 			var data = {cmd: 'chat', nick: client.nick, trip: client.trip, text: text, admin: this.isAdmin(client), donator: this.isDonator(client)};
+			if (typeof triplist[data.trip] != 'undefined' )
+				data.trip = triplist[data.trip];
 
 			if (text[0] != '!')
 				this.broadcast(data, client.channel);

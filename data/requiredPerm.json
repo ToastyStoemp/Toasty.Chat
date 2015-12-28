@@ -1,4 +1,6 @@
 {
+    "tripadd": 2,
+    "tripremove": 2,
     "donateadd": 2,
     "donateremove": 2,
     "add": 2,
@@ -10,5 +12,5 @@
     "bot": 1,
     "hide": 1,
     "broadcast": 1,
-    "gettrip": 1
+    "tripget": 1
 }
