@@ -50,6 +50,14 @@ ChatServerBase.prototype.getClientsOfChannel = function(channel) {
 	if (clientsOfChannel !== void 0) return clientsOfChannel;
 	return {'':0}; // return empty list
 };
+ChatServerBase.prototype.getClientOfChannel = function(nick, channel) {
+	var clientsOfChannel = this._connectedClients[channel];
+	if (clientsOfChannel !== void 0)
+		for (var i in clientsOfChannel)
+			if (clientsOfChannel[i].nick == nick)
+				return clientsOfChannel[i];
+	return;
+};
 ChatServerBase.prototype.addClientToChannel = function(channel, client, nick, trip) {
 	var clientsOfChannel = this._connectedClients[channel];
 	if (clientsOfChannel === void 0) {
