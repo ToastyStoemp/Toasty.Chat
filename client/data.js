@@ -1,4 +1,4 @@
-var webClientVersion = "201512160013";
+var webClientVersion = "201512280014";
 
 module.exports = {
   webClientVersion: webClientVersion
