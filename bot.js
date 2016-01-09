@@ -72,12 +72,12 @@ function Bot(chatServerBase) {
   this.sendAll = function(text, client)
   {
   	var botData = {cmd: 'chat', text: text, nick: 'Bot'};
-  	this.chatServerBase.broadcast(botData, client.channel);
+  	this.chatServerBase.broadcast(null, botData, client.channel);
   }
   this.sendClient = function(text, client)
   {
   	var botData = {cmd: 'chat', text: text, nick: 'Bot'};
-  	client.send(botData);
+  	client.send(null, botData);
   }
 }
 util.inherits(Bot, events.EventEmitter);

@@ -24,7 +24,7 @@ WebSocketClient.prototype.getIpAddress = function() {
 WebSocketClient.prototype.close = function() {
 	this.socket.close();
 }
-WebSocketClient.prototype.send = function(data) {
+WebSocketClient.prototype.send = function(causingClient, data) {
 	data.time = Date.now(); // Add timestamp to command
 	try {
 		if (this.socket.readyState == ws.OPEN) {
