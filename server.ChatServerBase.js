@@ -261,6 +261,8 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			var data = {cmd: 'chat', nick: client.nick, trip: client.trip, text: text, admin: this.isAdmin(client), donator: this.isDonator(client)};
 			if (typeof triplist[data.trip] != 'undefined' )
 				data.trip = triplist[data.trip];
+			else 
+				data.trip = data.trip.substr(0,6);
 
 			if (text[0] != '!')
 				this.broadcast(data, client.channel);

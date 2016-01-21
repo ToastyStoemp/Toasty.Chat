@@ -262,7 +262,7 @@ function pushMessage(args, usePre) {
 			if (args.admin)
 				tripEl.textContent = "Admin ";
 			else
-				tripEl.textContent = args.trip.substr(0,6) + " ";
+				tripEl.textContent = args.trip + " ";
 			tripEl.classList.add('trip');
 			nickSpanEl.appendChild(tripEl);
 		}
