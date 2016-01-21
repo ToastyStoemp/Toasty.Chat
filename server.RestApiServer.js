@@ -72,7 +72,7 @@ RestClient.prototype.close = function() {
 	this.chatServerBase.onClose(this);
 	delete this.clients[this.token];
 };
-RestClient.prototype.send = function(data) {
+RestClient.prototype.send = function(causingClient, data) {
 	this.addToStorage(data);
 };
 

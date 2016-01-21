@@ -39,7 +39,7 @@ ToastyClient.prototype._generateIdentifier = function(nick) {
 ToastyClient.prototype._getSystemUser = function() {
 	return '&system';
 }
-ToastyClient.prototype.send = function(data) {
+ToastyClient.prototype.send = function(causingClient, data) {
 	var self = this;
 	data.time = Date.now(); // Add timestamp to command
 	switch (data.cmd) {
@@ -61,7 +61,7 @@ ToastyClient.prototype.send = function(data) {
 			}, this);
 			break;
 		case 'chat':
-			if (data.nick !== this.ircClient.nick) {
+			if (causingClient !== this) { // show only messages from different (specialized) clients
 				data.text.split('\n').forEach(function(line) {
 					this.ircClient.write(':'+this._generateIdentifier(data.nick)+' PRIVMSG #'+this.channelName+' :'+line.replace('\r', ''));
 				}, this);
