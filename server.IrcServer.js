@@ -203,6 +203,17 @@ IrcServer.prototype.handleCommand = function(client, args) {
 		case 'PING':
 			client.answer('PONG '+this.config.servHostname+' :'+args[1]);
 			return;
+		case 'INVITE':
+			if (client.state != IrcServer.STATE.ready) return;
+
+			var channelName = args[1].substr(1);
+			var message = args[2];
+
+			var toastyClient = client.channels[channelName];
+			if (toastyClient === void 0) return;
+
+			client.chatServerBase.onMessage(toastyClient, {cmd: 'invite', nick: message});
+			return;
 		case 'PRIVMSG':
 			if (client.state != IrcServer.STATE.ready) return;
 
