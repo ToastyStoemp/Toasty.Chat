@@ -76,13 +76,13 @@ function calculateRejoinTimeout() {
 function join(channel) {
 	connectTime = new Date(); // here also for 'normal' connect fails
 
-	if (document.domain == '<%= domain %>') {
+	if (document.domain == config.domain) {
 		// For http://toastystoemp.com/
-		ws = new WebSocket('wss://<%= domain %>/chatws');
+		ws = new WebSocket('wss://'+config.domain+'/chatws');
 	}
 	else {
 		// for local installs
-		ws = new WebSocket('ws://' + document.domain + ':<%= port %>');
+		ws = new WebSocket('ws://' + document.domain + ':'+config.port);
 	}
 
 	var lastPong = new Date();

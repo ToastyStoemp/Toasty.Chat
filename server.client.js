@@ -35,8 +35,8 @@ Client.prototype.run = function () {
   });
   var port = this.config.socketPort;
   var domain = this.config.domain;
-  var input = fs.readFileSync(__dirname + "/client/client.tpl").toString();
-  fs.writeFileSync(__dirname + "/client/client.js",ejs.render(input, {domain: domain, port: port}));
+  var input = fs.readFileSync(__dirname + "/client/config.tpl").toString();
+  fs.writeFileSync(__dirname + "/client/config.js",ejs.render(input, {domain: domain, port: port}));
   app.set('views', __dirname + '/client');
   app.set("view engine", "jade");
   app.use(express.static(__dirname + '/client'));
