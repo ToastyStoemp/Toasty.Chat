@@ -1,10 +1,12 @@
 var request = require("request");
 
-request("https://api.coindesk.com/v1/bpi/currentprice.json", function (err, res, body) {
-  if(err) 
-    return;
-  module.btc = JSON.parse(body);
-});
+function getJSON() {
+  request("https://api.coindesk.com/v1/bpi/currentprice.json", function (err, res, body) {
+    if(err) 
+      return;
+    module.btc = JSON.parse(body);
+  });
+}
 
 function prepareArgs(args) {
   var a = args;
@@ -16,6 +18,7 @@ function prepareArgs(args) {
   return a;
 }
 function BtcToUSD(bot, sender, args, data, client) {
+  getJSON();
   args = prepareArgs(args);
   if(!args)
     return bot.sendAll("Could not process", client);
@@ -24,6 +27,7 @@ function BtcToUSD(bot, sender, args, data, client) {
 }
 
 function BtcToEUR(bot, sender, args, data, client) {
+  getJSON();
   args = prepareArgs(args);
   if(!args)
     return bot.sendAll("Could not process", client);
