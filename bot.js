@@ -32,6 +32,8 @@ function Bot(chatServerBase) {
         }
 
         for (var key in cmds) {
+          if(key == "init")
+            continue;
           if (typeof cmds[key] != 'object' || typeof cmds[key].action != "function")
             throw errmsg;
           that.commands[key] = cmds[key].action;
