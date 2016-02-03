@@ -1,10 +1,11 @@
 var request = require("request");
+var btc = {};
 
 function getJSON() {
   request("https://api.coindesk.com/v1/bpi/currentprice.json", function (err, res, body) {
     if(err) 
       return;
-    module.btc = JSON.parse(body);
+    btc.btc = JSON.parse(body);
   });
 }
 
@@ -22,7 +23,7 @@ function BtcToUSD(bot, sender, args, data, client) {
   args = prepareArgs(args);
   if(!args)
     return bot.sendAll("Could not process", client);
-  var output = "@" + sender + " " + args[0] + " BTC = " + (args[0] * module.btc.bpi.USD.rate_float) + " USD.";
+  var output = "@" + sender + " " + args[0] + " BTC = " + (args[0] * btc.btc.bpi.USD.rate_float) + " USD.";
   return bot.sendAll(output, client);
 }
 
@@ -31,7 +32,7 @@ function BtcToEUR(bot, sender, args, data, client) {
   args = prepareArgs(args);
   if(!args)
     return bot.sendAll("Could not process", client);
-  var output = "@" + sender + " " + args[0] + " BTC = " + (args[0] * module.btc.bpi.EUR.rate_float) + " USD.";
+  var output = "@" + sender + " " + args[0] + " BTC = " + (args[0] * btc.btc.bpi.EUR.rate_float) + " USD.";
   return bot.sendAll(output, client);
 }
 module.exports = {
