@@ -48,5 +48,7 @@ var afk = function(bot, sender, args, data, client)
 module.exports =
 {
 	init: init,
-	afk: afk
+	afk: {
+		action: afk
+	}
 };

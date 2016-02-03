@@ -63,11 +63,11 @@ else
 			if(typeof userContexts[sender] != 'undefined')
 				delete userContexts[sender];
 
-			bot.send("@" + sender + " cleared context");
+			bot.sendAll("@" + sender + " cleared context");
 		}
-		else if(args.length == 0 || args.join("").trim() == "" || args[0] == "help")
+		else if(!args[0] || args[0] == "help")
 		{
-			bot.sendClient("Usage: !js <code>, !js pastebin <id>, !js clear, !js help", client);
+			bot.sendClient(bot.man.js, client);
 		}
 		else if(args[0] == "pastebin")
 		{
@@ -141,6 +141,6 @@ else
 			}, 3000);
 		}
 	}
-
-	module.exports = {js: jsCommand, init: init};
+	
+	module.exports = {js: {action: jsCommand, man: "Syntax is !js <JavaScript code>, !js clear, !js pastebin <id> or !js help; executes JS code."}, init: init};
 }

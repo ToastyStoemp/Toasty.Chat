@@ -37,4 +37,4 @@ var time = function(bot, sender, args, data, client)
 	}
 }
 
-module.exports = { time: time };
+module.exports = { time: {action: time, man: "Syntax is !time <region>; sends the time in <region>."} };

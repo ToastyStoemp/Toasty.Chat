@@ -17,4 +17,4 @@ var quote = function (bot, sender, args, data, client) {
 
 }
 
-exports.quote = quote;
+module.exports = {quote: {action: quote, man: "No arguments; sends a famous quote."}};

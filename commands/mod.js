@@ -41,16 +41,19 @@ var broadcast = function(bot, sender, args, data, client)
 	if (args[0] != '')
 		bot.chatServerBase.handleCommand('broadcast', client, args);
 	else
-		bot.sendClient("Usage is '!b [text]' or '!broadcast [text]''", client);
+		bot.sendClient(bot.man.b, client);
 };
 
-
+var br = {
+	action: broadcast,
+	man: "Syntax is !b <text> or !broadcast <text>; sends a server broadcast."
+}
 module.exports =
 {
-	mute: mute,
-	kick: kick,
-	ban: ban,
-	hide: hide,
-	b: broadcast,
-	broadcast: broadcast
+	mute: {action: mute},
+	kick: {action: kick},
+	ban: {action: ban},
+	hide: {action: hide},
+	b: br,
+	broadcast: br
 };

@@ -38,4 +38,4 @@ var weatherCommand = function(bot, sender, args, data, client)
 	});
 };
 
-module.exports = {weather: weatherCommand};
+module.exports = {weather: {action: weatherCommand, man: "Syntax is !weather <region>; sends the weather in <region>."}};

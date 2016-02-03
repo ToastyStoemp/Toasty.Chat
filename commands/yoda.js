@@ -1,6 +1,6 @@
 var soap = require('soap');
 var url = "http://www.yodaspeak.co.uk/webservice/yodatalk.php?wsdl";
-exports.yoda = function(bot, sender, args, data, client) {
+function yodaFunc(bot, sender, args, data, client) {
   if (args.length > 0) {
     var form_sentence = args.join(" ");
     soap.createClient(url, function(err, api) {
@@ -13,6 +13,8 @@ exports.yoda = function(bot, sender, args, data, client) {
       });
     });
   } else {
-    return bot.sendClient("@" + sender + " Usage: /yoda <sentence>", client);
+    return bot.sendClient(bot.man.yoda, client);
   }
 };
+
+module.exports = { yoda: { action: yodaFunc, man: "Syntax is !yoda <text>; sends what Yoda would say instead of <text>." } };

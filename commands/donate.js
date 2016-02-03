@@ -12,8 +12,8 @@ var donate = function(bot, sender, args, data, client)
 var donateadd = function(bot, sender, args, data, client)
 {
 	if (args[0] == "") {
-		bot.sendClient("Usage: !adddonator [nick]", client);
-		return
+		bot.sendClient(bot.man.donateadd, client);
+		return;
 	}
 	for (var i in donatorList)
 		if (donatorList[i] == args[0]) {
@@ -27,9 +27,9 @@ var donateadd = function(bot, sender, args, data, client)
 
 var donateremove = function(bot, sender, args, data, client)
 {
-	if (args[0] == "") {
-		bot.sendClient("Usage: !removedonator [nick]", client);
-		return
+	if (!args[0]) {
+		bot.sendClient(bot.man.donateremove, client);
+		return;
 	}
 	for (var i in donatorList)
 		if (donatorList[i] == args[0]) {
@@ -38,11 +38,11 @@ var donateremove = function(bot, sender, args, data, client)
 			return;
 		}
 
-	bot.sendClient("User not found", client);
+	bot.sendClient("User not found. " + bot.man.donateremove, client);
 };
 
 module.exports = {
-	donate: donate,
-	donateadd: donateadd,
-	donateremove: donateremove
+	donate: {action: donate, man: "No arguments; sends a donation link and the current donators."},
+	donateadd: {action: donateadd, man: "Syntax is !donateadd <nick>; adds a donator to the donator list."},
+	donateremove: {action: donateremove, man: "Syntax is !donateremove <nick>; removes a person from the donator list."}
 };

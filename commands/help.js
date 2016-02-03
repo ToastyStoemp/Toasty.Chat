@@ -13,4 +13,8 @@ var help = function(bot, sender, args, data, client)
 	bot.sendClient("Commands: !" + cmds.join(", !"), client);
 }
 
-module.exports = { h: help, help: help };
+var e = {
+	action: help,
+	man: "No arguments; sends all the available command of this bot, sorted alphabetically."
+}
+module.exports = { h: e, help: e };

@@ -120,5 +120,10 @@ function bfRun(code)
     return {output: out, variables: vars, index: index};
 }
 
-exports.bf = bfInterpreter;
-exports.brainfuck = bfInterpreter;
+var a = {
+    action: bfInterpreter,
+    man: "Syntax is !bf or !brainfuck <brainfuck code>. Executes the code and produces and output."
+}
+module.exports = {
+    
+};
