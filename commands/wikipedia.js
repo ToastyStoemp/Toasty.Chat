@@ -31,4 +31,4 @@ var wikiCallback = function(bot, sender, args, data, client)
 	});
 };
 
-module.exports = { wiki: wikiCallback };
+module.exports = { wiki: { action: wikiCallback, man: "Syntax is !wiki <term>; searches for <term> in Wikipedia." } };
