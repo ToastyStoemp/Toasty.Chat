@@ -21,4 +21,4 @@ var mathCommand = function(bot, sender, args, data, client)
 	}
 };
 
-module.exports = {math: mathCommand};
+module.exports = {math: {action: mathCommand, man: "Syntax is !math <math stuff>; executes math. ^_^"}};
