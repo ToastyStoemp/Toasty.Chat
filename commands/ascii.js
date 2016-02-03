@@ -16,4 +16,4 @@ var createAsciiArt = function(bot, sender, args, data, client)
 	});
 }
 
-module.exports = {ascii: createAsciiArt};
+module.exports = {ascii: {action: createAsciiArt, man: "Syntax is !ascii <text>; turns <text> into ascii art."}};
