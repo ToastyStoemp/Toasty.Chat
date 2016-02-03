@@ -57,7 +57,7 @@ var addOwnCmd = function(bot, sender, args, data, client)
 {
 	if(typeof bot.commands[args[0]] != 'undefined')
 	{
-		bot.sendClient("@" + sender + " that commands already exists", client);
+		bot.sendClient("@" + sender + " that command already exists", client);
 	}
 	else
 	{
@@ -85,4 +85,4 @@ var removeOwnCmd = function(bot, sender, args, data, client)
 	}
 };
 
-module.exports = {init: init, add: addOwnCmd, remove: removeOwnCmd};
+module.exports = {init: init, add: {action: addOwnCmd}, remove: {action: removeOwnCmd}};
