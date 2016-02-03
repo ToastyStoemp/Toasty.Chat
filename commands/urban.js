@@ -1,6 +1,6 @@
 var request = require("request");
 
-exports.urban = function(bot, sender, args, data, client)
+function urban (bot, sender, args, data, client)
 {
     if(args.join(" ").trim() == "")
     {
@@ -28,4 +28,11 @@ exports.urban = function(bot, sender, args, data, client)
       var defintion = data.list[0].definition.substr(0, 500);
       bot.sendAll("@" + sender + " " + defintion + " - " + data.list[0].permalink, client);
     });
-};
+}
+
+module.exports = {
+    urban: {
+        action: urban,
+        man: "Syntax is !urban <term>; searches for <term> in the Urban Dictionary (https://urbandictionary.com )."
+    }
+}
