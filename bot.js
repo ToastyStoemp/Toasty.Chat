@@ -35,7 +35,8 @@ function Bot(chatServerBase) {
           if (typeof cmds[key] != 'object' || typeof cmds[key].action != "function")
             throw errmsg;
           that.commands[key] = cmds[key].action;
-          that.man[key] = cmds[key].man;
+          if(cmds[key].man)
+            that.man[key] = cmds[key].man;
         }
       }
     }
