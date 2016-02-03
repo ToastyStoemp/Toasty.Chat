@@ -94,4 +94,4 @@ var configCmd = function(bot, sender, args, data, client)
 	}
 }
 
-module.exports = { init: init, config: configCmd };
+module.exports = { init: init, config: { action: configCmd } };
