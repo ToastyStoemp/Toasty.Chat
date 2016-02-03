@@ -14,14 +14,16 @@ function Bot(chatServerBase) {
     that.perm = require('./data/requiredPerm.json');
 
     that.commands = {};
+    that.man = {};
     var init = [];
 
     for (var i = 0; i < files.length; i++) {
+      var errmsg = "Invalid command " + files[i];
       if (path.extname(files[i]) == ".js") {
         var cmds = require("./commands/" + files[i]);
 
         if (typeof cmds != 'object')
-          throw "Invalid command " + files[i];
+          throw errmsg;
 
         if (typeof cmds.init == 'function') {
           cmds.init(that);
@@ -30,9 +32,10 @@ function Bot(chatServerBase) {
         }
 
         for (var key in cmds) {
-          if (typeof cmds[key] != 'function')
-            throw "Invalid command " + files[i];
-          that.commands[key] = cmds[key];
+          if (typeof cmds[key] != 'object' || typeof cmds[key].action != "function")
+            throw errmsg;
+          that.commands[key] = cmds[key].action;
+          that.man[key] = cmds[key].man;
         }
       }
     }
