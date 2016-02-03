@@ -40,4 +40,4 @@ var plot = function(bot, sender, args, data, client)
 	}
 };
 
-module.exports = { plot: plot };
+module.exports = { plot: {action: plot, man: "WHY DO YOU EVEN NEED A MAN?! JUST TRY IT"} };
