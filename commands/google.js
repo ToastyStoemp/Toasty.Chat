@@ -5,8 +5,8 @@ var googleCallback = function(bot, sender, args, data, client)
 {
 	var search = args.join(" ").trim();
 
-	if(search == "")
-		return bot.sendClient("Syntax is !google [Search term]", client);
+	if(!search)
+		return bot.sendClient(bot.man.g, client);
 
 	var apikey = bot.config.google.apiKey;
 	var cx = bot.config.google.customsearchId;
@@ -30,13 +30,17 @@ var googleCallback = function(bot, sender, args, data, client)
 		}
 		else
 		{
-			bot.sendClient("No reults found! Syntax is !google [Search term]", client);
+			bot.sendClient("No results found! " + bot.man.g, client);
 		}
 	});
 };
 
+var e = {
+	action: googleCallback,
+	man: "Syntax is !google <term>; searches for <term> on google."
+}
 module.exports =
 {
-	g: googleCallback,
-	google: googleCallback
+	g: e,
+	google: e
 };
