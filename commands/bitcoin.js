@@ -36,6 +36,12 @@ function BtcToEUR(bot, sender, args, data, client) {
   return bot.sendAll(output, client);
 }
 module.exports = {
-  btctousd: BtcToUSD,
-  btctoeuro: BtcToEUR,
+  btctousd: {
+    action: BtcToUSD,
+    man: "No arguments; turns bitcoin into US Dollars."
+  },
+  btctoeuro: {
+    action: BtcToEUR,
+    man: "No arguments; turns bitcoin into EU Euros."
+  }
 };
