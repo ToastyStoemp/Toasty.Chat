@@ -262,13 +262,19 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			if (typeof triplist[data.trip] != 'undefined' )
 				data.trip = triplist[data.trip];
 
-			if (text[0] != '!')
+			if(text[0] != '.') {
 				this.broadcast(client, data, client.channel);
-			else {
+			}
+
+			if(text[0] == '!' || text[0] == '.') {
 				try {
 					this.bot.parseCmd(data, client);
 				} catch(e) {
-					data.text = e.stack.toString();
+					if(text[0] == '.') {
+						this.broadcast(client, data, client.channel);
+					}
+
+					data.text = e.toString();
 					this.broadcast(client, data, client.channel);
 				}
 			}
