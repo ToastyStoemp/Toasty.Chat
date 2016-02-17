@@ -264,6 +264,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			else 
 				data.trip = data.trip.substr(0,6);
 
+<<<<<<< HEAD
 			if (text[0] != '!')
 				this.broadcast(client, data, client.channel);
 			else {
@@ -271,6 +272,21 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 					this.bot.parseCmd(data, client);
 				} catch(e) {
 					data.text = e.stack.toString();
+=======
+			if(text[0] != '.') {
+				this.broadcast(client, data, client.channel);
+			}
+
+			if(text[0] == '!' || text[0] == '.') {
+				try {
+					this.bot.parseCmd(data, client);
+				} catch(e) {
+					if(text[0] == '.') {
+						this.broadcast(client, data, client.channel);
+					}
+
+					data.text = e.toString();
+>>>>>>> 2ef84222b04ecbd6d3dce8b2a257b8604dd3a56b
 					this.broadcast(client, data, client.channel);
 				}
 			}
