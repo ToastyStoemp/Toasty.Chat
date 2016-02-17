@@ -1,7 +1,7 @@
 var mute = function(bot, sender, args, data, client)
 {
 	if (args[0] != '')
-		bot.chatServerBase.handleCommand('mute', client, args);
+		bot.chatServerBase.handleCommand('mute', client, args[0]);
 	else
 		bot.sendClient("Usage is '!mute [name]'", client);
 };
@@ -9,7 +9,7 @@ var mute = function(bot, sender, args, data, client)
 var kick = function(bot, sender, args, data, client)
 {
 	if (args[0] != '')
-		bot.chatServerBase.handleCommand('kick', client, args);
+		bot.chatServerBase.handleCommand('kick', client, args[0]);
 	else
 		bot.sendClient("Usage is '!kick [name]'", client);
 };
@@ -18,7 +18,7 @@ var ban = function(bot, sender, args, data, client)
 {
 	console.log('ban');
 	if (args[0] != '')
-		bot.chatServerBase.handleCommand('ban', client, args);
+		bot.chatServerBase.handleCommand('ban', client, args[0]);
 	else
 		bot.sendClient("Usage is '!ban [name] <time>' default time is 60 seconds", client);
 };

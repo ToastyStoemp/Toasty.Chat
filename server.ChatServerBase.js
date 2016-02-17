@@ -322,7 +322,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 	if (this.isMod(client)) {
 		switch (command) {
 			case 'kick':
-				var nick = String(args)
+				var nick = String(args);
 				if (!client.channel) return;
 
 				var badClient = this.getClientsOfChannel(client.channel)[nick.toLowerCase()];
@@ -334,8 +334,11 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 					client.send(null, {cmd: 'warn', errCode: 'E010', text: "Cannot kick moderator"});
 					return;
 				}
-
-				POLICE.dump(badClient.getIpAddress());
+				
+				badClient.clients.forEach(function(c){
+					POLICE.dump(c.getIpAddress());
+					c.close();
+				});
 				console.log(client.nick + " [" + client.trip + "] kicked " + nick + " in " + client.channel);
 				this.broadcast(client, {cmd: 'info', infoCode: 'I004', nick: nick, text: "Kicked " + nick}, client.channel);
 
