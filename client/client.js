@@ -1000,9 +1000,9 @@ jQuery.each(jQuery('textarea[data-autoresize]'), function() {
     jQuery(this).on('keyup input', function() { resizeTextarea(this); }).removeAttr('data-autoresize');
 });
 
-/*window.onbeforeunload = function(){
+window.onbeforeunload = function(){
   if(wasConnected && myChannel != '' && $('#leave-warning').is(":checked")) {
     return 'Are you sure you want to leave?';
   }
-}*/
+}
 });
