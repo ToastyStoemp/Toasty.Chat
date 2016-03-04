@@ -32,6 +32,7 @@ ToastyClient.prototype.getIpAddress = function() {
 }
 ToastyClient.prototype.close = function() {
 	this.ircClient.chatServerBase.onClose(this);
+	this.ircClient.close();
 }
 ToastyClient.prototype._generateIdentifier = function(nick) {
 	return nick+'!~'+nick+'@'+this.ircClient.config.serverHostname;
