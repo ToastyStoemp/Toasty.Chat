@@ -355,8 +355,22 @@ function pushMessage(args, usePre) {
 }
 
 
+function removeCharsTillIndex(index) {
+	var input = $('#chatinput');
+	var start = input[0].selectionStart || input.val().length || 0;
+	if (index >= start)
+		return;
+	var before = input.val().substr(0, index);
+	var after = input.val().substr(start);
+
+	input.val(before + after);
+
+	if (input[0].selectionStart)
+		input[0].selectionEnd = input[0].selectionStart = before.length;
+}
+
 function insertAtCursor(text) {
-	var input = $('#chatinput')
+	var input = $('#chatinput');
 	var start = input[0].selectionStart || input.val().length || 0;
 	var before = input.val().substr(0, start);
 	var after = input.val().substr(start);
@@ -642,7 +656,15 @@ $('#footer').onclick = function() {
 	$('#chatinput').focus();
 }
 
+var typedTabNick = null; // remember _typed_ letters for TAB autocompletion
+var nickTabIndex = -1; // last presented username index for TAB autocompletion
+var lengthOfInsertedNick = 0; // used for TAB autocompletion
 $('#chatinput').keydown(function(e) {
+	if (e.keyCode != 9) {
+		typedNick = null;
+		nickTabIndex = -1;
+		lengthOfInsertedNick = 0;
+	}
 	if (e.keyCode == 13 /* ENTER */ && !e.shiftKey) {
 		e.preventDefault();
 		// Submit message
@@ -689,18 +711,20 @@ $('#chatinput').keydown(function(e) {
 		var text = e.target.value;
 		var index = text.lastIndexOf('@', pos);
 		if (index >= 0) {
-			var stub = text.substring(index + 1, pos).toLowerCase();
-			// Search for nick beginning with stub
-			// var nicks = onlineUsers.filter(function(nick) {
-			// 	return nick.toLowerCase().indexOf(stub) == 0
-			// })
+			if (!typedNick)
+				typedNick = text.substring(index + 1, pos);
+			var stub = typedNick.toLowerCase();
+
 			var nicks = [];
 			for (var nick in onlineUsers){
-				if (nick.toLowerCase().indexOf(stub) == 0)
+				var lowerNick = nick.toLowerCase();
+				if (lowerNick.indexOf(stub) === 0)
 					nicks.push(nick);
 			}
-			if (nicks.length == 1) {
-				insertAtCursor(nicks[0].substr(stub.length) + " ");
+			if (nicks.length >= 1) {
+				nickTabIndex = (nickTabIndex + 1) % nicks.length; // loop through nicks
+				removeCharsTillIndex(index+1);
+				insertAtCursor(nicks[nickTabIndex] + " ");
 			}
 		}
 	}
