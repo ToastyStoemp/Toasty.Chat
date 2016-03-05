@@ -725,7 +725,9 @@ $('#chatinput').keydown(function(e) {
 				if (lowerNick.indexOf(stub) === 0)
 					nicks.push(nick);
 			}
-			if (nicks.length >= 1) {
+			if (nicks.length === 0)
+				nicks = onlineUsers;
+			if (nicks.length > 0) {
 				nickTabIndex = (nickTabIndex + 1) % nicks.length; // loop through nicks
 				removeCharsTillIndex(index+1);
 				insertAtCursor(nicks[nickTabIndex] + " ");
