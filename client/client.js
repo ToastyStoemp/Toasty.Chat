@@ -413,7 +413,7 @@ function parseLinks(g0) {
 	return a.outerHTML;
 }
 
-const imgurVidEndings = ["gifv", "webm", "mp4"];
+var imgurVidEndings = ["gifv", "webm", "mp4"];
 function parseUrl(url) {
 	var imgurMatch = url.match(/(http(s|)):\/\/(www\.|i\.|)imgur\.com\/([^\.]+)\.([^\s]+)/i);
 	var ytMatch = url.match(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/);
@@ -449,17 +449,21 @@ function parseMedia(){
 	el.style.background = 'none';
 	el.onclick = function() {
 		if (!display) {
-				for(link of media)
-						link.style.display = "inline";
-				el.innerHTML = '[-]';
-				display = true;
+			for (var i in media) {
+				var link = media[i];
+				link.style.display = "inline";
 			}
-    else {
-				for(link of media)
-					link.style.display = "none";
-				el.innerHTML = '[+]';
-				display = false;
+			el.innerHTML = '[-]';
+			display = true;
+		}
+		else {
+			for (var i in media) {
+				var link = media[i];
+				link.style.display = "none";
 			}
+			el.innerHTML = '[+]';
+			display = false;
+		}
 	};
 	el.addEventListener("mouseover", function() {
 	  el.style.cursor = "pointer";
