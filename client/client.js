@@ -811,7 +811,8 @@ function userRemove(nick) {
 
 function usersClear() {
 	$('#users li').remove();
-	onlineUsers.length = 0;
+	for (var i in onlineUsers) // loop keeps same reference
+		delete onlineUsers[i];
 }
 
 function userInvite(nick) {
