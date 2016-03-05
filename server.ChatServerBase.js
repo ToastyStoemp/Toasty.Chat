@@ -29,6 +29,7 @@ MetaClient.prototype.setClientConfigurationData = function(channel, nick, trip) 
 function ChatServerBase() {
 	this._connectedClients = {'':0}; // map: channel -> (lowerCaseNick -> ChatClientBase)
 	this.bot = new (require('./bot.js'))(this);
+	this.bot.restrictCommandToChannels('ascii', ['ascii']);
 }
 module.exports = function() {
 	return new ChatServerBase();

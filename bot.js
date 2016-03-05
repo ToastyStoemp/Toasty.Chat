@@ -5,6 +5,7 @@ var util = require('util');
 
 function Bot(chatServerBase) {
   this.chatServerBase = chatServerBase;
+  this.channelRestrictedCommands = {};
   events.EventEmitter.call(this);
   var that = this;
   fs.readdir("./commands", function(err, files) {
@@ -38,10 +39,20 @@ function Bot(chatServerBase) {
     }
   });
 
+  this.restrictCommandToChannels = function(cmd, channelList) {
+	this.channelRestrictedCommands[cmd] = channelList;
+  }
+
   this.parseCmd = function(data, client) {
     var msg = data.text;
     var cmd = msg.substr(1).split(" ")[0];
     var args = msg.substr(2 + cmd.length).split(" ");
+
+    var channelRestrictedCommand = this.channelRestrictedCommands[cmd];
+    if (channelRestrictedCommand && channelRestrictedCommands.indexOf(client.channel) == -1) {
+        that.sendClient("This command can not be executed in this channel", client);
+        return;
+    }
 
     if (typeof that.commands[cmd] == 'function' && that.commands.hasOwnProperty(cmd))
       if (that.verify(that, cmd, data, client))
