@@ -364,7 +364,10 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 					return;
 				}
 
-				POLICE.arrest(badClient.getIpAddress(), args.time);
+				badClient.clients.forEach(function(c) {
+					POLICE.arrest(c.getIpAddress(), args.time);
+					c.close();
+				});
 				console.log(client.nick + " [" + client.trip + "] banned " + nick + " in " + client.channel);
 				this.broadcast(client, {cmd: 'info', infoCode: 'I004', nick: nick, text: "Banned " + nick}, client.channel);
 
