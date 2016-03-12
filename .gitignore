@@ -3,3 +3,7 @@ node_modules/
 npm-debug.log
 config.json
 data/trips.json
+data/donators.json
+data/google.json
+
+
