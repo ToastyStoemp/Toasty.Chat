@@ -23,6 +23,15 @@ var ban = function(bot, sender, args, data, client)
 		bot.sendClient("Usage is '!ban [name] <time>' default time is 60 seconds", client);
 };
 
+var unban = function(bot, sender, args, data, client)
+{
+	console.log('unban');
+	if (args[0] != '')
+	        bot.chatServerBase.handleCommand("unban", client, args[0]);
+	else
+	        bot.sendClient("Usage is '!unban [name]'");
+}
+
 var hide = function(bot, sender, args, data, client)
 {
 	bot.sendClient("This command is not in use yet");
@@ -50,6 +59,7 @@ module.exports =
 	mute: mute,
 	kick: kick,
 	ban: ban,
+	unban: unban,
 	hide: hide,
 	b: broadcast,
 	broadcast: broadcast
