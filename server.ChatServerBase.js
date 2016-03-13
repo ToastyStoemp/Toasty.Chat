@@ -4,6 +4,7 @@
 var crypto = require('crypto');
 var donatorlist = require("./data/donators.json");
 var triplist = require("./data/trips.json");
+var IPdata = {};
 
 // Keeps multiple connections for a client
 function MetaClient() {
@@ -365,13 +366,29 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 				}
 
 				badClient.clients.forEach(function(c) {
-					POLICE.arrest(c.getIpAddress(), args.time);
+					var ClientIP = c.getIpAddress();
+					POLICE.arrest(ClientIP, args.time);
+					IPdata[nick] = ClientIP;
 					c.close();
 				});
 				console.log(client.nick + " [" + client.trip + "] banned " + nick + " in " + client.channel);
 				this.broadcast(client, {cmd: 'info', infoCode: 'I004', nick: nick, text: "Banned " + nick}, client.channel);
 
 				return;
+			case 'unban':
+				var nick = String(args);
+				if (!client.channel)
+					return;
+
+				if (!IPdata[nick])
+					return;
+
+				POLICE.setFree(IPdata[nick]);
+				delete IPdata[nick];
+				console.log(client.nick + " [" + client.trip + "] unbanned " + nick + " in " + client.channel);
+				this.broadcast(client, {cmd: 'info', infoCode: "I004", nick: nick, text: "Unbanned " + nick}, client.channel);
+
+			    return;
 			case 'mute':
 				var nick = String(args);
 				if (!client.channel) return;
@@ -455,14 +472,14 @@ var POLICE = {
 	},
 
 	search: function(id) {
-		var record = this.records[id]
+		var record = this.records[id];
 		if (!record) {
 			record = this.records[id] = {
 				time: Date.now(),
-				score: 0,
-			}
+				score: 0
+			};
 		}
-		return record
+		return record;
 	},
 
 	frisk: function(id, deltaScore) {
@@ -485,10 +502,18 @@ var POLICE = {
 		if (record) {
 			record.arrested = true
 			if (time)
-				setTimeout(function(){ record.arrested = false }, time * 1000);
+				setTimeout(function(){ 
+					record.arrested = false;
+					delete IPdata[nick];
+				}, time * 1000);
 		}
 	},
-
+	setFree: function(id) {
+		var record = this.search(id);
+		if (record) {
+			record.arrested = false;
+		}
+	},
 	dump: function(id) {
 		var record = this.search(id)
 		if (record) {
