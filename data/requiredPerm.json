@@ -6,11 +6,14 @@
     "add": 2,
     "remove": 2,
     "config": 2,
+    "reload": 2,
     "mute": 1,
     "kick": 1,
     "ban": 1,
+    "unban": 1,
     "bot": 1,
     "hide": 1,
     "broadcast": 1,
+    "b": 1,
     "tripget": 1
 }
