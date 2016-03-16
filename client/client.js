@@ -76,9 +76,9 @@ function calculateRejoinTimeout() {
 function join(channel) {
 	connectTime = new Date(); // here also for 'normal' connect fails
 
-	if (document.domain == 'chat.toastystoemp.com') {
+	if (document.domain == window.config.domain) {
 		// For http://toastystoemp.com/
-		ws = new WebSocket('wss://chat.toastystoemp.com/chatws');
+		ws = new WebSocket('wss://'+window.config.domain+'/chatws');
 	}
 	else {
 		// for local installs
