@@ -15,32 +15,33 @@ function Bot(chatServerBase) {
     that.perm = require('./data/requiredPerm.json');
 
     that.commands = {};
-    var init = [];
+    that.makeCmd = function(files, that, init) {
+      for (var i = 0; i < files.length; i++) {
+        if (path.extname(files[i]) == ".js") {
+          var cmds = require("./commands/" + files[i]);
+          if (typeof cmds != 'object')
+              throw "Invalid command " + files[i];
 
-    for (var i = 0; i < files.length; i++) {
-      if (path.extname(files[i]) == ".js") {
-        var cmds = require("./commands/" + files[i]);
+          if (typeof cmds.init == 'function') {
+              cmds.init(that);
+              init.push(cmds.init);
+              delete cmds.init;
+          }
 
-        if (typeof cmds != 'object')
-          throw "Invalid command " + files[i];
-
-        if (typeof cmds.init == 'function') {
-          cmds.init(that);
-          init.push(cmds.init);
-          delete cmds.init;
-        }
-
-        for (var key in cmds) {
-          if (typeof cmds[key] != 'function')
-            throw "Invalid command " + files[i];
-          that.commands[key] = cmds[key];
+          for (var key in cmds) {
+              if (typeof cmds[key] != 'function')
+                  throw "Invalid command " + files[i];
+              that.commands[key] = cmds[key];
+          }
         }
       }
     }
+    var init = [];
+    that.makeCmd(files, that, init);
   });
 
   this.restrictCommandToChannels = function(cmd, channelList) {
-	this.channelRestrictedCommands[cmd] = channelList;
+	  this.channelRestrictedCommands[cmd] = channelList;
   }
 
   this.parseCmd = function(data, client) {
@@ -63,7 +64,6 @@ function Bot(chatServerBase) {
       that.sendClient("Unknown command, type !help or !h for a list of available commands", client);
     return;
   }
-
   this.verify = function (that, cmd, data, client) {
     if (that.perm[cmd] > 0){
      if(data.mod || data.admin)
@@ -71,7 +71,7 @@ function Bot(chatServerBase) {
     else
       return false;
     }
-    if (that.perm[cmd] > 1){
+    if (that.perm[cmd] > 1){ 
       if (data.admin)
         return true;
       else
