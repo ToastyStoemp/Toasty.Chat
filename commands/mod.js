@@ -1,7 +1,7 @@
 var mute = function(bot, sender, args, data, client)
 {
 	if (args[0] != '')
-		bot.chatServerBase.handleCommand('mute', client, args[0]);
+		bot.chatServerBase.handleCommand('mute', client, args[0], args[1] != '' ? 60 : args[1]);
 	else
 		bot.sendClient("Usage is '!mute [name]'", client);
 };

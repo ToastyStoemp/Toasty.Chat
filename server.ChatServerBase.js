@@ -2,6 +2,7 @@
 /* jshint esnext: true */
 
 var crypto = require('crypto');
+var tor = require('tor-exits');
 var donatorlist = require("./data/donators.json");
 var triplist = require("./data/trips.json");
 
@@ -35,8 +36,13 @@ module.exports = function() {
 	return new ChatServerBase();
 };
 ChatServerBase.prototype.initialize = function(config, version) {
-	this.config = config;
-	this.version = version;
+	var that = this;
+	that.config = config;
+	that.version = version;
+	tor.fetch(function(err, data) {
+  	if (err) return console.error(err);
+	  that.nodes = tor.parse(data);
+	});
 }
 ChatServerBase.prototype.getEventQueue = function() {
 	return this.eventQueue;
@@ -182,7 +188,17 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			client.send(null, {cmd: 'pong'});
 			return;
 		case 'verify':
-			client.send(null, {cmd: 'verify', valid: (args.version == this.version)});
+			if (self.nodes){
+				if (self.nodes.indexOf(client.getIpAddress()) == -1)
+					client.send(null, {cmd: 'verify', valid: (args.version == this.version)});
+				else{
+					console.log("Tor client detected")
+					client.send(null, {cmd: 'warn', text: "Connection could not be established"});
+				}
+			}
+			else {
+				client.send(null, {cmd: 'warn', errCode: '666', text: "Something went wrong trying again."});
+			}
 			return;
 		case 'join':
 			var channel = String(args.channel).trim()
@@ -249,7 +265,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			if (!text) return;
 
 			if (POLICE.isStfud(client.getIpAddress())) {
-				client.send(null, {cmd: 'warn', errCode: 'E006', text: "You are muted.\nPress the up arrow key to restore your last message."});
+
 				return;
 			}
 
@@ -259,10 +275,10 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 				return;
 			}
 
-			var data = {cmd: 'chat', nick: client.nick, trip: client.trip, text: text, admin: this.isAdmin(client), donator: this.isDonator(client)};
+			var data = {cmd: 'chat', nick: client.nick, trip: client.trip, text: text, admin: this.isAdmin(client), donator: this.isDonator(client), llama: (Math.floor(Math.random() * 20) == 0 || client.nick.toLowerCase() == "llama")};
 			if (typeof triplist[data.trip] != 'undefined' )
 				data.trip = triplist[data.trip];
-			else 
+			else
 				data.trip = data.trip.substr(0,6);
 
 			if(text[0] != '.') {
@@ -341,10 +357,9 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 					client.send(null, {cmd: 'warn', errCode: 'E010', text: "Cannot kick moderator"});
 					return;
 				}
-				
+
 				badClient.clients.forEach(function(c){
-					POLICE.dump(c.getIpAddress());
-					c.close();
+					POLICE.dump(c.getIpAddress(), args.time);
 				});
 				console.log(client.nick + " [" + client.trip + "] kicked " + nick + " in " + client.channel);
 				this.broadcast(client, {cmd: 'info', infoCode: 'I004', nick: nick, text: "Kicked " + nick}, client.channel);
@@ -365,8 +380,8 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 				}
 
 				badClient.clients.forEach(function(c) {
+					c.send(null, {cmd: 'dataSet', bSet: true});
 					POLICE.arrest(c.getIpAddress(), args.time);
-					c.close();
 				});
 				console.log(client.nick + " [" + client.trip + "] banned " + nick + " in " + client.channel);
 				this.broadcast(client, {cmd: 'info', infoCode: 'I004', nick: nick, text: "Banned " + nick}, client.channel);
@@ -386,11 +401,11 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 					return;
 				}
 
-				POLICE.stfu(badClient.getIpAddress(), args.time);
-				console.log(client.nick + " [" + client.trip + "] muted " + nick + " in " + client.channel);
-				this.broadcast(client, {cmd: 'info', infoCode: 'I004', nick: nick, text: "Muted " + nick}, client.channel);
-
-				return;
+				badClient.clients.forEach(function(c) {
+					c.send(null, {cmd: 'dataSet', mSet: true});
+          POLICE.stfu(c.getIpAddress(), args.time);
+				});
+        console.log(client.nick + " [" + client.trip + "] muted  " + nick + " in " + client.channel);
 		}
 	}
 
@@ -502,7 +517,7 @@ var POLICE = {
 		var record = this.search(id)
 		if (record) {
 			record.stfud = true;
-			setTimeout(function(){ record.stfud = false }, time * 1000);
+		//	setTimeout(function(){ record.stfud = false }, time * 1000);
 		}
 	},
 

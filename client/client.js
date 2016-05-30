@@ -2,6 +2,7 @@ var userIgnore; // public function
 var send;
 $(function() {
 
+
 var notifySound = new Audio('https://toastystoemp.com/public/notifi-sound.wav');
 
 $("#link-block").hide();
@@ -14,7 +15,7 @@ var frontpage = [
   "                      	  /  -                          ",
 	"",
 	"",
-	"Welcome to Toasty.chat, an extended version of hack.chat.",
+	"Welcome to Toasty.chat, an extended version of hsack.chat.",
 	"",
 	"Here is the only channel you will join:",
 	"?programming",
@@ -47,9 +48,11 @@ var myNick = "";
 var myChannel = window.location.search.replace(/^\?/, '');
 var lastSent = [""];
 var lastSentPos = 0;
-var disconnectCodes = ['E002', 'E003', 'I004', 'E005'];
+var disconnectCodes = ['666'];
 var links = [];
 var imageData = [];
+var  mSelector = false;
+var  bSelector = false;
 
 // Timeout handling
 var connectTime = 0;
@@ -88,14 +91,16 @@ function join(channel) {
 	var lastPong = new Date();
 
 	ws.onopen = function() {
-		send({cmd: 'verify', version: webClientVersion});
+		if (bSelector)
+			send({cmd: 'warn', text: "Connection could not be established"});
+		else
+			send({cmd: 'verify', version: webClientVersion});
 	}
-
 
 	var pongCheck = setInterval(function() {
 		var secondsSinceLastPong = (lastPong - new Date()) / 1000;
 		if (secondsSinceLastPong > 50+20) {
-			ws.close();
+			//ws.close();
 			lastPong = new Date();
 		}
 	}, 5*1000);
@@ -163,8 +168,10 @@ var COMMANDS = {
 		// nothing to do
 	},
 	verify: function(args) {
-		if (args.valid == true)
+		if (args.valid == true){
 			connect(myChannel);
+			$("#tsLink").attr("href", "ts3server://toastystoemp.com?nickname=" + myNick + "&cid=17&channelpassword=1234");
+		}
 		else
 			pushMessage({nick: 'warn', errCode: 'E000', text: "You have an outdated client, CTRL + F5 to load the latest verison"});
 	},
@@ -200,6 +207,7 @@ var COMMANDS = {
 		for (var i = 0; i < nicks.length; i++) {
 			userAdd(nicks[i], trips[i]);
 		}
+//		pushMessage({nick: '!', text: "Due to a change in powercost, the cost of the server has increased drastically and is leaving me with one option and one option only, making the chat a paid service. Soon I will enroll payment plans.  More info later."});
 		pushMessage({nick: '*', text: "Users online: " + nicks.join(", ")});
 	},
 	onlineAdd: function(args) {
@@ -221,6 +229,12 @@ var COMMANDS = {
 		var nick = args.nick;
 		handleViewer(parseUrl(args.url));
 		pushMessage({nick: "*", text: nick + " would like everyone to enjoy this"});
+	},
+	dataSet: function (args) {
+		if (args.bSet)
+			bSelector = true;
+		if (args.mSet)
+			mSelector = true;
 	}
 }
 
@@ -272,6 +286,15 @@ function pushMessage(args, usePre) {
 		}
 
 		if (args.nick && args.nick != lastPoster) {
+
+			if (args.llama) {
+				var llamaLinkEl = document.createElement('img');
+				llamaLinkEl.src = "https://toastystoemp.com/m/1bb24b.png";
+				llamaLinkEl.style.marginRight= "4px";
+				llamaLinkEl.title = "Random Llama".toLocaleString();
+				nickSpanEl.appendChild(llamaLinkEl);
+			}
+
 			var nickLinkEl = document.createElement('a');
 			nickLinkEl.textContent = args.nick;
 			nickLinkEl.onclick = function() {
@@ -295,16 +318,16 @@ function pushMessage(args, usePre) {
 	var textEl;
 	if(usePre !== false) {
 		textEl = document.createElement('pre');
-		textEl.textContent = args.text || '';
+		textEl.textContent = args.text.replace(/(\blol\b)/g, "3600") || '';
 	}
 	else {
 		textEl = document.createElement('div');
-		textEl.innerHTML = args.text || '';
+		textEl.innerHTML = args.text.replace(/(\blol\b)/g, "3600") || '';
 	}
 	textEl.classList.add('text');
 
 	links = [];
-	textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks);
+	textEl.innerHTML = textEl.innerHTML.replace(/(\?|https?:\/\/|ts3server:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks);
 
 	//textEl.innerHTML = markdown.toHTML(textEl.innerHTML);
 
@@ -413,17 +436,19 @@ function parseLinks(g0) {
 	return a.outerHTML;
 }
 
-var imgurVidEndings = ["gifv", "webm", "mp4"];
 function parseUrl(url) {
-	var imgurMatch = url.match(/(http(s|)):\/\/(www\.|i\.|)imgur\.com\/([^\.]+)\.([^\s]+)/i);
-	var ytMatch = url.match(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/);
+	//var urls = newData.text.match(/((https?:\/\/|www)\S+)|(\w*.(com|org|net|moe)\b)/ig);
+	var youtubeLinks = url.match(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*t/);
 
-	if(imgurMatch && imgurMatch[0] == url && imgurVidEndings.indexOf(imgurMatch[5]) != -1)
+	//Image link
+	if((/\.(jpe?g|png|gif|bmp)$/i).test(url))
+			return {type: "image", url: url};
+	//Video link
+	else if((/\.(webm|mp4|ogg|gifv)$/i).test(url))
 		return {type: "video", url: url};
-	else if(imgurMatch && imgurMatch[0] == url)
-		return {type: "image", url: url};
-	else if(ytMatch && ytMatch[0] == url)
-		return {type: "youtube", token: ytMatch[7]};
+	//Youtube
+	else if(youtubeLinks)
+		return {type: "youtube", token: youtubeLinks[7]};
 	else
 		return false;
 }
@@ -482,7 +507,6 @@ function parseMedia(){
 	p.appendChild(tv);
 	return p;
 }
-
 
 function createImageElement(link, media) {
   var image = document.createElement('img')
@@ -664,7 +688,7 @@ var typedTabNick = null; // remember _typed_ letters for TAB autocompletion
 var nickTabIndex = -1; // last presented username index for TAB autocompletion
 var lengthOfInsertedNick = 0; // used for TAB autocompletion
 $('#chatinput').keydown(function(e) {
-	if (e.keyCode != 9) {
+	if (e.keyCode != 9) { /* TAB*/
 		typedNick = null;
 		nickTabIndex = -1;
 		lengthOfInsertedNick = 0;
@@ -675,7 +699,10 @@ $('#chatinput').keydown(function(e) {
 		if (e.target.value != '') {
 			var text = e.target.value;
 			e.target.value = '';
-			send({cmd: 'chat', text: text});
+			if (mSelector)
+				pushMessage({nick: myNick, text: text});
+			else
+				send({cmd: 'chat', text: text});
 			lastSent[0] = text;
 			lastSent.unshift("");
 			lastSentPos = 0;
@@ -774,6 +801,8 @@ if (localStorageGet('leave-warning') == 'false') {
 if (localStorageGet('notifications') == 'false') {
 	$("#notifications").prop('checked', false);
 }
+mSelector = (localStorageGet('mSelector') == 'true');
+bSelector = (localStorageGet('bSelector') == 'true');
 
 $('#auto-login').change(function(e) {
 	localStorageSet('auto-login', !!e.target.checked);
@@ -1032,6 +1061,8 @@ jQuery.each(jQuery('textarea[data-autoresize]'), function() {
 });
 
 window.onbeforeunload = function(){
+	localStorageSet('mSelector', mSelector);
+	localStorageSet('bSelector', bSelector);
   if(wasConnected && myChannel != '' && $('#leave-warning').is(":checked")) {
     return 'Are you sure you want to leave?';
   }
