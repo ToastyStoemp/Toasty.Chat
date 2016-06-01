@@ -313,7 +313,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 				client.send(null, {cmd: 'warn', errCode: 'E008', text: "Could not find user in channel"});
 				return
 			}
-			if (friend === client) return; // Ignore silently
+			if (friend.nicks === client.nick) return; // Ignore silently
 
 			var channel = Math.random().toString(36).substr(2, 8);
 			client.send(null, {cmd: 'info', infoCode: 'I001', channel: channel, text: "You invited " + friend.nick + " to ?" + channel});
