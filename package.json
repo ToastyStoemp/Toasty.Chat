@@ -41,6 +41,7 @@
     "redwrap": "^0.0.4",
     "request": "^2.60.0",
     "soap": "^0.9.1",
+    "tor-exits": "0.0.6",
     "unirest": "^0.4.2",
     "weather-js": "^1.0.2",
     "wikijs": "^0.1.1",
