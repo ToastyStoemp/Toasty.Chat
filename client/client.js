@@ -181,6 +181,11 @@ var COMMANDS = {
 		}
 		pushMessage(args);
 	},
+	action: function(args) {
+		args.text = args.nick + args.text.substr(3);
+		args.nick = '*';
+		pushMessage(args);
+	},
 	info: function(args) {
 		args.nick = '*';
 		pushMessage(args);
@@ -243,7 +248,7 @@ var lastPoster = "";
 function pushMessage(args, usePre) {
 	var messageEl = document.createElement('div');
 		messageEl.classList.add('message');
-		if (args.admin) {
+		if (args.admin && args.nick != '*') {
 			messageEl.classList.add('admin');
 		}
 		else if (args.nick == myNick) {
@@ -253,7 +258,11 @@ function pushMessage(args, usePre) {
 			messageEl.classList.add('warn');
 		}
 		else if (args.nick == '*') {
-			messageEl.classList.add('info');
+			if (args.cmd == 'action') {
+				messageEl.classList.add('action');
+			} else {
+				messageEl.classList.add('info');
+			}
 		}
 		else if (args.nick == '<Server>') {
 			messageEl.classList.add('shout');
