@@ -281,6 +281,15 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 			else
 				data.trip = data.trip.substr(0,6);
 
+			/* start action checks */
+			if(text[0] == '/' && text.substr(0,4) == '/me ') {
+				data.cmd = 'action';
+			} else if(text.substr(1,7) == 'ACTION '){
+				data.cmd = 'action';
+				data.text = '/me ' + data.text.substr(8);
+			}
+			/* end action checks */
+
 			if(text[0] != '.') {
 				this.broadcast(client, data, client.channel);
 			}

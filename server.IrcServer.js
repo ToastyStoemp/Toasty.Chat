@@ -68,6 +68,13 @@ ToastyClient.prototype.send = function(causingClient, data) {
 				}, this);
 			}
 			break;
+		case 'action':
+			if (causingClient !== this) {
+				data.text.split('\n').forEach(function(line) {
+					this.ircClient.write(':'+this._generateIdentifier(data.nick)+' PRIVMSG #'+this.channelName+ ' :' + String.fromCharCode(1) + 'ACTION '+line.replace('\r', '').substr(4) + String.fromCharCode(1));
+				}, this);
+			}
+			break;
 		case 'warn':
 			data.text.split('\n').forEach(function(line) {
 				this.ircClient.write(':'+this._generateIdentifier(this._getSystemUser())+' PRIVMSG #'+this.channelName+' :'+line.replace('\r', ''));
@@ -79,8 +86,8 @@ ToastyClient.prototype.send = function(causingClient, data) {
 			}, this);
 			break;
 	}
-	
-	
+
+
 	// @TODO: check for errors and disconnect/reconnect
 }
 
@@ -308,4 +315,3 @@ IrcClient.prototype.answerFrom = function(str, from) {
 IrcClient.prototype.answer = function(str) {
 	this.answerFrom(str, this.getServerHostname());
 }
-
