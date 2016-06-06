@@ -36,6 +36,7 @@
     "less": "^2.5.3",
     "mathjs": "^1.7.1",
     "md5": "^2.0.0",
+    "node-teamspeak": "^1.0.10",
     "octonode": "^0.7.1",
     "pastebin": "0.0.1",
     "redwrap": "^0.0.4",

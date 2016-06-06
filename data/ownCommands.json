@@ -1,4 +1,5 @@
 {
+    "0": "/me %0%",
     "source": "https://github.com/ToastyStoemp/Toasty.chat",
     "beard": "           _,,,,_\n         ,########, \n        ,##`    `##,\n        ## ##  ## ##\n        /# (.)(.) #\\\n        \\#   _)   #/\n         #,######,#\n         ##, ~~ ,##\n         '########'\n          `######`",
     "nsfw": "                        .-\"\"-.                                        \n                       (___/\\ \\ \n                      ( |' ' ) )  \n                    __) _\\=_/  (     \n               ____(__.' `  \\   )       \n             .(/\"-.._.('     ; (                                      \n            /   / .     (' , |  )                                     \n _.`'---.._/   /.__ ____.'_| |_/                                      \n'-'``'-._     /  | `-........'                                        \n   jgs   `;-\"`;  |                                                    \n           `'.__/                                                     ",
@@ -34,5 +35,7 @@
     "tootylinkstoadd": "https://edgeofthewww.com/messages/",
     "rafdontwatch": "https://youtu.be/woHXfbwvvCY",
     "pedoep": "https://toastystoemp.com/m/2e33af.mp3",
-    "c++": "C++ is a horrible language for M4GNV5. It’s made more horrible by the fact that M4GNV5 uses it, to the point where hes generating total and utter crap with it."
+    "c++": "C++ is a horrible language for M4GNV5. It’s made more horrible by the fact that M4GNV5 uses it, to the point where hes generating total and utter crap with it.",
+    "meow": "  /\\_/\\\n=( °w° )=\n  )   (  //\n (__ __)//",
+    "upload": "#!/bin/bash\ncurl -F \"k={password}\" -F \"d=@$1\" https://toastystoemp.com/m/) | xclip"
 }
