@@ -20,12 +20,12 @@ var tsCommand = function(bot, sender, args, data, client)
               cl.send("clientlist", function(err, response, rawResponse){
                 for(user in response){
                   if(response[user].cid == wantedChannel){
-										if (response[user].client_nickname.indexOf(config.client_login_name) != -1) {
+										if (response[user].client_nickname.indexOf(config.client_login_name) == -1) {
 											onlineUsers.push(response[user].client_nickname);
 										}
                   }
                 }
-                bot.sendAll("Online users in " + name + ": " + onlineUsers.joing(", "), client);
+                bot.sendAll("Online users in " + name + ": " + onlineUsers.join(", "), client);
 								cl.send("quit", function(err, response, rawResponse){});
               });
             }
