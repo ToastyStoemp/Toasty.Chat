@@ -48,6 +48,10 @@ WebSocketServer.prototype.run = function(chatServerBase) {
 	this.server = new ws.Server({host: this.config.host, port: this.config.port})
 	console.log("Started server on " + this.config.host + ":" + this.config.port)
 
+	this.server.on('error', function(error) {
+		console.error("Error in WebsocketServer:");
+		console.error(error);
+	});
 	this.server.on('connection', function(socket) {
 		var newClient = new WebSocketClient(socket);
 
