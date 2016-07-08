@@ -4,6 +4,7 @@
 
 var ChatClientBase = require('./server.ChatClientBase.js');
 var util = require("util");
+var http = require("http");
 var express = require("express");
 var session = require('express-session');
 
@@ -192,7 +193,20 @@ RestApiServer.prototype.run = function(chatServerBase) {
 			res.send(JSON.stringify(outData));
 		});
 	});
-	
-	app.listen(this.config.port, this.config.ip);
+
+	// error callback must be defined last
+	app.use(function(err, req, res, next) {
+		console.error(err);
+		res.send(500);
+	});
+
+	var httpServer = http.createServer();
+	httpServer.on('request', app);
+	httpServer.on('error', function(error) {
+		console.error("Error in RestApi Server:");
+		console.error(error);
+	});
+	httpServer.listen(this.config.port, this.config.ip);
+
 	console.log("Started rest api server on " + this.config.ip + ":" + this.config.port);
 };
