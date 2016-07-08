@@ -1,11 +1,68 @@
-var userIgnore; // public function
+var userIgnore;
 var send;
+
 $(function() {
 
+// localstorage wrappers //
+function localStorageGet(key) {
+	try {
+		return window.localStorage[key];
+	}
+	catch(e) {
+		return false;
+	}
+}
+
+function localStorageSet(key, val) {
+	try {
+		window.localStorage[key] = val;
+	}
+	catch(e) {
+		return false;
+	}
+}
+
+// favorite functions start //
+function storeFavArray(favArray){
+	localStorageSet('favs', JSON.stringify(favArray));
+}
+
+function getFavArray(){
+	var toReturn = localStorageGet('favs');
+	if(!toReturn || typeof toReturn === 'undefined')
+		return ['programming'];
+
+	return JSON.parse(toReturn);
+}
+
+function getFavArrayFormatted(){
+	var toReturn = "Favorited Channels:\n";
+	var favs = getFavArray();
+	for(var i = 0, j = favs.length; i < j; i++)
+		toReturn += " - ?" + favs[i] + "\n";
+
+	return toReturn;
+}
+
+function addToFavs(channel){
+	var favs = getFavArray();
+	favs.push(channel);
+	storeFavArray(favs);
+}
+
+function isInFavChan(qChan){
+	var favs = getFavArray();
+	for(var i = 0, j = favs.length; i < j; i++)
+	if(favs[i] == qChan) return true;
+
+	return false;
+}
+// favorite functions end //
 
 var notifySound = new Audio('https://toastystoemp.com/public/notifi-sound.wav');
 
 $("#link-block").hide();
+
 var frontpage = [
 	" __                                                 ",
 	" /|                 /                  /         /   ",
@@ -17,9 +74,6 @@ var frontpage = [
 	"",
 	"Welcome to Toasty.chat, an extended version of hsack.chat.",
 	"",
-	"Here is the only channel you will join:",
-	"?programming",
-	"",
 	"You can create any channel you want, just type: ?<Channel Name> behind the url",
 	"",
 	"The chat is now also accessable through IRC, server: chat.toastystoemp.com:6667",
@@ -27,21 +81,9 @@ var frontpage = [
 	"",
 	"Server and web client released under the GNU General Public License.",
 	"No message history is retained on the toasty.chat server.",
-].join("\n");
-
-function localStorageGet(key) {
-	try {
-		return window.localStorage[key];
-	}
-	catch(e) {}
-}
-
-function localStorageSet(key, val) {
-	try {
-		window.localStorage[key] = val;
-	}
-	catch(e) {}
-}
+	"",
+	"",
+].join("\n") + getFavArrayFormatted();
 
 var ws;
 var myNick = "";
@@ -775,6 +817,12 @@ $('#chatinput').keydown(function(e) {
 
 /* sidebar */
 var firstSlide = true;
+
+$('#favLink').click(function () {
+	addToFavs(myChannel);
+	$('#favLink').remove();
+});
+
 $('#settingsicon').click(function () {
 	if (!firstSlide) {
 		$( "#sidebar-content" ).toggle( "fold", {size: "0"} );
@@ -1030,6 +1078,7 @@ if (myChannel == '') {
 	$('#sidebar').addClass('hidden');
 }
 else {
+	if(isInFavChan(myChannel)) $("#favLink").remove();
 	join(myChannel);
 }
 
