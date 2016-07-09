@@ -22,7 +22,10 @@ function localStorageSet(key, val) {
 	}
 }
 
-// favorite functions start //
+// favorite functions & vars start //
+var unFavedIcon = "http://marzavec.com/favoriteIcon.png";
+var favedIcon = "http://s.imgur.com/images/favicon-96x96.png";
+
 function storeFavArray(favArray){
 	localStorageSet('favs', JSON.stringify(favArray));
 }
@@ -38,6 +41,7 @@ function getFavArray(){
 function getFavArrayFormatted(){
 	var toReturn = "Favorited Channels:\n";
 	var favs = getFavArray();
+
 	for(var i = 0, j = favs.length; i < j; i++)
 		toReturn += " - ?" + favs[i] + "\n";
 
@@ -47,6 +51,16 @@ function getFavArrayFormatted(){
 function addToFavs(channel){
 	var favs = getFavArray();
 	favs.push(channel);
+	storeFavArray(favs);
+}
+
+function removeFromFavs(channel){
+	var favs = getFavArray();
+
+	for(var i = 0, j = favs.length; i < j; i++)
+		if(favs[i] == channel)
+			favs[i].splice(i, 1);
+
 	storeFavArray(favs);
 }
 
@@ -819,8 +833,13 @@ $('#chatinput').keydown(function(e) {
 var firstSlide = true;
 
 $('#favLink').click(function () {
-	addToFavs(myChannel);
-	$('#favLink').remove();
+	if(isInFavChan(myChannel)){
+		removeFromFavs(myChannel);
+		$(this).children('img').attr('src', unFavedIcon);
+	}else{
+		addToFavs(myChannel);
+		$(this).children('img').attr('src', favedIcon);
+	}
 });
 
 $('#settingsicon').click(function () {
@@ -1078,7 +1097,9 @@ if (myChannel == '') {
 	$('#sidebar').addClass('hidden');
 }
 else {
-	if(isInFavChan(myChannel)) $("#favLink").remove();
+	if(isInFavChan(myChannel))
+		$("#favLink").children('img').attr('src', unFavedIcon);
+
 	join(myChannel);
 }
 
