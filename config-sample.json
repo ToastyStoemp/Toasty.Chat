@@ -1,35 +1,46 @@
 {
-	"base": {
-		"admin": "AzureDiamond",
-		"password": "hunter2",
-		"mods": [
-			"add-mod-tripcodes-here"
-		],
-		"salt": "insert-randomly-generated-string-here"
-	},
-	"webSocketServer": {
-		"enabled": true,
-		"host": "0.0.0.0",
-		"port": "6060",
-		"x_forwarded_for": false
-	},
-	"ircServer": {
-		"enabled": true,
-		"ip": "0.0.0.0",
-		"port": 6667,
-		"serverHostname": "chat.toastystoemp.com"
-	},
-	"restApiServer": {
-		"enabled": true,
-		"ip": "0.0.0.0",
-		"port": 12300,
-		"x_forwarded_for": false
-	},
-	"client": {
-		"enabled": true,
-		"host":"0.0.0.0",
-		"port": 8080,
-		"domain":"chat.toastystoemp.com",
-		"x_forwarded_for": false
-	}
+  "base": {
+    "admin": "AzureDiamond",
+    "password": "hunter2",
+    "mods": [
+      "add-mod-tripcodes-here"
+    ],
+    "salt": "insert-randomly-generated-string-here"
+  },
+  "webSocketServer": {
+    "enabled": true,
+    "host": "0.0.0.0",
+    "port": "6060",
+    "x_forwarded_for": false
+  },
+  "ircServer": {
+    "enabled": true,
+    "ip": "0.0.0.0",
+    "port": 6667,
+    "serverHostname": "chat.toastystoemp.com"
+  },
+  "restApiServer": {
+    "enabled": true,
+    "ip": "0.0.0.0",
+    "port": 12300,
+    "x_forwarded_for": false
+  },
+  "client": {
+    "enabled": true,
+    "host": "0.0.0.0",
+    "port": 8080,
+    "domain": "chat.toastystoemp.com",
+    "x_forwarded_for": false
+  },
+  "bouncer": {
+    "enabled": false,
+    "wss": "wss://chat.toastystoemp.com/chatws",
+    "port": 8081,
+    "socketPort": 6060,
+    "host": "0.0.0.0",
+    "memorySize": 200,
+    "mentionHold": true,
+    "commandChar": "#",
+    "client" : true
+  }
 }
