@@ -35,12 +35,13 @@
   "bouncer": {
     "enabled": false,
     "wss": "wss://chat.toastystoemp.com/chatws",
+    "domain": "chat.toastystoemp.com",
     "port": 8081,
     "socketPort": 6060,
     "host": "0.0.0.0",
     "memorySize": 200,
     "mentionHold": true,
     "commandChar": "#",
-    "client" : true
+    "client": true
   }
 }

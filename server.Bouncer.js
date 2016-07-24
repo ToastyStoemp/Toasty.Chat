@@ -54,51 +54,92 @@ Bouncer.prototype.run = function () {
         console.error(error);
     });
     server.on('connection', function (socket) {
-        var newClient = new WebSocketClient(socket);
+        var newClient = new BouncerClient(socket);
         socket.on('message', function (data) {
             var args = JSON.parse(data);
+            console.log("Socket", args);
             switch (args.cmd) {
                 case "join":
-                    socket.nick = args.nick;
-                    socket.pass = args.pass;
-                    socket.channel = args.channel.trim();
+                    this.nick = args.nick;
+                    this.pass = args.pass;
+                    this.channel = args.channel.trim();
                     var relay = null;
-                    if (that.relays.hasOwnProperty(args.nick) && that.relays[args.nick].hasOwnProperty(args.pass) && that.relays[args.nick][args.pass].hasOwnProperty(args.channel)) {
-                        relay = that.relays[args.nick][args.pass][args.channel];
+                    if (that.relays.hasOwnProperty(this.nick) && that.relays[this.nick].hasOwnProperty(this.pass) && that.relays[this.nick][this.pass].hasOwnProperty(this.channel)) {
+                        relay = that.relays[this.nick][this.pass][this.channel];
+                        for (var idx in relay.memory) {
+                            if (relay.memory.hasOwnProperty(idx)) {
+                                this.send(relay.memory[idx].data);
+                            }
+                        }
+                        relay.memory = [];
+                        this.send(JSON.stringify({"cmd": "onlineSet", "nicks": relay.nicks, "trips": relay.trips}));
                     } else {
-                        relay = new ws({host: that.config.wss});
+                        relay = new ws(that.config.wss);
+                        that.relays[this.nick] = {};
+                        that.relays[this.nick][this.pass] = {};
+                        that.relays[this.nick][this.pass][this.channel] = relay;
                         relay.on("open", function () {
-                            //TODO: What to do, what to do?
+                            this.send(data);
                         });
                         relay.on("message", function (data) {
                             var args = JSON.parse(data);
+                            console.log("Relay", args);
                             switch (args.cmd) {
                                 case "warn":
-                                    if (errCode === "E005" || errCode === E003) {
+                                    if (args.errCode === "E005" || args.errCode === "E003") {
                                         socket.nick = null;
                                     }
                                     break;
                                 case "onlineSet":
-                                    if (this.hasOwnProperty("memory")) {
-                                        for (var idx in this.memory) {
-                                            socket.send(this.memory[idx]);
-                                        }
-                                    } else {
-                                        this.memory = [];
-                                        that.relays[args.nick] = {};
-                                        that.relays[args.nick][args.pass] = {};
-                                        that.relays[args.nick][args.pass][args.channel] = this;
-                                    }
+                                    this.socket.send(data);
+                                    this.memory = [];
+                                    this.nicks = args.nicks;
+                                    this.trips = args.trips;
+                                    return;
+                                    break;
+                                case "onlineAdd":
+                                    this.nicks.push(args.nick);
+                                    this.trips.push(args.trip);
+                                    break;
+                                case "onlineRemove":
+                                    var idx = this.nick.indexOf(args.nick);
+                                    this.nicks.pop(idx);
+                                    this.trips.pop(idx);
+                                    break;
+                                case "ping":
+                                    this.socket.send(JSON.stringify({cmd: "pong"}));
                                     break;
                             }
                             if (this.socket !== null) {
-                                socket.send(data);
+                                var isOpened = false;
+                                while (!isOpened) {
+                                    try {
+                                        this.socket.send(data);
+                                        isOpened = true;
+                                    } catch (e) {
+
+                                    }
+                                }
                             } else {
-                                this.memory.push(data);
+                                if (this.memory.length > that.config.memorySize) {
+                                    var idx = 0;
+                                    if (that.config.mentionHold) {
+                                        for (; idx < this.memory.length && this.memory[idx].mention; idx++);
+                                    }
+                                    this.memory.pop(idx);
+                                }
+                                var reg = new RegExp("@" + socket.nick + "(\\s|$)");
+                                var mention = reg.test(data);
+                                this.memory.push({"data": data, "mention": mention});
                             }
                         });
+                        relay.on("close", function () {
+                            console.log("Relay close");
+                        });
                     }
+                    socket.relay = relay;
                     relay.socket = this;
+                    return;
                     break;
                 case "chat":
                     try {
@@ -119,16 +160,25 @@ Bouncer.prototype.run = function () {
                         // Nothing to see here, move along
                     }
                     break;
+                case "verify":
+                    this.send(JSON.stringify({"cmd": "verify", "valid": true}));
+                    return;
+                    break;
             }
-            relay.send(data);
+            this.relay.send(data);
         });
         socket.on('close', function () {
-            socket.relay.socket = null;
-            newClient.close();
+            console.log("Socket close");
+            try {
+                this.relay.socket = null;
+                newClient.close();
+            } catch (e) {
+
+            }
         });
     });
 };
 
 Object.prototype.isEmpty = function () {
-    return Object.keys(obj).length === 0 && obj.constructor === Object;
+    return Object.keys(this).length === 0 && this.constructor === Object;
 };
