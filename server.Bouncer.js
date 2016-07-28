@@ -75,6 +75,7 @@ Bouncer.prototype.run = function () {
                         this.send(JSON.stringify({"cmd": "onlineSet", "nicks": relay.nicks, "trips": relay.trips}));
                     } else {
                         relay = new ws(that.config.wss);
+                        relay.sockets = {};
                         that.relays[this.nick] = {};
                         that.relays[this.nick][this.pass] = {};
                         that.relays[this.nick][this.pass][this.channel] = relay;
