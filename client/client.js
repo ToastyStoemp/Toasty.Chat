@@ -426,12 +426,13 @@ $(function () {
         }
         else if (!(args.nick == '!' || args.nick == '*' || args.nick == '<Server>')) {
             for (var nick in onlineUsers) {
-                if (new RegExp(nick + "(\\s|$)").test(args.text)) {
+                var nickReg = new RegExp("(@" + nick + ")(\\s|$)");
+                if (nickReg.test(args.text)) {
                     var user = document.createElement('span');
                     user.textContent = "@" + nick;
                     user.style.color = onlineUsers[nick];
                     try {
-                        textEl.outerHTML = textEl.outerHTML.replace(mentionReg, user.outerHTML);
+                        textEl.innerHTML = textEl.innerHTML.replace(textEl.innerHTML.match(nickReg)[1], user.outerHTML);
                     }
                     catch (err) {
                         console.log(err.message);
