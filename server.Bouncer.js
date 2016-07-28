@@ -102,7 +102,7 @@ Bouncer.prototype.run = function () {
                                     this.trips.push(args.trip);
                                     break;
                                 case "onlineRemove":
-                                    var idx = this.nick.indexOf(args.nick);
+                                    var idx = this.nicks.indexOf(args.nick);
                                     this.nicks.pop(idx);
                                     this.trips.pop(idx);
                                     break;
