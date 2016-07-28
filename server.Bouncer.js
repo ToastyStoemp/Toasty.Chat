@@ -79,6 +79,9 @@ Bouncer.prototype.run = function () {
                         that.relays[this.nick][this.pass] = {};
                         that.relays[this.nick][this.pass][this.channel] = relay;
                         relay.on("open", function () {
+                            this.nick = socket.nick;
+                            this.pass = socket.pass;
+                            this.channel = socket.channel;
                             this.send(data);
                         });
                         relay.on("message", function (data) {
@@ -91,7 +94,11 @@ Bouncer.prototype.run = function () {
                                     }
                                     break;
                                 case "onlineSet":
-                                    this.socket.send(data);
+                                    for (var socketId in this.sockets) {
+                                        if (this.sockets.hasOwnProperty(socketId)) {
+                                            this.sockets[socketId].send(data);
+                                        }
+                                    }
                                     this.memory = [];
                                     this.nicks = args.nicks;
                                     this.trips = args.trips;
@@ -107,14 +114,22 @@ Bouncer.prototype.run = function () {
                                     this.trips.pop(idx);
                                     break;
                                 case "ping":
-                                    this.socket.send(JSON.stringify({cmd: "pong"}));
+                                    for (var socketId in this.sockets) {
+                                        if (this.sockets.hasOwnProperty(socketId)) {
+                                            socket.send(JSON.stringify({cmd: "pong"}));
+                                        }
+                                    }
                                     break;
                             }
-                            if (this.socket !== null) {
+                            if (this.sockets.length === 0) {// !== null) {
                                 var isOpened = false;
                                 while (!isOpened) {
                                     try {
-                                        this.socket.send(data);
+                                        for (var socketId in this.sockets) {
+                                            if (this.sockets.hasOwnProperty(socketId)) {
+                                                this.sockets[socketId].send(data);
+                                            }
+                                        }
                                         isOpened = true;
                                     } catch (e) {
 
@@ -135,10 +150,12 @@ Bouncer.prototype.run = function () {
                         });
                         relay.on("close", function () {
                             console.log("Relay close");
+                            delete that.relays[this.nick][this.pass][this.channel];
                         });
                     }
-                    socket.relay = relay;
-                    relay.socket = this;
+                    this.relay = relay;
+                    this.socketId = new Date().getTime();
+                    relay.sockets[this.socketId] = this;
                     return;
                     break;
                 case "chat":
@@ -170,7 +187,7 @@ Bouncer.prototype.run = function () {
         socket.on('close', function () {
             console.log("Socket close");
             try {
-                this.relay.socket = null;
+                delete this.relay.sockets[this.socketId];
                 newClient.close();
             } catch (e) {
 
