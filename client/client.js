@@ -141,9 +141,9 @@ $(function () {
     function join(channel) {
         connectTime = new Date(); // here also for 'normal' connect fails
 
-        if (document.domain == 'chat.toastystoemp.com') {
-            // For http://toastystoemp.com/
-            ws = new WebSocket('wss://chat.toastystoemp.com/chatws');
+        if (document.domain === window.config.domain) {
+            // For a registered domain
+            ws = new WebSocket('wss://' + document.domain + '/chatws');
         }
         else {
             // for local installs
@@ -973,7 +973,7 @@ $(function () {
 
             not.onclick = function () {
                 if (Channel) {
-                    window.open('https://chat.toastystoemp.com/?' + Channel, '_blank');
+                    window.open('https://' + document.domain + '/?' + Channel, '_blank');
                 } else
                     window.focus()
             };
