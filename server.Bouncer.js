@@ -151,27 +151,45 @@ Bouncer.prototype.run = function () {
                         });
                         relay.on("close", function () {
                             console.log("Relay close");
-                            delete that.relays[this.nick][this.pass][this.channel];
+                            try {
+                                delete that.relays[this.nick][this.pass][this.channel];
+                                if (that.relays[this.nick][this.pass].isEmpty()) {
+                                    delete that.relays[this.nick][this.pass];
+                                    if (that.relays[this.nick].isEmpty()) {
+                                        delete that.relays[this.nick];
+                                    }
+                                }
+
+                            } catch (e) {
+
+                            }
                         });
                     }
-                    this.relay = relay;
                     this.socketId = new Date().getTime();
                     relay.sockets[this.socketId] = this;
                     return;
                     break;
                 case "chat":
                     try {
-                        var potentialCmd = args.text.split(" ")[0].split(that.config.commandChar)[1];
-                        if (potentialCmd === "quit") {
-                            delete that.relays[args.nick][args.pass][args.channel];
-                            if (that.relays[args.nick][args.pass].isEmpty()) {
-                                delete that.relays[args.nick][args.pass];
-                                if (that.relays[args.nick].isEmpty()) {
-                                    delete that.relays[args.nick];
+                        var cmdReg = new RegExp("^" + that.config.commandChar + "([^\\s]+)(\\s|$)");
+                        var potentialCmd = args.text.match(cmdReg)[1];
+                        switch (potentialCmd) {
+                            case "quit":
+                                for (var socketId in that.relays[this.nick][this.pass][this.channel].sockets) {
+                                    if (that.relays[this.nick][this.pass][this.channel].sockets.hasOwnProperty(socketId)) {
+                                        socket.close();
+                                    }
                                 }
-                            }
-                            this.close();
-                            return;
+                                that.relays[this.nick][this.pass][this.channel].close();
+                                delete that.relays[this.nick][this.pass][this.channel];
+                                if (that.relays[this.nick][this.pass].isEmpty()) {
+                                    delete that.relays[this.nick][this.pass];
+                                    if (that.relays[this.nick].isEmpty()) {
+                                        delete that.relays[this.nick];
+                                    }
+                                }
+                                return;
+                                break;
                         }
                     }
                     catch (e) {
@@ -183,12 +201,12 @@ Bouncer.prototype.run = function () {
                     return;
                     break;
             }
-            this.relay.send(data);
+            that.relays[this.nick][this.pass][this.channel].send(data);
         });
         socket.on('close', function () {
             console.log("Socket close");
             try {
-                delete this.relay.sockets[this.socketId];
+                delete that.relays[this.nick][this.pass][this.channel].sockets[this.socketId];
                 newClient.close();
             } catch (e) {
 
