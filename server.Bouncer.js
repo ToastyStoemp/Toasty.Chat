@@ -122,18 +122,18 @@ Bouncer.prototype.run = function () {
                                     }
                                     break;
                             }
-                            if (this.hasOwnProperty("sockets") && this.sockets !== null && this.sockets.length > 0) {
-                                var isOpened = false;
-                                while (!isOpened) {
-                                    try {
-                                        for (var socketId in this.sockets) {
-                                            if (this.sockets.hasOwnProperty(socketId)) {
+                            if (this.hasOwnProperty("sockets") && this.sockets !== null && !this.sockets.isEmpty()) {
+                                for (var socketId in this.sockets) {
+                                    if (this.sockets.hasOwnProperty(socketId)) {
+                                        var isOpened = false;
+                                        while (!isOpened) {
+                                            try {
                                                 this.sockets[socketId].send(data);
+                                                isOpened = true;
+                                            } catch (e) {
+                                                console.error(e);
                                             }
                                         }
-                                        isOpened = true;
-                                    } catch (e) {
-
                                     }
                                 }
                             } else {
