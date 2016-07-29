@@ -122,7 +122,7 @@ Bouncer.prototype.run = function () {
                                     }
                                     break;
                             }
-                            if (this.sockets.length === 0) {// !== null) {
+                            if (this.hasOwnProperty("sockets") && this.sockets !== null && this.sockets.length > 0) {
                                 var isOpened = false;
                                 while (!isOpened) {
                                     try {
