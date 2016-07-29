@@ -111,8 +111,8 @@ Bouncer.prototype.run = function () {
                                     break;
                                 case "onlineRemove":
                                     var idx = this.nicks.indexOf(args.nick);
-                                    this.nicks.pop(idx);
-                                    this.trips.pop(idx);
+                                    this.nicks.splice(idx, 1);
+                                    this.trips.splice(idx, 1);
                                     break;
                                 case "ping":
                                     for (var socketId in this.sockets) {
@@ -142,7 +142,7 @@ Bouncer.prototype.run = function () {
                                     if (that.config.mentionHold) {
                                         for (; idx < this.memory.length && this.memory[idx].mention; idx++);
                                     }
-                                    this.memory.pop(idx);
+                                    this.memory.splice(idx, 1);
                                 }
                                 var reg = new RegExp("@" + socket.nick + "(\\s|$)");
                                 var mention = reg.test(data);
