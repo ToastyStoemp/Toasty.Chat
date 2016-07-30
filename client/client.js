@@ -206,8 +206,15 @@ function connect(channel)
 
 	var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
 	if (!wasConnected && !autoLoginOk) {
-		myNick = prompt('Nickname:', myNick);
+		$("#overlay").removeClass("hidden");
+		$("#nick").val(myNick).data("realNick", myNick).data("channel", channel);
 	}
+	else{
+		$(document).trigger("login", channel);
+	}
+}
+
+$(document).on("login", function (e, channel) {
 	if (myNick) {
 		localStorageSet('my-nick', myNick);
 		var nick = myNick.split("#")[0];
@@ -217,7 +224,7 @@ function connect(channel)
 	}
 	// if !myNick: do nothing - reload continued to try again
 	wasConnected = true;
-}
+});
 
 var COMMANDS = {
 	pong: function(args) {
@@ -1146,4 +1153,39 @@ window.onbeforeunload = function(){
     return 'Are you sure you want to leave?';
   }
 }
+
+//Login
+    $("#login form").submit(function(e) {
+        e.preventDefault();
+        $("#overlay").addClass("hidden");
+		myNick = $("#nick").data("realNick");
+		$("#nick").val("").data("realNick", "");
+		$(document).trigger("login", $("#nick").data("channel"));
+		$("#nick").data("channel", "");
+    });
+    $("#login form input#nick").keydown(function(e) {
+        $(this).data("keyCode", e.keyCode);
+    }).on("select", function(e) {
+        $(this).data("selectionEnd", e.currentTarget.selectionEnd);
+        $(this).data("selectionStart", e.currentTarget.selectionStart);
+    }).on("input", function(e) {
+        if ($(this).data("realNick") == null) {
+            $(this).data("realNick", "");
+        }
+        if ($(this).data("keyCode") == 8) {
+            var value = $(this).data("realNick");
+            $(this).data("realNick", value.slice(0, $(this).data("selectionStart") - 1) + value.slice($(this).data("selectionEnd") + 1, value.length - 1));
+            return;
+        }
+        var nick = e.currentTarget.value;
+        var lastChar = nick[nick.length - 1];
+        if (nick.length > $(this).data("realNick").length) {
+            $(this).data("realNick", $(this).data("realNick") + lastChar);
+        }
+        var matches = nick.match(/#(.+)/i);
+        if (matches !== null) {
+            var password = nick.match(/#(.+)/i)[1];
+            e.currentTarget.value = nick.replace(/#(.+)/, "#" + password.replace(/./g, "*"));
+        }
+    });
 });
