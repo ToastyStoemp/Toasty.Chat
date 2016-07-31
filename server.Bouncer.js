@@ -46,6 +46,12 @@ Bouncer.prototype.openRelay = function (relayInfo) {
     var that = this;
     var relay = new ws(this.config.wss);
     relay.sockets = {};
+    if (relayInfo.hasOwnProperty("memory")) {
+        relay.memory = relayInfo.memory;
+    }
+    else {
+        relay.memory = [];
+    }
     relay.on("open", function () {
         this.nick = relayInfo.nick;
         this.pass = relayInfo.pass;
@@ -67,7 +73,6 @@ Bouncer.prototype.openRelay = function (relayInfo) {
                         this.sockets[socketId].send(data);
                     }
                 }
-                this.memory = [];
                 this.nicks = args.nicks;
                 this.trips = args.trips;
                 return;
@@ -129,7 +134,8 @@ Bouncer.prototype.openRelay = function (relayInfo) {
                     that.relays[this.nick][this.pass][this.channel] = that.openRelay({
                         "nick": this.nick,
                         "pass": this.pass,
-                        "channel": this.channel
+                        "channel": this.channel,
+                        "memory": this.memory
                     });
                     return;
                 } catch (e) {
