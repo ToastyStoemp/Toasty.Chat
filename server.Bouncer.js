@@ -117,9 +117,6 @@ Bouncer.prototype.openRelay = function (relayInfo) {
                     }
                     this.memory.splice(idx, 1);
                 }
-                else {
-                    this.memory = [];
-                }
             }
             var reg = new RegExp("@" + relayInfo.nick + "(\\s|$)");
             var mention = reg.test(data);
