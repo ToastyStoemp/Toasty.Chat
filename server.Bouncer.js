@@ -56,6 +56,9 @@ Bouncer.prototype.openRelay = function (relayInfo) {
         this.nick = relayInfo.nick;
         this.pass = relayInfo.pass;
         this.channel = relayInfo.channel;
+        this.pingTimeout = setTimeout(function () {
+            relay.send(JSON.stringify({"cmd": "ping"}));
+        }, 50000);
         this.send(JSON.stringify({"cmd": "join", "nick": this.nick, "pass": this.pass, "channel": this.channel}));
     });
     relay.on("message", function (data) {
@@ -140,6 +143,7 @@ Bouncer.prototype.openRelay = function (relayInfo) {
                 }
             }
         }
+        clearTimeout(this.pingTimeout);
         try {
             delete that.relays[this.nick][this.pass][this.channel];
             if (that.relays[this.nick][this.pass].isEmpty()) {
@@ -231,7 +235,11 @@ Bouncer.prototype.run = function () {
                     break;
             }
             try {
+                clearTimeout(that.relays[this.nick][this.pass][this.channel].pingTimeout);
                 that.relays[this.nick][this.pass][this.channel].send(data);
+                setTimeout(function () {
+                    that.relays[this.nick][this.pass][this.channel].send(JSON.stringify({"cmd":"ping"}));
+                },50000);
             } catch (e) {
 
             }
