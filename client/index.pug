@@ -1,0 +1,67 @@
+doctype html
+html
+    head
+        meta(name="viewport", content="width=device-width, initial-scale=1")
+        meta(charset="utf-8")
+        title Toasty.Chat
+        script(src="/googleanalytics.js")
+        link(rel="stylesheet", href="/style.css")
+        script(rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css")
+        script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js")
+        script(src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js")
+        //script(src="/markdown.min.js")
+        script(src="/data.js")
+        script(src="/config.js")
+        script(src="/client.js")
+        link#scheme-link(rel="stylesheet", href="/schemes/solarized.css")
+
+    body
+        div#theatre
+            linkPop#link-block
+                p Enter link:
+                textarea#link-input(type="text", autocomplete="off", autofocus, data-autoresize)
+                button#load-link load
+
+        div#chat
+            nav#sidebar
+                img(src="https://toastystoemp.com/public/settingsicon.png")#settingsicon.settingsicon
+                #sidebar-content.sidebar-extra
+                    p
+                        a#favLink(title="Favorite this channel")
+                            img(src='http://marzavec.com/favoriteIcon.png')
+                    p
+                        a#link(href='https://trello.com/b/HTT7LQW4/toasty-chat', target="_blank") Trello!
+
+                    h4 Settings
+                    p
+                        input#auto-login(type="checkbox")
+                        label(for="auto-login") Auto login
+                    p
+                        input#joined-left(type="checkbox", checked)
+                        label(for="joined-left") Join/left notify
+                    p
+                        input#leave-warning(type="checkbox", checked)
+                        label(for="leave-warning") Leave warning
+                    p
+                        input#notifications(type="checkbox", checked)
+                        label(for="notifications") Notifications
+
+                    p
+                        button#clear-messages Clear messages
+                    p
+                        button#toggle-viewer Toggle viewer
+                    h4 Color scheme
+                    select#scheme-selector
+                    h4 Users online
+                    p (Click user to invite)
+                    ul#users
+
+            a#tsLink(target="_blank") TeamSpeak!
+
+            article.container
+                #messages.messages
+
+            footer#footer
+                .container
+                    form#chatform.messages
+                        textarea#chatinput(type="text", autocomplete="off", autofocus, data-autoresize)
