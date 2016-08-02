@@ -38,7 +38,7 @@ Client.prototype.run = function () {
   var input = fs.readFileSync(__dirname + "/client/config.tpl").toString();
   fs.writeFileSync(__dirname + "/client/config.js",ejs.render(input, {domain: domain, port: port}));
   app.set('views', __dirname + '/client');
-  app.set("view engine", "jade");
+  app.set("view engine", "pug");
   app.use(express.static(__dirname + '/client'));
   app.use("/schemes",express.static(__dirname + '/client/schemes'));
   app.get("/", function (req, res) {
