@@ -206,15 +206,31 @@ Bouncer.prototype.run = function () {
                     break;
                 case "chat":
                     try {
-                        var cmdReg = new RegExp("^" + that.config.commandChar + "([^\\s]+)(\\s|$)");
+                        var cmdReg = new RegExp("^" + that.config.commandChar + "([^\\s]+)(\\s|$)([^\\s]+)*");
                         var potentialCmd = args.text.match(cmdReg)[1];
                         switch (potentialCmd) {
-                            case "quit":
-                                for (var socketId in that.relays[this.nick][this.pass][this.channel].sockets) {
-                                    if (that.relays[this.nick][this.pass][this.channel].sockets.hasOwnProperty(socketId)) {
-                                        that.relays[this.nick][this.pass][this.channel].sockets[socketId].close();
-                                        delete that.relays[this.nick][this.pass][this.channel].sockets[socketId];
-                                    }
+                            case "close":
+                                var arg = args.text.match(cmdReg)[3];
+                                switch (arg) {
+                                    default:
+                                    case "quit":
+                                        for (var socketId in that.relays[this.nick][this.pass][this.channel].sockets) {
+                                            if (that.relays[this.nick][this.pass][this.channel].sockets.hasOwnProperty(socketId)) {
+                                                that.relays[this.nick][this.pass][this.channel].sockets[socketId].send(JSON.stringify({
+                                                    "cmd": "warn",
+                                                    "text": "Bouncer has closed the connection"
+                                                }));
+                                            }
+                                        }
+                                        break;
+                                    case "reload":
+                                        for (var socketId in that.relays[this.nick][this.pass][this.channel].sockets) {
+                                            if (that.relays[this.nick][this.pass][this.channel].sockets.hasOwnProperty(socketId)) {
+                                                that.relays[this.nick][this.pass][this.channel].sockets[socketId].close();
+                                                delete that.relays[this.nick][this.pass][this.channel].sockets[socketId];
+                                            }
+                                        }
+                                        break;
                                 }
                                 that.relays[this.nick][this.pass][this.channel].sockets = null;
                                 that.relays[this.nick][this.pass][this.channel].close();
