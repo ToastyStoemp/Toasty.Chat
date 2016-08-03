@@ -67,7 +67,11 @@ Bouncer.prototype.openRelay = function (relayInfo) {
         switch (args.cmd) {
             case "warn":
                 if (args.errCode === "E005" || args.errCode === "E003") {
-                    socket.nick = null;
+                    for (var socketId in this.sockets) {
+                        if (this.sockets.hasOwnProperty(socketId)) {
+                            this.sockets[socketId].nick = null;
+                        }
+                    }
                 }
                 break;
             case "onlineSet":
@@ -238,8 +242,8 @@ Bouncer.prototype.run = function () {
                 clearInterval(that.relays[this.nick][this.pass][this.channel].pingInterval);
                 that.relays[this.nick][this.pass][this.channel].send(data);
                 that.relays[this.nick][this.pass][this.channel].pingInterval = setInterval(function () {
-                    that.relays[socket.nick][socket.pass][socket.channel].send(JSON.stringify({"cmd":"ping"}));
-                },50000);
+                    that.relays[socket.nick][socket.pass][socket.channel].send(JSON.stringify({"cmd": "ping"}));
+                }, 50000);
             } catch (e) {
 
             }

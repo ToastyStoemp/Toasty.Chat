@@ -1185,8 +1185,7 @@ window.onbeforeunload = function(){
 		$("#nick").val("").data("realNick", "");
 		$(document).trigger("login", $("#nick").data("channel"));
 		$("#nick").data("channel", "");
-    });
-    $("#login form input#nick").keydown(function(e) {
+    }).find("input#nick").keydown(function(e) {
         $(this).data("keyCode", e.keyCode);
     }).on("select", function(e) {
         $(this).data("selectionEnd", e.currentTarget.selectionEnd);
