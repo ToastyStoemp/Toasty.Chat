@@ -62,50 +62,49 @@ Bouncer.prototype.openRelay = function (relayInfo) {
         this.send(JSON.stringify({"cmd": "join", "nick": this.nick, "pass": this.pass, "channel": this.channel}));
     });
     relay.on("message", function (data) {
-        var args = JSON.parse(data);
-        console.log("Relay", args);
-        switch (args.cmd) {
-            case "warn":
-                if (args.errCode === "E005" || args.errCode === "E003") {
-                    for (var socketId in this.sockets) {
-                        if (this.sockets.hasOwnProperty(socketId)) {
-                            this.sockets[socketId].nick = null;
+            var args = JSON.parse(data);
+            console.log("Relay", args);
+            switch (args.cmd) {
+                case "warn":
+                    if (args.errCode === "E005" || args.errCode === "E003") {
+                        for (var socketId in this.sockets) {
+                            if (this.sockets.hasOwnProperty(socketId)) {
+                                this.sockets[socketId].nick = null;
+                            }
                         }
                     }
-                }
-                break;
-            case "onlineSet":
+                    break;
+                case "onlineSet":
+                    for (var socketId in this.sockets) {
+                        if (this.sockets.hasOwnProperty(socketId)) {
+                            this.sockets[socketId].send(data);
+                        }
+                    }
+                    this.nicks = args.nicks;
+                    this.trips = args.trips;
+                    return;
+                    break;
+                case "onlineAdd":
+                    this.nicks.push(args.nick);
+                    this.trips.push(args.trip);
+                    break;
+                case "onlineRemove":
+                    var idx = this.nicks.indexOf(args.nick);
+                    this.nicks.splice(idx, 1);
+                    this.trips.splice(idx, 1);
+                    break;
+                case "ping":
+                    for (var socketId in this.sockets) {
+                        if (this.sockets.hasOwnProperty(socketId)) {
+                            socket.send(JSON.stringify({cmd: "pong"}));
+                        }
+                    }
+                    break;
+            }
+            var isOpened = false;
+            if (this.hasOwnProperty("sockets") && this.sockets !== null && !this.sockets.isEmpty()) {
                 for (var socketId in this.sockets) {
                     if (this.sockets.hasOwnProperty(socketId)) {
-                        this.sockets[socketId].send(data);
-                    }
-                }
-                this.nicks = args.nicks;
-                this.trips = args.trips;
-                return;
-                break;
-            case "onlineAdd":
-                this.nicks.push(args.nick);
-                this.trips.push(args.trip);
-                break;
-            case "onlineRemove":
-                var idx = this.nicks.indexOf(args.nick);
-                this.nicks.splice(idx, 1);
-                this.trips.splice(idx, 1);
-                break;
-            case "ping":
-                for (var socketId in this.sockets) {
-                    if (this.sockets.hasOwnProperty(socketId)) {
-                        socket.send(JSON.stringify({cmd: "pong"}));
-                    }
-                }
-                break;
-        }
-        if (this.hasOwnProperty("sockets") && this.sockets !== null && !this.sockets.isEmpty()) {
-            for (var socketId in this.sockets) {
-                if (this.sockets.hasOwnProperty(socketId)) {
-                    var isOpened = false;
-                    while (!isOpened) {
                         try {
                             this.sockets[socketId].send(data);
                             isOpened = true;
@@ -115,21 +114,22 @@ Bouncer.prototype.openRelay = function (relayInfo) {
                     }
                 }
             }
-        } else {
-            if (this.memory != null) {
-                if (this.memory.length > that.config.memorySize) {
-                    var idx = 0;
-                    if (that.config.mentionHold) {
-                        for (; idx < this.memory.length && this.memory[idx].mention; idx++);
+            if (!this.hasOwnProperty("sockets") || this.sockets === null || this.sockets.isEmpty() || !isOpened) {
+                if (this.memory != null) {
+                    if (this.memory.length > that.config.memorySize) {
+                        var idx = 0;
+                        if (that.config.mentionHold) {
+                            for (; idx < this.memory.length && this.memory[idx].mention; idx++);
+                        }
+                        this.memory.splice(idx, 1);
                     }
-                    this.memory.splice(idx, 1);
                 }
+                var reg = new RegExp("@" + relayInfo.nick + "(\\s|$)");
+                var mention = reg.test(data);
+                this.memory.push({"data": data, "mention": mention});
             }
-            var reg = new RegExp("@" + relayInfo.nick + "(\\s|$)");
-            var mention = reg.test(data);
-            this.memory.push({"data": data, "mention": mention});
         }
-    });
+    );
     relay.on("close", function () {
         console.log("Relay close");
         if (this.sockets !== null) {
@@ -161,7 +161,8 @@ Bouncer.prototype.openRelay = function (relayInfo) {
         }
     });
     return relay;
-};
+}
+;
 
 Bouncer.prototype.initialize = function (config) {
     this.config = config;

@@ -20,7 +20,7 @@ html
             div#login
                 form#login-form
                     label Enter nick and pass like this : nick#pass
-                    input#nick(type="text",required,pattern="[a-zA-Z0-9_]{1,24}(#.+)?",autofocus,title="Nickname must consist of up to 24 letters, numbers, and underscores")
+                    input#nick(type="text",required,pattern="[a-zA-Z0-9_]{1,24}(#.+)?",autofocus, autocomplete="off",title="Nickname must consist of up to 24 letters, numbers, and underscores")
                     input(type="submit")
         div#theatre
             linkPop#link-block

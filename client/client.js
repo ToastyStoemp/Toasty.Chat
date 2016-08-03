@@ -1199,18 +1199,20 @@ $(function () {
         }
         if ($(this).data("keyCode") == 8) {
             var value = $(this).data("realNick");
-            $(this).data("realNick", value.slice(0, $(this).data("selectionStart") - 1) + value.slice($(this).data("selectionEnd") + 1, value.length - 1));
-            return;
+            $(this).data("realNick", value.slice(0, $(this).data("selectionStart") - 1) + value.slice($(this).data("selectionEnd") + 1));
+        } else {
+            var nick = e.currentTarget.value;
+            var idxStart = $(this).data("selectionStart") || e.currentTarget.selectionStart - 1;
+            var idxEnd = $(this).data("selectionEnd") || e.currentTarget.selectionStart;
+            var newChar = nick[idxStart];
+            $(this).data("realNick", $(this).data("realNick").slice(0, idxStart) + newChar + $(this).data("realNick").slice(idxEnd));
+            var matches = nick.match(/#(.+)/i);
+            if (matches !== null) {
+                var password = matches[1];
+                e.currentTarget.value = nick.replace(/#(.+)/, "#" + password.replace(/./g, "*"));
+            }
         }
-        var nick = e.currentTarget.value;
-        var lastChar = nick[nick.length - 1];
-        if (nick.length > $(this).data("realNick").length) {
-            $(this).data("realNick", $(this).data("realNick") + lastChar);
-        }
-        var matches = nick.match(/#(.+)/i);
-        if (matches !== null) {
-            var password = nick.match(/#(.+)/i)[1];
-            e.currentTarget.value = nick.replace(/#(.+)/, "#" + password.replace(/./g, "*"));
-        }
+        $(this).data("selectionStart", null);
+        $(this).data("selectionEnd", null);
     });
 });
