@@ -732,13 +732,13 @@ $(function () {
     var unread = 0;
 
     window.onfocus = function (e) {
+        for (var i = 0; i < notifications.length; i++) {
+            notifications[i].close();
+        }
+        notifications = [];
+        unread = 0;
+        updateTitle();
         if (e.target === window) {
-            for (var i = 0; i < notifications.length; i++) {
-                notifications[i].close();
-            }
-            notifications = [];
-            unread = 0;
-            updateTitle();
             $('#chatinput').focus();
         }
     };
