@@ -157,7 +157,7 @@ $(function () {
                 send({cmd: 'warn', text: "Connection could not be established"});
             else
                 send({cmd: 'verify', version: webClientVersion});
-        }
+        };
 
         var pongCheck = setInterval(function () {
             var secondsSinceLastPong = (lastPong - new Date()) / 1000;
@@ -196,7 +196,7 @@ $(function () {
                     join(this.channel);
                 }
             }, 1000);
-        }
+        };
 
         ws.onmessage = function (message) {
             lastPong = new Date();
@@ -207,7 +207,7 @@ $(function () {
                 command.call(null, args);
             else
                 console.warning('Unknown command: ' + String(cmd));
-        }
+        };
     }
 
     var wasConnected = false;
@@ -215,27 +215,27 @@ $(function () {
     function connect(channel) {
         myNick = localStorageGet('my-nick') || "";
 
-	var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
-	if (!wasConnected && !autoLoginOk) {
-		$("#overlay").removeClass("hidden");
-		$("#nick").val(myNick).data("realNick", myNick).data("channel", channel);
-	}
-	else{
-		$(document).trigger("login", channel);
-	}
-}
+        var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
+        if (!wasConnected && !autoLoginOk) {
+            $("#overlay").removeClass("hidden");
+            $("#nick").val(myNick).data("realNick", myNick).data("channel", channel);
+        }
+        else {
+            $(document).trigger("login", channel);
+        }
+    }
 
-$(document).on("login", function (e, channel) {
-	if (myNick) {
-		localStorageSet('my-nick', myNick);
-		var nick = myNick.split("#")[0];
-		var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
-		send({cmd: 'join', channel: channel, nick: nick, pass: pass});
-		myNick = nick;
-	}
-	// if !myNick: do nothing - reload continued to try again
-	wasConnected = true;
-});
+    $(document).on("login", function (e, channel) {
+        if (myNick) {
+            localStorageSet('my-nick', myNick);
+            var nick = myNick.split("#")[0];
+            var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
+            send({cmd: 'join', channel: channel, nick: nick, pass: pass});
+            myNick = nick;
+        }
+        // if !myNick: do nothing - reload continued to try again
+        wasConnected = true;
+    });
 
     var COMMANDS = {
         pong: function (args) {
@@ -731,21 +731,23 @@ $(document).on("login", function (e, channel) {
 
     var unread = 0;
 
-    window.onfocus = function () {
-        for (var i = 0; i < notifications.length; i++) {
-            notifications[i].close();
+    window.onfocus = function (e) {
+        if (e.target === window) {
+            for (var i = 0; i < notifications.length; i++) {
+                notifications[i].close();
+            }
+            notifications = [];
+            unread = 0;
+            updateTitle();
+            $('#chatinput').focus();
         }
-        notifications = [];
-        unread = 0;
-        updateTitle();
-        $('#chatinput').focus();
-    }
+    };
 
     window.onscroll = function () {
         if (isAtBottom()) {
             updateTitle();
         }
-    }
+    };
 
     function isAtBottom() {
         return (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 1);
@@ -1169,28 +1171,29 @@ $(document).on("login", function (e, channel) {
         }).removeAttr('data-autoresize');
     });
 
-window.onbeforeunload = function(){
-	localStorageSet('mSelector', mSelector);
-	localStorageSet('bSelector', bSelector);
-  if(wasConnected && myChannel != '' && $('#leave-warning').is(":checked")) {
-    return 'Are you sure you want to leave?';
-  }
-}
+    window.onbeforeunload = function () {
+        localStorageSet('mSelector', mSelector);
+        localStorageSet('bSelector', bSelector);
+        if (wasConnected && myChannel != '' && $('#leave-warning').is(":checked")) {
+            return 'Are you sure you want to leave?';
+        }
+    }
 
 //Login
-    $("#login form").submit(function(e) {
+    $("#login form").submit(function (e) {
         e.preventDefault();
+        var $nick = $(this).find("input#nick");
         $("#overlay").addClass("hidden");
-		myNick = $("#nick").data("realNick");
-		$("#nick").val("").data("realNick", "");
-		$(document).trigger("login", $("#nick").data("channel"));
-		$("#nick").data("channel", "");
-    }).find("input#nick").keydown(function(e) {
+        myNick = $nick.data("realNick");
+        $nick.val("").data("realNick", "");
+        $(document).trigger("login", $nick.data("channel"));
+        $nick.data("channel", "");
+    }).find("input#nick").keydown(function (e) {
         $(this).data("keyCode", e.keyCode);
-    }).on("select", function(e) {
+    }).on("select", function (e) {
         $(this).data("selectionEnd", e.currentTarget.selectionEnd);
         $(this).data("selectionStart", e.currentTarget.selectionStart);
-    }).on("input", function(e) {
+    }).on("input", function (e) {
         if ($(this).data("realNick") == null) {
             $(this).data("realNick", "");
         }
