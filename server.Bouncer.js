@@ -197,8 +197,12 @@ Bouncer.prototype.run = function () {
                         this.send(JSON.stringify({"cmd": "onlineSet", "nicks": relay.nicks, "trips": relay.trips}));
                     } else {
                         relay = that.openRelay(socket);
-                        that.relays[this.nick] = {};
-                        that.relays[this.nick][this.pass] = {};
+                        if(!that.relays.hasOwnProperty(this.nick)){
+                            that.relays[this.nick] = {};
+                        }
+                        if(that.relays[this.nick].hasOwnProperty(this.pass)){
+                            that.relays[this.nick][this.pass] = {};
+                        }
                         that.relays[this.nick][this.pass][this.channel] = relay;
                     }
                     this.socketId = new Date().getTime();
@@ -262,7 +266,7 @@ Bouncer.prototype.run = function () {
                     that.relays[socket.nick][socket.pass][socket.channel].send(JSON.stringify({"cmd": "ping"}));
                 }, 50000);
             } catch (e) {
-
+                console.error(e);
             }
         });
         socket.on('close', function () {
