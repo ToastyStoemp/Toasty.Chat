@@ -157,7 +157,7 @@ $(function () {
                 send({cmd: 'warn', text: "Connection could not be established"});
             else
                 send({cmd: 'verify', version: webClientVersion});
-        }
+        };
 
         var pongCheck = setInterval(function () {
             var secondsSinceLastPong = (lastPong - new Date()) / 1000;
@@ -196,7 +196,7 @@ $(function () {
                     join(this.channel);
                 }
             }, 1000);
-        }
+        };
 
         ws.onmessage = function (message) {
             lastPong = new Date();
@@ -207,7 +207,7 @@ $(function () {
                 command.call(null, args);
             else
                 console.warning('Unknown command: ' + String(cmd));
-        }
+        };
     }
 
     var wasConnected = false;
@@ -215,27 +215,27 @@ $(function () {
     function connect(channel) {
         myNick = localStorageGet('my-nick') || "";
 
-	var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
-	if (!wasConnected && !autoLoginOk) {
-		$("#overlay").removeClass("hidden");
-		$("#nick").val(myNick).data("realNick", myNick).data("channel", channel);
-	}
-	else{
-		$(document).trigger("login", channel);
-	}
-}
+        var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
+        if (!wasConnected && !autoLoginOk) {
+            $("#overlay").removeClass("hidden");
+            $("#nick").val(myNick).data("realNick", myNick).data("channel", channel);
+        }
+        else {
+            $(document).trigger("login", channel);
+        }
+    }
 
-$(document).on("login", function (e, channel) {
-	if (myNick) {
-		localStorageSet('my-nick', myNick);
-		var nick = myNick.split("#")[0];
-		var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
-		send({cmd: 'join', channel: channel, nick: nick, pass: pass});
-		myNick = nick;
-	}
-	// if !myNick: do nothing - reload continued to try again
-	wasConnected = true;
-});
+    $(document).on("login", function (e, channel) {
+        if (myNick) {
+            localStorageSet('my-nick', myNick);
+            var nick = myNick.split("#")[0];
+            var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
+            send({cmd: 'join', channel: channel, nick: nick, pass: pass});
+            myNick = nick;
+        }
+        // if !myNick: do nothing - reload continued to try again
+        wasConnected = true;
+    });
 
     var COMMANDS = {
         pong: function (args) {
@@ -731,21 +731,23 @@ $(document).on("login", function (e, channel) {
 
     var unread = 0;
 
-    window.onfocus = function () {
+    window.onfocus = function (e) {
         for (var i = 0; i < notifications.length; i++) {
             notifications[i].close();
         }
         notifications = [];
         unread = 0;
         updateTitle();
-        $('#chatinput').focus();
-    }
+        if (e.target === window) {
+            $('#chatinput').focus();
+        }
+    };
 
     window.onscroll = function () {
         if (isAtBottom()) {
             updateTitle();
         }
-    }
+    };
 
     function isAtBottom() {
         return (window.innerHeight + window.scrollY) >= (document.body.scrollHeight - 1);
@@ -1169,46 +1171,48 @@ $(document).on("login", function (e, channel) {
         }).removeAttr('data-autoresize');
     });
 
-window.onbeforeunload = function(){
-	localStorageSet('mSelector', mSelector);
-	localStorageSet('bSelector', bSelector);
-  if(wasConnected && myChannel != '' && $('#leave-warning').is(":checked")) {
-    return 'Are you sure you want to leave?';
-  }
-}
+    window.onbeforeunload = function () {
+        localStorageSet('mSelector', mSelector);
+        localStorageSet('bSelector', bSelector);
+        if (wasConnected && myChannel != '' && $('#leave-warning').is(":checked")) {
+            return 'Are you sure you want to leave?';
+        }
+    }
 
 //Login
-    $("#login form").submit(function(e) {
+    $("#login form").submit(function (e) {
         e.preventDefault();
+        var $nick = $(this).find("input#nick");
         $("#overlay").addClass("hidden");
-		myNick = $("#nick").data("realNick");
-		$("#nick").val("").data("realNick", "");
-		$(document).trigger("login", $("#nick").data("channel"));
-		$("#nick").data("channel", "");
-    });
-    $("#login form input#nick").keydown(function(e) {
+        myNick = $nick.data("realNick");
+        $nick.val("").data("realNick", "");
+        $(document).trigger("login", $nick.data("channel"));
+        $nick.data("channel", "");
+    }).find("input#nick").keydown(function (e) {
         $(this).data("keyCode", e.keyCode);
-    }).on("select", function(e) {
+    }).on("select", function (e) {
         $(this).data("selectionEnd", e.currentTarget.selectionEnd);
         $(this).data("selectionStart", e.currentTarget.selectionStart);
-    }).on("input", function(e) {
+    }).on("input", function (e) {
         if ($(this).data("realNick") == null) {
             $(this).data("realNick", "");
         }
         if ($(this).data("keyCode") == 8) {
             var value = $(this).data("realNick");
-            $(this).data("realNick", value.slice(0, $(this).data("selectionStart") - 1) + value.slice($(this).data("selectionEnd") + 1, value.length - 1));
-            return;
+            $(this).data("realNick", value.slice(0, $(this).data("selectionStart") - 1) + value.slice($(this).data("selectionEnd") + 1));
+        } else {
+            var nick = e.currentTarget.value;
+            var idxStart = $(this).data("selectionStart") || e.currentTarget.selectionStart - 1;
+            var idxEnd = $(this).data("selectionEnd") || e.currentTarget.selectionStart;
+            var newChar = nick[idxStart];
+            $(this).data("realNick", $(this).data("realNick").slice(0, idxStart) + newChar + $(this).data("realNick").slice(idxEnd));
+            var matches = nick.match(/#(.+)/i);
+            if (matches !== null) {
+                var password = matches[1];
+                e.currentTarget.value = nick.replace(/#(.+)/, "#" + password.replace(/./g, "*"));
+            }
         }
-        var nick = e.currentTarget.value;
-        var lastChar = nick[nick.length - 1];
-        if (nick.length > $(this).data("realNick").length) {
-            $(this).data("realNick", $(this).data("realNick") + lastChar);
-        }
-        var matches = nick.match(/#(.+)/i);
-        if (matches !== null) {
-            var password = nick.match(/#(.+)/i)[1];
-            e.currentTarget.value = nick.replace(/#(.+)/, "#" + password.replace(/./g, "*"));
-        }
+        $(this).data("selectionStart", null);
+        $(this).data("selectionEnd", null);
     });
 });
