@@ -200,7 +200,7 @@ Bouncer.prototype.run = function () {
                         if(!that.relays.hasOwnProperty(this.nick)){
                             that.relays[this.nick] = {};
                         }
-                        if(that.relays[this.nick].hasOwnProperty(this.pass)){
+                        if(!that.relays[this.nick].hasOwnProperty(this.pass)){
                             that.relays[this.nick][this.pass] = {};
                         }
                         that.relays[this.nick][this.pass][this.channel] = relay;
