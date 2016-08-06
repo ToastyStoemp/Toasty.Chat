@@ -93,12 +93,13 @@ Bouncer.prototype.openRelay = function (relayInfo) {
                     this.nicks.splice(idx, 1);
                     this.trips.splice(idx, 1);
                     break;
-                case "ping":
+                case "pong":
                     for (var socketId in this.sockets) {
                         if (this.sockets.hasOwnProperty(socketId)) {
                             socket.send(JSON.stringify({cmd: "pong"}));
                         }
                     }
+                    return;
                     break;
             }
             var isOpened = false;
