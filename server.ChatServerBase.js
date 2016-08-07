@@ -386,10 +386,6 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                     client.send(null, {cmd: 'warn', errCode: 'E010', text: "Cannot kick moderator"});
                     return;
                 }
-
-                badClient.clients.forEach(function (c) {
-                    self.POLICE.dump(c.getIpAddress(), args.time);
-                });
                 console.log(client.nick + " [" + client.trip + "] kicked " + nick + " in " + client.channel);
                 this.broadcast(client, {
                     cmd: 'info',
@@ -398,6 +394,11 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                     text: "Kicked " + nick
                 }, client.channel);
 
+                //Kick the client
+                badClient.clients.forEach(function (c) {
+                    c.send(null, {cmd: 'close'});
+                    self.POLICE.dump(c.getIpAddress(), args.time);
+                });
                 return;
             case 'ban':
                 var nick = String(args);
@@ -412,11 +413,6 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                     client.send(null, {cmd: 'warn', errCode: 'E010', text: "Cannot ban moderator"});
                     return;
                 }
-
-                badClient.clients.forEach(function (c) {
-                    c.send(null, {cmd: 'dataSet', bSet: true});
-                    self.POLICE.arrest(c.getIpAddress(), args.time);
-                });
                 console.log(client.nick + " [" + client.trip + "] banned " + nick + " in " + client.channel);
                 this.broadcast(client, {
                     cmd: 'info',
@@ -425,6 +421,12 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                     text: "Banned " + nick
                 }, client.channel);
 
+                //Ban the client
+                badClient.clients.forEach(function (c) {
+                  c.send(null, {cmd: 'dataSet', bSet: true});
+                  c.send(null, {cmd: 'close'});
+                  self.POLICE.arrest(c.getIpAddress(), args.time);
+                });
                 return;
             case 'mute':
                 var nick = String(args);
