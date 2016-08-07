@@ -28,7 +28,7 @@ BouncerClient.prototype.send = function (causingClient, data) {
     data.time = Date.now(); // Add timestamp to command
     try {
         if (this.socket.readyState == ws.OPEN) {
-            this.socket.send(JSON.stringify(data));
+            this.socket.send(data);
         }
     } catch (e) {
         // Ignore exceptions thrown by client.send()
