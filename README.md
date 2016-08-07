@@ -18,6 +18,7 @@ List of contributors Toasty.Chat:
 * https://github.com/0x17de
 * https://github.com/raf924
 * https://github.com/M4GNV5
+* https://github.com/marzavec
 
 ## Local install
 
