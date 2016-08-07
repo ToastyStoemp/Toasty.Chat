@@ -218,7 +218,7 @@ $(function () {
         var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
         if (!wasConnected && !autoLoginOk) {
             $("#loginOverlay").removeClass("hidden");
-            $("#nick").val(myNick).data("realNick", myNick).data("channel", channel);
+            $("#nick").val(myNick.replace(/[#](.*)/,"#"+myNick.split("#")[1].replace(/./g,"*"))).data("realNick", myNick).data("channel", channel);
         }
         else {
             $(document).trigger("login", channel);
