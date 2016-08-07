@@ -23,8 +23,8 @@ $(function () {
     }
 
 // favorite functions & vars start //
-    var unFavedIcon = "http://marzavec.com/favoriteIcon.png";
-    var favedIcon = "http://s.imgur.com/images/favicon-96x96.png";
+    var unFavedIcon = "https://toastystoemp.com/public/removeFav.png";
+    var favedIcon = "https://toastystoemp.com/public/addFav.png";
 
     function storeFavArray(favArray) {
         localStorageSet('favs', JSON.stringify(favArray));
