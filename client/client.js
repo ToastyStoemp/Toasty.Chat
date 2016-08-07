@@ -407,6 +407,13 @@ $(function () {
 
         // Text
         var textEl;
+        if (usePre !== false) {
+            textEl = document.createElement('pre');
+            textEl.textContent = args.text;
+        } else {
+            textEl = document.createElement('div');
+            textEl.innerHTML = args.text;
+        }
         textEl.classList.add('text');
 
         links = [];
@@ -417,8 +424,7 @@ $(function () {
         messageEl.appendChild(textEl);
 
         //Mentioning
-        var mentionReg = new RegExp(myNick.toLowerCase() + "(\\s|$)");
-        if (mentionReg.test(args.text.toLowerCase())) {
+        if ((new RegExp(myNick + "(\\s|$)", "i")).test(args.text)) {
             messageEl.classList.add('mention');
             if ($('#notifications').is(":checked") && !document.hasFocus()) {
                 notifyMe(args.nick + " mentioned you", args.text, false);
