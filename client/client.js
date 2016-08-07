@@ -616,7 +616,6 @@ $(function () {
         video.style.display = "none";
         video.style.width = "100%";
         video.style.height = "100%";
-        video.play();
         video.loop = true;
         video.controls = true;
         media.push(video);
