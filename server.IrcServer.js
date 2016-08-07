@@ -230,6 +230,8 @@ IrcServer.prototype.handleCommand = function(client, args) {
 			var channelName = args[1].substr(1);
 			var message = args[2];
 
+			if (/^\x01ACTION /.test(message)) // "me" action
+				message = message.replace(/^\x01ACTION (.*)\x01$/, "/me $1");
 			if (/x03/.test(message)) // contains coloring
 				message = message.replace(/\x03[01]?[0-9](,[01]?[0-9])?([^\x03]+)/g, "$2").replace(/\x03/g, "");
 
