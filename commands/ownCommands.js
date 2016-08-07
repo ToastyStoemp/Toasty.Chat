@@ -67,7 +67,7 @@ var addOwnCmd = function(bot, sender, args, data, client)
 		bot.commands[name] = createOwnCmdFunc(name, output);
 		bot.config.ownCommands[name] = output;
 
-		bot.sendClient("@" + sender + " added command " + name, client);
+		bot.sendAll("@" + sender + " added command " + name, client);
 	}
 };
 
@@ -81,7 +81,7 @@ var removeOwnCmd = function(bot, sender, args, data, client)
 	{
 		delete bot.commands[args[0]];
 		delete bot.config.ownCommands[args[0]];
-		bot.sendClient("@" + sender + " removed command " + args[0], client);
+		bot.sendAll("@" + sender + " removed command " + args[0], client);
 	}
 };
 
