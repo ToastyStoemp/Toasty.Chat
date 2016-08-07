@@ -3,35 +3,22 @@
 
 
 var ws = require('ws');
-var ChatClientBase = require('./server.ChatClientBase.js');
+var WebSocketClient = require('./server.WebSocketClient.js');
 var util = require("util");
 
-
 function BouncerClient(socket) {
-    ChatClientBase.call(this);
+    WebSocketClient.call(this);
     this.socket = socket;
 }
-util.inherits(BouncerClient, ChatClientBase);
-BouncerClient.prototype.getId = function () {
-    return this.socket;
-};
-BouncerClient.prototype.getIpAddress = function () {
-    var ip = this.socket.upgradeReq.connection.remoteAddress;
-    if (ip == "127.0.0.1" || ip == "::1") // only use forward ip when seeing local ips
-        ip = this.socket.upgradeReq.headers['x-forwarded-for'] || ip; // fallback to local ip if not set
-    return ip;
-};
-BouncerClient.prototype.close = function () {
-    this.socket.close();
-};
-BouncerClient.prototype.send = function (causingClient, data) {
-    data.time = Date.now(); // Add timestamp to command
+util.inherits(BouncerClient, WebSocketClient);
+
+BouncerClient.prototype.send = function (data) {
     try {
         if (this.socket.readyState == ws.OPEN) {
             this.socket.send(JSON.stringify(data));
         }
     } catch (e) {
-        // Ignore exceptions thrown by client.send()
+        console.error(data);
     }
 };
 
@@ -96,13 +83,12 @@ Bouncer.prototype.openRelay = function (relayInfo) {
                 case "pong":
                     for (var socketId in this.sockets) {
                         if (this.sockets.hasOwnProperty(socketId)) {
-                            try{
+                            try {
                                 this.sockets[socketId].send(JSON.stringify({cmd: "pong"}));
                             }
-                            catch(e){
+                            catch (e) {
                                 console.error(e);
                             }
-
                         }
                     }
                     return;
@@ -171,8 +157,9 @@ Bouncer.prototype.openRelay = function (relayInfo) {
 }
 ;
 
-Bouncer.prototype.initialize = function (config) {
+Bouncer.prototype.initialize = function (config, POLICE) {
     this.config = config;
+    this.POLICE = POLICE;
 };
 Bouncer.prototype.run = function () {
     var server = new ws.Server({host: this.config.host, port: this.config.socketPort});
@@ -183,8 +170,14 @@ Bouncer.prototype.run = function () {
         console.error(error);
     });
     server.on('connection', function (socket) {
-        var newClient = new BouncerClient(socket);
+        var client = new BouncerClient(socket);
+        if (that.POLICE.frisk(client.getIpAddress(), 0)) {
+            return;
+        }
         socket.on('message', function (data) {
+            if (that.POLICE.frisk(client.getIpAddress(), 0)) {
+                return;
+            }
             var args = JSON.parse(data);
             console.log("Socket", args);
             switch (args.cmd) {
@@ -204,10 +197,10 @@ Bouncer.prototype.run = function () {
                         this.send(JSON.stringify({"cmd": "onlineSet", "nicks": relay.nicks, "trips": relay.trips}));
                     } else {
                         relay = that.openRelay(socket);
-                        if(!that.relays.hasOwnProperty(this.nick)){
+                        if (!that.relays.hasOwnProperty(this.nick)) {
                             that.relays[this.nick] = {};
                         }
-                        if(!that.relays[this.nick].hasOwnProperty(this.pass)){
+                        if (!that.relays[this.nick].hasOwnProperty(this.pass)) {
                             that.relays[this.nick][this.pass] = {};
                         }
                         that.relays[this.nick][this.pass][this.channel] = relay;
@@ -280,9 +273,10 @@ Bouncer.prototype.run = function () {
             console.log("Socket close");
             try {
                 delete that.relays[this.nick][this.pass][this.channel].sockets[this.socketId];
-                newClient.close();
+                client.close();
+                delete client;
             } catch (e) {
-
+                console.error(e);
             }
         });
     });
