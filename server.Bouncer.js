@@ -93,12 +93,19 @@ Bouncer.prototype.openRelay = function (relayInfo) {
                     this.nicks.splice(idx, 1);
                     this.trips.splice(idx, 1);
                     break;
-                case "ping":
+                case "pong":
                     for (var socketId in this.sockets) {
                         if (this.sockets.hasOwnProperty(socketId)) {
-                            socket.send(JSON.stringify({cmd: "pong"}));
+                            try{
+                                this.sockets[socketId].send(JSON.stringify({cmd: "pong"}));
+                            }
+                            catch(e){
+                                console.error(e);
+                            }
+
                         }
                     }
+                    return;
                     break;
             }
             var isOpened = false;
@@ -197,8 +204,12 @@ Bouncer.prototype.run = function () {
                         this.send(JSON.stringify({"cmd": "onlineSet", "nicks": relay.nicks, "trips": relay.trips}));
                     } else {
                         relay = that.openRelay(socket);
-                        that.relays[this.nick] = {};
-                        that.relays[this.nick][this.pass] = {};
+                        if(!that.relays.hasOwnProperty(this.nick)){
+                            that.relays[this.nick] = {};
+                        }
+                        if(!that.relays[this.nick].hasOwnProperty(this.pass)){
+                            that.relays[this.nick][this.pass] = {};
+                        }
                         that.relays[this.nick][this.pass][this.channel] = relay;
                     }
                     this.socketId = new Date().getTime();
@@ -262,7 +273,7 @@ Bouncer.prototype.run = function () {
                     that.relays[socket.nick][socket.pass][socket.channel].send(JSON.stringify({"cmd": "ping"}));
                 }, 50000);
             } catch (e) {
-
+                console.error(e);
             }
         });
         socket.on('close', function () {
