@@ -340,6 +340,7 @@ $(function () {
         }
         else if (args.nick == '*') {
             if (args.cmd == 'action') {
+              lastPoster = '';
                 messageEl.classList.add('action');
             } else {
                 messageEl.classList.add('info');
