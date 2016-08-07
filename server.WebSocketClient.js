@@ -1,5 +1,6 @@
 var ChatClientBase = require('./server.ChatClientBase.js');
 var util = require("util");
+var ws = require("ws");
 
 function WebSocketClient(socket) {
     ChatClientBase.call(this);
@@ -30,7 +31,7 @@ WebSocketClient.prototype.send = function (causingClient, data) {
             this.socket.send(JSON.stringify(data));
         }
     } catch (e) {
-        // Ignore exceptions thrown by client.send()
+        console.error(e);
     }
 };
 
