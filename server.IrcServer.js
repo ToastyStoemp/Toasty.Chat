@@ -51,10 +51,12 @@ ToastyClient.prototype.send = function(causingClient, data) {
 			this.ircClient.write(':'+data.nick+' PART :#'+this.channelName);
 			break;
 		case 'onlineSet':
+			var nicks = [];
 			data.nicks.forEach(function(nick) {
-				if (nick !== self.ircClient.nick)
-					self.ircClient.write(':'+nick+' JOIN :#'+self.channelName);
+				nicks.push(nick);
 			});
+			this.ircClient.answer('353 '+this.ircClient.nick+' = #'+this.channelName+' :'+nicks.join(" "));
+			this.ircClient.answer('366 '+this.ircClient.nick+' #'+this.channelName+' :End of NAMES list');
 			break;
 		case 'shout':
 			data.text.split('\n').forEach(function(line) {
@@ -294,8 +296,6 @@ IrcClient.prototype.addChannel = function(channelName) {
 	// @TODO: check for valid channel name
 
 	this.answerFrom('JOIN :#'+channelName, this.getIdentifier()); // notify irc client of success
-	this.answer('353 '+this.nick+' = #'+channelName+' :@'+this.nick);
-	this.answer('366 '+this.nick+' #'+channelName+' :End of NAMES list');
 	if (this.channels[channelName] !== void 0) return; // already joined
 
 	this.channels[channelName] = new ToastyClient(this, channelName);
