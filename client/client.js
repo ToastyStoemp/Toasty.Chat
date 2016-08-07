@@ -232,6 +232,7 @@ $(function () {
             var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
             send({cmd: 'join', channel: channel, nick: nick, pass: pass});
             myNick = nick;
+            $("#tsLink").attr("href", "ts3server://toastystoemp.com?nickname=" + myNick + "&cid=17&channelpassword=1234");
         }
         // if !myNick: do nothing - reload continued to try again
         wasConnected = true;
@@ -244,7 +245,6 @@ $(function () {
         verify: function (args) {
             if (args.valid == true) {
                 connect(myChannel);
-                $("#tsLink").attr("href", "ts3server://toastystoemp.com?nickname=" + myNick + "&cid=17&channelpassword=1234");
             }
             else
                 pushMessage({
