@@ -15,7 +15,7 @@ util.inherits(BouncerClient, WebSocketClient);
 BouncerClient.prototype.send = function (data) {
     try {
         if (this.socket.readyState == ws.OPEN) {
-            this.socket.send(JSON.stringify(data));
+            this.socket.send(data);
         }
     } catch (e) {
         console.error(data);
