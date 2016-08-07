@@ -26,7 +26,9 @@ function main() {
     console.log("Running version " + version);
 
     var chatServerBase = require("./server.ChatServerBase.js")();
-    chatServerBase.initialize(config.base, version);
+    var POLICE = require("./server.Police.js");
+    var police = new POLICE(config.base);
+    chatServerBase.initialize(config.base, version, police);
 
     if (config.webSocketServer && config.webSocketServer.enabled) {
         var webSocketServer = require("./server.WebSocketServer.js")();
@@ -51,7 +53,7 @@ function main() {
     }
     else if (config.bouncer && config.bouncer.enabled && config.bouncer.hasOwnProperty("wss")) {
         var bouncer = require("./server.Bouncer.js")();
-        bouncer.initialize(config.bouncer);
+        bouncer.initialize(config.bouncer, police);
         bouncer.run();
         if (config.bouncer.client) {
             var client = require("./server.client")();
