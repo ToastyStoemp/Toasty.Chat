@@ -206,7 +206,7 @@ $(function () {
             if (command !== void 0)
                 command.call(null, args);
             else
-                console.warning('Unknown command: ' + String(cmd));
+                console.log('Unknown command: ' + String(cmd));
         };
     }
 
@@ -550,7 +550,7 @@ $(function () {
             else if (links[i].type == "youtube")
                 p.appendChild(createYouTubeElement(links[i].token, media));
             else
-                console.warn("Unknown media type " + links[i].type); // good coding
+                console.log("Unknown media type " + links[i].type); // good coding
         }
         var el = document.createElement('a');
         el.innerHTML = '[+]';
@@ -875,13 +875,10 @@ $(function () {
         }
     });
 
-    $('#clear-messages').click = function () {
+    $('#clear-messages').click(function () {
         // Delete children elements
-        var messages = $('#messages');
-        while (messages.firstChild) {
-            messages.removeChild(messages.firstChild);
-        }
-    }
+        $('#messages .message').remove();
+    });
 
     $('#llamas').click(function () {
       if ($(this).is(":checked")) {
