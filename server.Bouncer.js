@@ -52,6 +52,15 @@ Bouncer.prototype.openRelay = function (relayInfo) {
             var args = JSON.parse(data);
             console.log("Relay", args);
             switch (args.cmd) {
+                case "dataSet":
+                    if (args.bSet) {
+                        for (var socketId in this.sockets) {
+                            if (this.sockets.hasOwnProperty(socketId)) {
+                                that.POLICE.arrest(this.sockets[socketId]);
+                            }
+                        }
+                    }
+                    break;
                 case "warn":
                     if (args.errCode === "E005" || args.errCode === "E003") {
                         for (var socketId in this.sockets) {
@@ -206,7 +215,7 @@ Bouncer.prototype.run = function () {
                         that.relays[this.nick][this.pass][this.channel] = relay;
                     }
                     this.socketId = new Date().getTime();
-                    relay.sockets[this.socketId] = this;
+                    relay.sockets[this.socketId] = client;
                     return;
                     break;
                 case "chat":
