@@ -421,19 +421,19 @@ $(function () {
         messageEl.appendChild(textEl);
 
         //Mentioning
-        var mentionReg = new RegExp("@" + myNick + "(\\s|$)");
-        if (mentionReg.test(args.text)) {
+        var mentionReg = new RegExp(myNick.toLowerCase() + "(\\s|$)");
+        if (mentionReg.test(args.text.toLowerCase())) {
             messageEl.classList.add('mention');
             if ($('#notifications').is(":checked") && !document.hasFocus()) {
                 notifyMe(args.nick + " mentioned you", args.text, false);
             }
         }
-        else if (/@\*(\s|$)/.test(args.text)) {
+        else if (/@\*(\s|$)/.test(args.text.toLowerCase())) {
             messageEl.classList.add('mention');
         }
         else if (!(args.nick == '!' || args.nick == '*' || args.nick == '<Server>')) {
             for (var nick in onlineUsers) {
-                var nickReg = new RegExp("(@" + nick + ")(\\s|$)");
+                var nickReg = new RegExp("(@" + nick.toLowerCase() + ")(\\s|$)");
                 if (nickReg.test(args.text)) {
                     var user = document.createElement('span');
                     user.textContent = "@" + nick;
@@ -826,11 +826,11 @@ $(function () {
             lastSent[lastSentPos] = "";
         }
         else if (e.keyCode == 9 /* TAB */) {
-            // Tab complete nicknames starting with @
+            // Tab complete nicknames starting with a whitespace
             e.preventDefault();
             var pos = e.target.selectionStart || 0;
             var text = e.target.value;
-            var index = text.lastIndexOf('@', pos);
+            var index = text.lastIndexOf(' ', pos);
             if (index >= 0) {
                 if (!typedNick)
                     typedNick = text.substring(index + 1, pos);
