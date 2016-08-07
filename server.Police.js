@@ -72,6 +72,9 @@ POLICE.prototype.dump = function (id) {
 };
 
 POLICE.prototype.stfu = function (id, time) {
+    if (id == "127.0.0.1" || id == "::1") {
+        return;
+    }
     time = typeof time !== 'undefined' ? time : 60;
     var record = this.search(id);
     if (record) {
