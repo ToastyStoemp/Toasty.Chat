@@ -96,7 +96,13 @@ Bouncer.prototype.openRelay = function (relayInfo) {
                 case "pong":
                     for (var socketId in this.sockets) {
                         if (this.sockets.hasOwnProperty(socketId)) {
-                            this.sockets[socketId].send(JSON.stringify({cmd: "pong"}));
+                            try{
+                                this.sockets[socketId].send(JSON.stringify({cmd: "pong"}));
+                            }
+                            catch(e){
+                                console.error(e);
+                            }
+
                         }
                     }
                     return;
