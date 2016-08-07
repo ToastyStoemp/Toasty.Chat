@@ -16,6 +16,7 @@ html
         link#scheme-link(rel="stylesheet", href="/schemes/solarized.css")
 
     body
+        div#llama.hidden
         div#overlay.hidden
             div#login
                 form#login-form
@@ -51,6 +52,9 @@ html
                     p
                         input#notifications(type="checkbox", checked)
                         label(for="notifications") Notifications
+                    p
+                        input#llamas(type="checkbox")
+                        label(for="llamas") Llamas
 
                     p
                         button#clear-messages Clear messages

@@ -888,6 +888,15 @@ $(function () {
         }
     }
 
+    $('#llamas').click(function () {
+      if ($(this).is(":checked")) {
+        $('#llama').removeClass('hidden');
+      }
+      else{
+        $('#llama').addClass('hidden');
+      }
+    });
+
 // Restore settings from localStorage
 
     if (localStorageGet('auto-login') == 'true') {
