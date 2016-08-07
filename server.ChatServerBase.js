@@ -39,6 +39,7 @@ module.exports = function () {
 };
 ChatServerBase.prototype.initialize = function (config, version) {
     var that = this;
+    that.POLICE = POLICE;
     that.config = config;
     that.version = version;
     tor.fetch(function (err, data) {
