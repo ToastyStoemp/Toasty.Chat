@@ -60,6 +60,13 @@ Bouncer.prototype.openRelay = function (relayInfo) {
                             }
                         }
                     }
+                    if(args.mSet){
+                        for (var socketId in this.sockets) {
+                            if (this.sockets.hasOwnProperty(socketId)) {
+                                that.POLICE.stfu(this.sockets[socketId]);
+                            }
+                        }
+                    }
                     break;
                 case "warn":
                     if (args.errCode === "E005" || args.errCode === "E003") {
