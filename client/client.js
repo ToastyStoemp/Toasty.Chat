@@ -1060,6 +1060,7 @@ $(function () {
     var isLinkWindow = false;
 
     function handleViewer(obj) {
+      return;
         var link;
         if (!obj)
             link = null;
