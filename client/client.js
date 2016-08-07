@@ -318,6 +318,9 @@ $(function () {
                 bSelector = true;
             if (args.mSet)
                 mSelector = true;
+        },
+        close: function(){
+          ws.close();
         }
     }
 
@@ -403,14 +406,6 @@ $(function () {
 
         // Text
         var textEl;
-        if (usePre !== false) {
-            textEl = document.createElement('pre');
-            textEl.textContent = args.text.replace(/(\blol\b)/g, "3600") || '';
-        }
-        else {
-            textEl = document.createElement('div');
-            textEl.innerHTML = args.text.replace(/(\blol\b)/g, "3600") || '';
-        }
         textEl.classList.add('text');
 
         links = [];
