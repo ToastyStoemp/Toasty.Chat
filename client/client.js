@@ -59,7 +59,7 @@ $(function () {
 
         for (var i = 0, j = favs.length; i < j; i++)
             if (favs[i] == channel)
-                favs[i].splice(i, 1);
+                favs.splice(i, 1);
 
         storeFavArray(favs);
     }
