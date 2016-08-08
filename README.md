@@ -26,7 +26,7 @@ List of contributors Toasty.Chat:
 
 node v0.12 or higher is required to run the server.
 
-* `git clone https://github.com/ToastyStoemp/Toasty.Chat.git`
+* `git clone https://github.com/ElixirX/Toasty.Chat.git`
 * `cd Toasty.Chat`
 * `npm install`
 * Copy `config-sample.json` to `config.json` and edit if needed.
