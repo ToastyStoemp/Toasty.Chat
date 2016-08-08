@@ -420,31 +420,29 @@ $(function () {
 
         messageEl.appendChild(textEl);
 
-        //Mentioning
-        if(myNick){
-          if ((new RegExp(myNick + "(\\s|$)", "i")).test(args.text)) {
-              messageEl.classList.add('mention');
-              if ($('#notifications').is(":checked") && !document.hasFocus()) {
-                  notifyMe(args.nick + " mentioned you", args.text, false);
-              }
-          }
-          else if (/@\*(\s|$)/.test(args.text.toLowerCase())) {
-              messageEl.classList.add('mention');
-          }
-          else if (!(args.nick == '!' || args.nick == '*' || args.nick == '<Server>')) {
-            for (var nick in onlineUsers) {
-              var nickReg = new RegExp("(@" + nick.toLowerCase() + ")(\\s|$)");
-              if (nickReg.test(args.text)) {
-                var user = document.createElement('span');
-                user.textContent = "@" + nick;
-                user.style.color = onlineUsers[nick];
-                try {
-                  textEl.innerHTML = textEl.innerHTML.replace(textEl.innerHTML.match(nickReg)[1], user.outerHTML);
-                } catch (err) {
-                  console.log(err.message);
-                }
+        //Nick highligting
+        if (!(args.nick == '!' || args.nick == '<Server>')) {
+          for (var nick in onlineUsers) {
+            var nickReg = new RegExp("(\\s|^)(@?"+ nick + "\\b)", "i");
+            if (nickReg.test(args.text)) {
+              var user = document.createElement('span');
+              user.textContent = "@" + nick;
+              user.style.color = onlineUsers[nick];
+              try {
+                textEl.innerHTML = textEl.innerHTML.replace(nickReg, user.outerHTML);
+              } catch (err) {
+                console.log(err.message);
               }
             }
+          }
+        }
+
+        //Mentioning
+        if(myNick && args.nick != '*'){
+          if ((new RegExp("(\\s|^)(@?"+ myNick + "\\b)|(\\s|^)(@\\*)\\s", "i")).test(args.text)) {
+              messageEl.classList.add('mention');
+              if ($('#notifications').is(":checked") && !document.hasFocus())
+                  notifyMe(args.nick + " mentioned you", args.text, false);
           }
         }
 
