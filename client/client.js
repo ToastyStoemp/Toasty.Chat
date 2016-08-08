@@ -368,10 +368,7 @@ $(function () {
 
         if (args.trip && args.nick != lastPoster) {
             var tripEl = document.createElement('span');
-            if (args.admin)
-                tripEl.textContent = "Admin ";
-            else
-                tripEl.textContent = args.trip + " ";
+            tripEl.textContent = args.trip + " ";
             tripEl.classList.add('trip');
             nickSpanEl.appendChild(tripEl);
         }
