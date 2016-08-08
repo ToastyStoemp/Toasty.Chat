@@ -217,7 +217,7 @@ $(function () {
 
         var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
         if (!wasConnected && !autoLoginOk) {
-            $("#overlay").removeClass("hidden");
+            $("#loginOverlay").removeClass("hidden");
             $("#nick").val(myNick).data("realNick", myNick).data("channel", channel);
         }
         else {
@@ -1193,7 +1193,7 @@ $(function () {
     $("#login form").submit(function (e) {
         e.preventDefault();
         var $nick = $(this).find("input#nick");
-        $("#overlay").addClass("hidden");
+        $("#loginOverlay").addClass("hidden");
         myNick = $nick.data("realNick");
         $nick.val("").data("realNick", "");
         $(document).trigger("login", $nick.data("channel"));
