@@ -1,9 +1,19 @@
-var TeamSpeakClient = require("node-teamspeak"),
-	util = require("util"),
-	config = require("../data/ts.json");
+var config;
+try {
+  config = JSON.parse(fs.readFileSync("../data/ts.json"));
+} catch(e) {
+  config = null;
+}
+
+var TeamSpeakClient, util;
+if (config !== null) {
+  TeamSpeakClient = require("node-teamspeak");
+  util = require("util");
+}
 
 var tsCommand = function(bot, sender, args, data, client)
 {
+  if (config === null) return;
 
   var onlineUsers = [];
   var reqChannel = args[0].toLowerCase();
