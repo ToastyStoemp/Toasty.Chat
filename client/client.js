@@ -426,28 +426,27 @@ $(function () {
               messageEl.classList.add('mention');
               if ($('#notifications').is(":checked") && !document.hasFocus()) {
                   notifyMe(args.nick + " mentioned you", args.text, false);
+              }
+          }
+          else if (/@\*(\s|$)/.test(args.text.toLowerCase())) {
+              messageEl.classList.add('mention');
+          }
+          else if (!(args.nick == '!' || args.nick == '*' || args.nick == '<Server>')) {
+            for (var nick in onlineUsers) {
+              var nickReg = new RegExp("(@" + nick.toLowerCase() + ")(\\s|$)");
+              if (nickReg.test(args.text)) {
+                var user = document.createElement('span');
+                user.textContent = "@" + nick;
+                user.style.color = onlineUsers[nick];
+                try {
+                  textEl.innerHTML = textEl.innerHTML.replace(textEl.innerHTML.match(nickReg)[1], user.outerHTML);
+                } catch (err) {
+                  console.log(err.message);
                 }
               }
-              else if (/@\*(\s|$)/.test(args.text.toLowerCase())) {
-                messageEl.classList.add('mention');
-              }
-              else if (!(args.nick == '!' || args.nick == '*' || args.nick == '<Server>')) {
-                for (var nick in onlineUsers) {
-                  var nickReg = new RegExp("(@" + nick.toLowerCase() + ")(\\s|$)");
-                  if (nickReg.test(args.text)) {
-                      var user = document.createElement('span');
-                      user.textContent = "@" + nick;
-                      user.style.color = onlineUsers[nick];
-                      try {
-                          textEl.innerHTML = textEl.innerHTML.replace(textEl.innerHTML.match(nickReg)[1], user.outerHTML);
-                      }
-                      catch (err) {
-                          console.log(err.message);
-                      }
-                    }
-                  }
-                }
-              }
+            }
+          }
+        }
 
         if (links.length != 0) {
             messageEl.appendChild(parseMedia());
