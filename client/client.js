@@ -79,26 +79,42 @@ $(function () {
     $("#link-block").hide();
 
     var frontpage = [
-            " __                                                 ",
-            " /|                 /                  /         /   ",
-            "( |  ___  ___  ___ (___           ___ (___  ___ (___ ",
-            "  | |   )|   )|___ |    /\   )    |    |   )|   )|    ",
-            "  | |__/ |__/| __/ |__   /\_/     |__  |  / |__/||__  ",
-            "                      	  /  -                          ",
-            "",
-            "",
-            "Welcome to Toasty.chat, an extended version of hsack.chat.",
-            "",
-            "You can create any channel you want, just type: ?<Channel Name> behind the url",
-            "",
-            "The chat is now also accessable through IRC, server: chat.toastystoemp.com:6667",
-            "channel: #<Channel Name>",
-            "",
-            "Server and web client released under the GNU General Public License.",
-            "No message history is retained on the toasty.chat server.",
-            "",
-            "",
-        ].join("\n") + getFavArrayFormatted();
+    "                       __  __       ___ _           _   	             ",       					
+    "                       \\ \\/ /      / __\\ |__   __ _| |_ 	         ",
+    "                        \\  /      / /  | '_ \\ / _` | __|	             ",
+    "                        /  \\     / /___| | | | (_| | |_ 	             ",
+    "                       /_/\\_\\  . \\____/|_| |_|\\__,_|\\__|	         ",
+	"",	
+	"",
+	"Welcome to X.chat a private chat network hosted by ElixirX",
+	"",
+	"",
+	"Channels:",
+	"?X",
+	"",
+	"",
+	"To prevent you from being impersonated we use trips. Type #whatever after your username to get your personal trip.",
+	"A trip is made from the salt string and is a 6 character long code to identify you",
+	"",
+	"",
+	"Formatting:",
+	"Whitespace is preserved, so source code can be pasted verbatim.",
+ 	"",
+	"	                  _        _                                         ",
+	"	  /\\/\\   __ _  __| | ___  | |__  _   _                             ",
+	"	 /    \\ / _` |/ _` |/ _ \\ | '_ \\| | | |                           ",
+	"	/ /\\/\\ \\ (_| | (_| |  __/ | |_) | |_| |                           ",
+	"	\\/    \\/\\__,_|\\__,_|\\___| |_.__/ \\__, |                        ",
+	"	                                 |___/                               ",
+	"	   __ _ _      _       __  __                                        ",
+	"	  /__\\ (_)_  _(_)_ __  \\ \\/ /                                     ",
+	"	 /_\\ | | \\ \\/ / | '__|  \\  /                                     ",
+	"	//__ | | |>  <| | |     /  \\                                        ",
+	"	\\__/ |_|_/_/\\_\\_|_|    /_/\\_\\                                   ",
+	"",
+	"",
+	"",
+        ].join("\n");
 
     var ws;
     var myNick = "";
@@ -764,7 +780,7 @@ $(function () {
         if (myChannel)
             title = "?" + myChannel;
         else
-            title = "Toasty.Chat";
+            title = "X.chat";
 
         if (unread > 0)
             title = '(' + unread + ') ' + title;
@@ -966,8 +982,6 @@ $(function () {
     }
 
     function colorRender(trip, admin) {
-        if (trip == "vmowGH")
-            return "#cd3333";
         var color1 = (Math.floor((trip[0].charCodeAt(0) - 33) * 2.865)).toString(16);
         var color3 = (Math.floor((trip[1].charCodeAt(0) - 33) * 2.865)).toString(16);
         var color2 = (Math.floor((trip[2].charCodeAt(0) - 33) * 2.865)).toString(16);
