@@ -426,7 +426,7 @@ $(function () {
             var nickReg = new RegExp("(\\s|^)(@?"+ nick + "\\b)", "i");
             if (nickReg.test(args.text)) {
               var user = document.createElement('span');
-              user.textContent = "@" + nick;
+              user.textContent = " @" + nick;
               user.style.color = onlineUsers[nick];
               try {
                 textEl.innerHTML = textEl.innerHTML.replace(nickReg, user.outerHTML);
