@@ -1,4 +1,5 @@
 // rate limiter
+var donatorlist = require("./data/donators.json");
 
 function POLICE(config) {
     this.config = config;

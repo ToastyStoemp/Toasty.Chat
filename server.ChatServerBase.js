@@ -3,7 +3,6 @@
 
 var crypto = require('crypto');
 var tor = require('tor-exits');
-var donatorlist = require("./data/donators.json");
 var triplist = require("./data/trips.json");
 
 // Keeps multiple connections for a client
