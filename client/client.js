@@ -87,7 +87,7 @@ $(function () {
             "                      	  /  -                          ",
             "",
             "",
-            "Welcome to Toasty.chat, an extended version of hsack.chat.",
+            "Welcome to Toasty.chat, an extended version of hack.chat.",
             "",
             "You can create any channel you want, just type: ?<Channel Name> behind the url",
             "",
@@ -97,7 +97,7 @@ $(function () {
             "Server and web client released under the GNU General Public License.",
             "No message history is retained on the toasty.chat server.",
             "",
-            "",
+            ""
         ].join("\n") + getFavArrayFormatted();
 
     var ws;
@@ -828,10 +828,10 @@ $(function () {
             e.preventDefault();
             var pos = e.target.selectionStart || 0;
             var text = e.target.value;
-            var index = text.lastIndexOf(' ', pos);
+            var index = text.substr(0,po).lastIndexOf(' ') + 1;
             if (index >= 0) {
                 if (!typedNick)
-                    typedNick = text.substring(index + 1, pos);
+                    typedNick = text.substring(index, pos);
                 var stub = typedNick.toLowerCase();
 
                 var nicks = [];
@@ -844,7 +844,7 @@ $(function () {
                     nicks = onlineUsers;
                 if (nicks.length > 0) {
                     nickTabIndex = (nickTabIndex + 1) % nicks.length; // loop through nicks
-                    removeCharsTillIndex(index + 1);
+                    removeCharsTillIndex(index);
                     insertAtCursor(nicks[nickTabIndex] + " ");
                 }
             }
