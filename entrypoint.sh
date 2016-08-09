@@ -7,7 +7,7 @@ cd /data/Toasty.Chat
 toastyChatPid=$!
 
 function stop() {
-    kill toastyChatPid
+    kill $toastyChatPid
 }
 
-wait toastyChatPid
+wait $toastyChatPid
