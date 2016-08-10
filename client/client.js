@@ -303,10 +303,10 @@ $(function () {
         },
         onlineRemove: function (args) {
             var nick = args.nick;
-            userRemove(nick);
             if ($('#joined-left').is(":checked")) {
-                pushMessage({nick: '*', text: nick + " left"});
+              pushMessage({nick: '*', text: nick + " left"});
             }
+            userRemove(nick);
         },
         play: function (args) {
             var nick = args.nick;
