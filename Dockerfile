@@ -12,8 +12,7 @@ RUN apt-get clean \
 && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 RUN mkdir /config
 RUN cd /config \
-&& touch test.js
-
+&& touch test.json
 
 COPY ./entrypoint.sh /
 CMD ["bash", "./entrypoint.sh"]
