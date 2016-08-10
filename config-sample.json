@@ -32,7 +32,7 @@
     "domain": "chat.toastystoemp.com",
     "x_forwarded_for": false,
     "logoText": "Toasty.chat",
-    "logoOptions":{ //See https://www.npmjs.com/package/figlet & http://patorjk.com/software/taag/#p=moreopts&f=Standard&t=Toasty.Chat
+    "logoOptions":{
       "font": "Big",
       "verticalLayout": "default",
       "horizontalLayout": "default",
