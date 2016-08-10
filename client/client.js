@@ -79,12 +79,7 @@ $(function () {
     $("#link-block").hide();
 
     var frontpage = [
-            " __                                                 ",
-            " /|                 /                  /         /   ",
-            "( |  ___  ___  ___ (___           ___ (___  ___ (___ ",
-            "  | |   )|   )|___ |    /\   )    |    |   )|   )|    ",
-            "  | |__/ |__/| __/ |__   /\_/     |__  |  / |__/||__  ",
-            "                      	  /  -                          ",
+            window.config.logo,
             "",
             "",
             "Welcome to Toasty.chat, an extended version of hsack.chat.",

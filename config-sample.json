@@ -30,7 +30,14 @@
     "host": "0.0.0.0",
     "port": 8080,
     "domain": "chat.toastystoemp.com",
-    "x_forwarded_for": false
+    "x_forwarded_for": false,
+    "logoText": "Toasty.chat",
+    "logoOptions":{ //See https://www.npmjs.com/package/figlet & http://patorjk.com/software/taag/#p=moreopts&f=Standard&t=Toasty.Chat
+      "font": "Big",
+      "verticalLayout": "default",
+      "horizontalLayout": "default",
+      "kerning": "default"
+    }
   },
   "bouncer": {
     "enabled": false,
