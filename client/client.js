@@ -79,7 +79,7 @@ $(function () {
     $("#link-block").hide();
 
     var frontpage = [
-            window.config.logo,
+            window.config.typeLogo === "text" ? window.config.logo : "",
             "",
             "",
             "Welcome to Toasty.chat, an extended version of hsack.chat.",
@@ -213,7 +213,7 @@ $(function () {
         var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
         if (!wasConnected && !autoLoginOk) {
             $("#loginOverlay").removeClass("hidden");
-            $("#nick").val(myNick.replace(/[#](.*)/,"#"+myNick.split("#")[1].replace(/./g,"*"))).data("realNick", myNick).data("channel", channel);
+            $("#nick").val(myNick.replace(/[#](.*)/, "#" + myNick.split("#")[1].replace(/./g, "*"))).data("realNick", myNick).data("channel", channel);
         }
         else {
             $(document).trigger("login", channel);
@@ -314,8 +314,8 @@ $(function () {
             if (args.mSet)
                 mSelector = true;
         },
-        close: function(){
-          ws.close();
+        close: function () {
+            ws.close();
         }
     }
 
@@ -335,7 +335,7 @@ $(function () {
         }
         else if (args.nick == '*') {
             if (args.cmd == 'action') {
-              lastPoster = '';
+                lastPoster = '';
                 messageEl.classList.add('action');
             } else {
                 messageEl.classList.add('info');
@@ -417,28 +417,28 @@ $(function () {
 
         //Nick highligting
         if (!(args.nick == '!' || args.nick == '<Server>')) {
-          for (var nick in onlineUsers) {
-            var nickReg = new RegExp("(\\s|^)(@?"+ nick + "\\b)", "i");
-            if (nickReg.test(args.text)) {
-              var user = document.createElement('span');
-              user.textContent = " @" + nick;
-              user.style.color = onlineUsers[nick];
-              try {
-                textEl.innerHTML = textEl.innerHTML.replace(nickReg, user.outerHTML);
-              } catch (err) {
-                console.log(err.message);
-              }
+            for (var nick in onlineUsers) {
+                var nickReg = new RegExp("(\\s|^)(@?" + nick + "\\b)", "i");
+                if (nickReg.test(args.text)) {
+                    var user = document.createElement('span');
+                    user.textContent = " @" + nick;
+                    user.style.color = onlineUsers[nick];
+                    try {
+                        textEl.innerHTML = textEl.innerHTML.replace(nickReg, user.outerHTML);
+                    } catch (err) {
+                        console.log(err.message);
+                    }
+                }
             }
-          }
         }
 
         //Mentioning
-        if(myNick && args.nick != '*'){
-          if ((new RegExp("(\\s|^)(@?"+ myNick + "\\b)|(\\s|^)(@\\*)\\s", "i")).test(args.text)) {
-              messageEl.classList.add('mention');
-              if ($('#notifications').is(":checked") && !document.hasFocus())
-                  notifyMe(args.nick + " mentioned you", args.text, false);
-          }
+        if (myNick && args.nick != '*') {
+            if ((new RegExp("(\\s|^)(@?" + myNick + "\\b)|(\\s|^)(@\\*)\\s", "i")).test(args.text)) {
+                messageEl.classList.add('mention');
+                if ($('#notifications').is(":checked") && !document.hasFocus())
+                    notifyMe(args.nick + " mentioned you", args.text, false);
+            }
         }
 
         if (links.length != 0) {
@@ -879,12 +879,12 @@ $(function () {
     });
 
     $('#llamas').click(function () {
-      if ($(this).is(":checked")) {
-        $('#llama').removeClass('hidden');
-      }
-      else{
-        $('#llama').addClass('hidden');
-      }
+        if ($(this).is(":checked")) {
+            $('#llama').removeClass('hidden');
+        }
+        else {
+            $('#llama').addClass('hidden');
+        }
     });
 
 // Restore settings from localStorage
@@ -1055,7 +1055,7 @@ $(function () {
     var isLinkWindow = false;
 
     function handleViewer(obj) {
-      return;
+        return;
         var link;
         if (!obj)
             link = null;
@@ -1122,6 +1122,10 @@ $(function () {
     /* main */
     if (myChannel == '') {
         pushMessage({text: frontpage});
+        var img = document.createElement("img");
+        img.src = window.config.logo;
+        img.id = "logo";
+        $("pre.text").prepend(window.config.logo);
         $('#footer').addClass('hidden');
         $('#sidebar').addClass('hidden');
     }

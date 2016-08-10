@@ -37,16 +37,25 @@ Client.prototype.run = function () {
     });
     var port = this.config.socketPort;
     var domain = this.config.domain;
-    var logoText = this.config.logoText;
-    var options = this.config.logoOptions;
-
-    var asciiArt = figlet.textSync(logoText, options);
+    var logo = null;
+    switch (this.config.logo) {
+        case "text":
+            var logoText = this.config.logoText;
+            var options = this.config.logoOptions;
+            var asciiArt = figlet.textSync(logoText, options);
+            logo = asciiArt.replace(/\\/g, "\\\\").replace(/\n/g, "\\n");
+            break;
+        case "img":
+            logo = "<img id='logo' src='" + this.config.logoImage + "'>";
+            break;
+    }
 
     var input = fs.readFileSync(__dirname + "/client/config.tpl").toString();
     fs.writeFileSync(__dirname + "/client/config.js", ejs.render(input, {
         domain: domain,
         port: port,
-        logo: asciiArt.replace(/\\/g, "\\\\").replace(/\n/g, "\\n")
+        logo: logo,
+        typeLogo: this.config.logo
     }));
     app.set('views', __dirname + '/client');
     app.set("view engine", "pug");
