@@ -3,7 +3,6 @@
 
 var crypto = require('crypto');
 var tor = require('tor-exits');
-var donatorlist = require("./data/donators.json");
 var triplist = require("./data/trips.json");
 
 // Keeps multiple connections for a client
@@ -12,16 +11,16 @@ function MetaClient() {
 }
 MetaClient.prototype.push = function (client) {
     this.clients.push(client);
-}
+};
 MetaClient.prototype.remove = function (client) {
     this.clients.splice(this.clients.indexOf(client), 1);
-}
+};
 MetaClient.prototype.send = function () {
     var args = arguments;
     this.clients.forEach(function (c) {
         c.send.apply(c, args);
     });
-}
+};
 MetaClient.prototype.setClientConfigurationData = function (channel, nick, trip) {
     this.channel = channel;
     this.nick = nick;
@@ -37,7 +36,7 @@ function ChatServerBase() {
 module.exports = function () {
     return new ChatServerBase();
 };
-ChatServerBase.prototype.initialize = function (config, version) {
+ChatServerBase.prototype.initialize = function (config, version, POLICE) {
     var that = this;
     that.POLICE = POLICE;
     that.config = config;
@@ -46,7 +45,7 @@ ChatServerBase.prototype.initialize = function (config, version) {
         if (err) return console.error(err);
         that.nodes = tor.parse(data);
     });
-}
+};
 ChatServerBase.prototype.getEventQueue = function () {
     return this.eventQueue;
 };
@@ -116,12 +115,12 @@ ChatServerBase.prototype.onClose = function (client) {
 };
 ChatServerBase.prototype.onMessage = function (client, data) {
     try {
-        if (POLICE.frisk(client.getIpAddress(), 0)) { // probe for rate limit
+        if (this.POLICE.frisk(client.getIpAddress(), 0)) { // probe for rate limit
             client.send(client, {cmd: 'warn', errCode: 'E001', text: "Your IP is being rate-limited or blocked."});
             return;
         }
 
-        POLICE.frisk(client.getIpAddress(), 1); // Penalize here, but don't do anything about it
+        this.POLICE.frisk(client.getIpAddress(), 1); // Penalize here, but don't do anything about it
 
         if (data.length > 65536) return; // ignore large packets
 
@@ -163,17 +162,7 @@ ChatServerBase.prototype.hashPassword = function (password) {
     sha.update(password + this.config.salt);
     return sha.digest('base64').substr(0, 10);
 };
-ChatServerBase.prototype.isAdmin = function (client) {
-    return client.nick.toLowerCase() === this.config.admin.toLowerCase();
-};
-ChatServerBase.prototype.isMod = function (client) {
-    if (!client.trip) return false;
-    if (this.isAdmin(client)) return true;
-    return this.config.mods && this.config.mods.indexOf(client.trip) >= 0;
-};
-ChatServerBase.prototype.isDonator = function (client) {
-    return typeof donatorlist[client.trip] != 'undefined';
-};
+
 ChatServerBase.prototype.generatePassword = function (nick) {
     var gPass = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -212,7 +201,7 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                 args.pass = this.generatePassword(nick);
             var trip = this.hashPassword(args.pass);
 
-            // if (POLICE.frisk(client.getIpAddress(), 2) && !this.) {
+            // if (this.POLICE.frisk(client.getIpAddress(), 2) && !this.) {
             // 	send(client, {cmd: 'warn', errCode: 'E002', text: "You are joining channels too fast. Wait a moment and try again."}, this)
             // 	return
             // }
@@ -270,13 +259,12 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
             text = text.replace(/\n{3,}/g, "\n\n");
             if (!text) return;
 
-            if (POLICE.isStfud(client.getIpAddress())) {
-
+            if (this.POLICE.isStfud(client.getIpAddress())) {
                 return;
             }
 
             var score = text.length / 83 / 4;
-            if (POLICE.frisk(client.getIpAddress(), score) && !client.admin) {
+            if (this.POLICE.frisk(client.getIpAddress(), score) && !client.admin) {
                 client.send(null, {
                     cmd: 'warn',
                     errCode: 'E006',
@@ -290,8 +278,8 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                 nick: client.nick,
                 trip: client.trip,
                 text: text,
-                admin: this.isAdmin(client),
-                donator: this.isDonator(client),
+                admin: this.POLICE.isAdmin(client),
+                donator: this.POLICE.isDonator(client),
                 llama: (Math.floor(Math.random() * 20) == 0 || client.nick.toLowerCase() == "llama")
             };
             if (typeof triplist[data.trip] != 'undefined')
@@ -325,7 +313,7 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
             var nickToInvite = String(args.nick);
             if (!client.channel) return;
 
-            if (POLICE.frisk(client.getIpAddress(), 2)) {
+            if (this.POLICE.frisk(client.getIpAddress(), 2)) {
                 client.send(null, {
                     cmd: 'warn',
                     errCode: 'E007',
@@ -382,7 +370,7 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
     }
 
     // Commands usable by all mods
-    if (this.isMod(client)) {
+    if (this.POLICE.isMod(client)) {
         switch (command) {
             case 'kick':
                 var nick = String(args);
@@ -393,14 +381,10 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                     client.send(null, {cmd: 'warn', errCode: 'E009', text: "Could not find " + nick});
                     return;
                 }
-                if (this.isMod(badClient)) {
+                if (this.POLICE.isMod(badClient)) {
                     client.send(null, {cmd: 'warn', errCode: 'E010', text: "Cannot kick moderator"});
                     return;
                 }
-
-                badClient.clients.forEach(function (c) {
-                    POLICE.dump(c.getIpAddress(), args.time);
-                });
                 console.log(client.nick + " [" + client.trip + "] kicked " + nick + " in " + client.channel);
                 this.broadcast(client, {
                     cmd: 'info',
@@ -409,6 +393,11 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                     text: "Kicked " + nick
                 }, client.channel);
 
+                //Kick the client
+                badClient.clients.forEach(function (c) {
+                    c.send(null, {cmd: 'close'});
+                    self.POLICE.dump(c.getIpAddress(), args.time);
+                });
                 return;
             case 'ban':
                 var nick = String(args);
@@ -419,15 +408,10 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                     client.send(null, {cmd: 'warn', errCode: 'E009', text: "Could not find " + nick});
                     return;
                 }
-                if (this.isMod(badClient)) {
+                if (this.POLICE.isMod(badClient)) {
                     client.send(null, {cmd: 'warn', errCode: 'E010', text: "Cannot ban moderator"});
                     return;
                 }
-
-                badClient.clients.forEach(function (c) {
-                    c.send(null, {cmd: 'dataSet', bSet: true});
-                    POLICE.arrest(c.getIpAddress(), args.time);
-                });
                 console.log(client.nick + " [" + client.trip + "] banned " + nick + " in " + client.channel);
                 this.broadcast(client, {
                     cmd: 'info',
@@ -436,6 +420,12 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                     text: "Banned " + nick
                 }, client.channel);
 
+                //Ban the client
+                badClient.clients.forEach(function (c) {
+                  c.send(null, {cmd: 'dataSet', bSet: true});
+                  c.send(null, {cmd: 'close'});
+                  self.POLICE.arrest(c.getIpAddress(), args.time);
+                });
                 return;
             case 'mute':
                 var nick = String(args);
@@ -446,21 +436,21 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                     client.send(null, {cmd: 'warn', errCode: 'E009', text: "Could not find " + nick});
                     return;
                 }
-                if (this.isMod(badClient)) {
+                if (this.POLICE.isMod(badClient)) {
                     client.send(null, {cmd: 'warn', errCode: 'E010', text: "Cannot mute moderator"});
                     return;
                 }
 
                 badClient.clients.forEach(function (c) {
                     c.send(null, {cmd: 'dataSet', mSet: true});
-                    POLICE.stfu(c.getIpAddress(), args.time);
+                    self.POLICE.stfu(c.getIpAddress(), args.time);
                 });
                 console.log(client.nick + " [" + client.trip + "] muted  " + nick + " in " + client.channel);
         }
     }
 
     // Commands usable by all admins
-    if (this.isAdmin(client)) {
+    if (this.POLICE.isAdmin(client)) {
         switch (command) {
             case 'play':
                 var url = args.url.trim();
@@ -495,91 +485,3 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
         }
     }
 };
-
-
-// rate limiter
-var POLICE = {
-    records: {},
-    halflife: 30000, // ms
-    threshold: 15,
-
-    loadJail: function (filename) {
-        var ids;
-        try {
-            var text = fs.readFileSync(filename, 'utf8');
-            ids = text.split(/\r?\n/);
-        } catch (e) {
-            return
-        }
-        for (var i in ids) {
-            if (ids[i] && ids[i][0] != '#') {
-                this.arrest(id)
-            }
-        }
-        console.log("Loaded jail '" + filename + "'")
-    },
-
-    search: function (id) {
-        var record = this.records[id];
-        if (!record) {
-            record = this.records[id] = {
-                time: Date.now(),
-                score: 0
-            }
-        }
-        return record
-    },
-
-    frisk: function (id, deltaScore) {
-        var record = this.search(id);
-        if (record.arrested || record.dumped) {
-            return true
-        }
-
-        record.score *= Math.pow(2, -(Date.now() - record.time) / POLICE.halflife);
-        record.score += deltaScore;
-        record.time = Date.now();
-        if (record.score >= this.threshold) {
-            return true
-        }
-        return false
-    },
-
-    arrest: function (id, time) {
-        var record = this.search(id);
-        if (record) {
-            record.arrested = true;
-            if (time)
-                setTimeout(function () {
-                    record.arrested = false
-                }, time * 1000);
-        }
-    },
-
-    dump: function (id) {
-        var record = this.search(id);
-        if (record) {
-            record.dumped = true;
-            setTimeout(function () {
-                record.dumped = false
-            }, 30 * 1000);
-        }
-    },
-
-    stfu: function (id, time) {
-        time = typeof time !== 'undefined' ? time : 60;
-        var record = this.search(id);
-        if (record) {
-            record.stfud = true;
-            //	setTimeout(function(){ record.stfud = false }, time * 1000);
-        }
-    },
-
-    isStfud: function (id) {
-        var record = this.search(id);
-        if (record)
-            return record.stfud;
-    }
-};
-
-POLICE.loadJail('jail.txt');

@@ -218,7 +218,7 @@ $(function () {
         var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
         if (!wasConnected && !autoLoginOk) {
             $("#loginOverlay").removeClass("hidden");
-            $("#nick").val(myNick).data("realNick", myNick).data("channel", channel);
+            $("#nick").val(myNick.replace(/[#](.*)/,"#"+myNick.split("#")[1].replace(/./g,"*"))).data("realNick", myNick).data("channel", channel);
         }
         else {
             $(document).trigger("login", channel);
@@ -232,6 +232,7 @@ $(function () {
             var pass = myNick.split("#")[1] || ''; // a random password will be generated on server side if empty
             send({cmd: 'join', channel: channel, nick: nick, pass: pass});
             myNick = nick;
+            $("#tsLink").attr("href", "ts3server://toastystoemp.com?nickname=" + myNick + "&cid=17&channelpassword=1234");
         }
         // if !myNick: do nothing - reload continued to try again
         wasConnected = true;
@@ -244,7 +245,6 @@ $(function () {
         verify: function (args) {
             if (args.valid == true) {
                 connect(myChannel);
-                $("#tsLink").attr("href", "ts3server://toastystoemp.com?nickname=" + myNick + "&cid=17&channelpassword=1234");
             }
             else
                 pushMessage({
