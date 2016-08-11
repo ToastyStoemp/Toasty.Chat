@@ -46,7 +46,7 @@ Client.prototype.run = function () {
             logo = asciiArt.replace(/\\/g, "\\\\").replace(/\n/g, "\\n");
             break;
         case "img":
-            logo = "<img id='logo' src='" + this.config.logoImage + "'>";
+            logo = this.config.logoImage;
             break;
     }
 

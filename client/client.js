@@ -1125,7 +1125,7 @@ $(function () {
         var img = document.createElement("img");
         img.src = window.config.logo;
         img.id = "logo";
-        $("pre.text").prepend(window.config.logo);
+        $("pre.text").prepend(img);
         $('#footer').addClass('hidden');
         $('#sidebar').addClass('hidden');
     }
