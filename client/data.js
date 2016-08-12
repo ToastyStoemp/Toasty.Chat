@@ -1,4 +1,4 @@
-var webClientVersion = "201603060021";
+var webClientVersion = "201603060023";
 
 var module;
 if (!module) module = {};
