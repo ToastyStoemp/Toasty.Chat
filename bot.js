@@ -87,12 +87,22 @@ function Bot(chatServerBase) {
     };
 
     this.sendAll = function (text, client) {
+      if (client) {
         var botData = {cmd: 'chat', text: text, nick: 'Bot'};
         this.chatServerBase.broadcast(null, botData, client.channel);
+        return true;
+      }
+      console.log('missing parameter [client] in bot.sendAll()');
+      return false;
     };
     this.sendClient = function (text, client) {
+      if (client) {
         var botData = {cmd: 'chat', text: text, nick: 'Bot'};
         client.send(null, botData);
+        return true;
+      }
+      console.log('missing parameter [client] in bot.sendAll()');
+      return false;
     }
 }
 util.inherits(Bot, events.EventEmitter);
