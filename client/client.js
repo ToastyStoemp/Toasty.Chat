@@ -214,7 +214,12 @@ $(function () {
         var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
         if (!wasConnected && !autoLoginOk) {
             $("#loginOverlay").removeClass("hidden");
-            $("#nick").val(myNick.replace(/[#](.*)/, "#" + myNick.split("#")[1].replace(/./g, "*"))).data("realNick", myNick).data("channel", channel);
+            var parts = myNick.split("#");
+            var password = "";
+            if (parts.length === 2) {
+                password = parts[1].replace(/./g, "*");
+            }
+            $("#nick").val(myNick.replace(/[#](.*)/, "#" + password)).data("realNick", myNick).data("channel", channel);
         }
         else {
             $(document).trigger("login", channel);
