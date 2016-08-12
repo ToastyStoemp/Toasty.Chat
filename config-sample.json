@@ -30,7 +30,16 @@
     "host": "0.0.0.0",
     "port": 8080,
     "domain": "chat.toastystoemp.com",
-    "x_forwarded_for": false
+    "x_forwarded_for": false,
+    "logo": "text",
+    "logoImage": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Llama_lying_down.jpg",
+    "logoText": "Toasty.chat",
+    "logoOptions":{
+      "font": "Big",
+      "verticalLayout": "default",
+      "horizontalLayout": "default",
+      "kerning": "default"
+    }
   },
   "bouncer": {
     "enabled": false,

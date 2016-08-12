@@ -41,6 +41,7 @@ ChatServerBase.prototype.initialize = function (config, version, POLICE) {
     that.POLICE = POLICE;
     that.config = config;
     that.version = version;
+    that.nodes = [];
     tor.fetch(function (err, data) {
         if (err) return console.error(err);
         that.nodes = tor.parse(data);
@@ -422,9 +423,9 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
 
                 //Ban the client
                 badClient.clients.forEach(function (c) {
-                  c.send(null, {cmd: 'dataSet', bSet: true});
-                  c.send(null, {cmd: 'close'});
-                  self.POLICE.arrest(c.getIpAddress(), args.time);
+                    c.send(null, {cmd: 'dataSet', bSet: true});
+                    c.send(null, {cmd: 'close'});
+                    self.POLICE.arrest(c.getIpAddress(), args.time);
                 });
                 return;
             case 'mute':
