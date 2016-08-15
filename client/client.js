@@ -305,7 +305,7 @@ $(function () {
         onlineRemove: function (args) {
             var nick = args.nick;
             if ($('#joined-left').is(":checked")) {
-              pushMessage({nick: '*', text: nick + " left"});
+                pushMessage({nick: '*', text: nick + " left"});
             }
             userRemove(nick);
         },
@@ -1186,7 +1186,7 @@ $(function () {
         if (wasConnected && myChannel != '' && $('#leave-warning').is(":checked")) {
             return 'Are you sure you want to leave?';
         }
-    }
+    };
 
 //Login
     $("#login form").submit(function (e) {
@@ -1194,11 +1194,19 @@ $(function () {
         var $nick = $(this).find("input#nick");
         $("#loginOverlay").addClass("hidden");
         myNick = $nick.data("realNick");
+        console.log($nick.data('realNick'));
         $nick.val("").data("realNick", "");
         $(document).trigger("login", $nick.data("channel"));
         $nick.data("channel", "");
     }).find("input#nick").keydown(function (e) {
         $(this).data("keyCode", e.keyCode);
+        if ((e.keyCode !== 8 && e.keyCode != 46) || $(this).data("selectionStart") == null) {
+            $(this).data("selectionEnd", e.currentTarget.selectionEnd);
+            $(this).data("selectionStart", e.currentTarget.selectionStart);
+        }
+    }).click(function (e) {
+        $(this).data("selectionEnd", e.currentTarget.selectionEnd);
+        $(this).data("selectionStart", e.currentTarget.selectionStart);
     }).on("select", function (e) {
         $(this).data("selectionEnd", e.currentTarget.selectionEnd);
         $(this).data("selectionStart", e.currentTarget.selectionStart);
@@ -1206,9 +1214,19 @@ $(function () {
         if ($(this).data("realNick") == null) {
             $(this).data("realNick", "");
         }
-        if ($(this).data("keyCode") == 8) {
-            var value = $(this).data("realNick");
-            $(this).data("realNick", value.slice(0, $(this).data("selectionStart") - 1) + value.slice($(this).data("selectionEnd") + 1));
+        if ($(this).data("keyCode") == 8 || $(this).data("keyCode") == 46) {
+            var oldNick = $(this).data("realNick");
+            var before = oldNick;
+            switch ($(this).data("keyCode")) {
+                case 8://BACKSPACE
+                    before = oldNick.slice(0, $(this).data("selectionStart") - 1);
+                    break;
+                case 46://DELETE
+                    var before = oldNick.slice(0, $(this).data("selectionStart"));
+                    break;
+            }
+            var after = oldNick.slice($(this).data("selectionEnd") + 1);
+            $(this).data("realNick", before + after);
         } else {
             var nick = e.currentTarget.value;
             var idxStart = $(this).data("selectionStart") || e.currentTarget.selectionStart - 1;
@@ -1223,5 +1241,7 @@ $(function () {
         }
         $(this).data("selectionStart", null);
         $(this).data("selectionEnd", null);
+        $(this).data("keyCode", null);
+        console.log($(this).data("realNick"));
     });
 });
