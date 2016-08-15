@@ -426,11 +426,12 @@ $(function () {
             for (var nick in onlineUsers) {
                 var nickReg = new RegExp("(\\s|^)(@?" + nick + "\\b)", "i");
                 if (nickReg.test(args.text)) {
+                    var matches = args.text.match(nickReg);
                     var user = document.createElement('span');
-                    user.textContent = " @" + nick;
+                    user.textContent = "@" + nick;
                     user.style.color = onlineUsers[nick];
                     try {
-                        textEl.innerHTML = textEl.innerHTML.replace(nickReg, user.outerHTML);
+                        textEl.innerHTML = textEl.innerHTML.replace(matches[2], user.outerHTML);
                     } catch (err) {
                         console.log(err.message);
                     }
