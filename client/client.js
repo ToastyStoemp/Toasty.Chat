@@ -781,6 +781,7 @@ $(function () {
             typedNick = null;
             nickTabIndex = -1;
             lengthOfInsertedNick = 0;
+            $(this).data("index", null);
         }
         if (e.keyCode == 13 /* ENTER */ && !e.shiftKey) {
             e.preventDefault();
@@ -829,7 +830,7 @@ $(function () {
             e.preventDefault();
             var pos = e.target.selectionStart || 0;
             var text = e.target.value;
-            var index = text.substr(0, pos).lastIndexOf(' ') + 1;
+            var index = $(this).data("index") != null ? $(this).data("index") : text.substr(0, pos).lastIndexOf(' ') + 1;
             if (index >= 0) {
                 if (!typedNick)
                     typedNick = text.substring(index, pos);
@@ -849,6 +850,7 @@ $(function () {
                     insertAtCursor(nicks[nickTabIndex] + " ");
                 }
             }
+            $(this).data("index", index);
         }
     });
 
