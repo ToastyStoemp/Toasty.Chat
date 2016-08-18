@@ -1197,7 +1197,6 @@ $(function () {
         var $nick = $(this).find("input#nick");
         $("#loginOverlay").addClass("hidden");
         myNick = $nick.data("realNick");
-        console.log($nick.data('realNick'));
         $nick.val("").data("realNick", "");
         $(document).trigger("login", $nick.data("channel"));
         $nick.data("channel", "");
@@ -1245,6 +1244,5 @@ $(function () {
         $(this).data("selectionStart", null);
         $(this).data("selectionEnd", null);
         $(this).data("keyCode", null);
-        console.log($(this).data("realNick"));
     });
 });
