@@ -466,21 +466,6 @@ $(function () {
         updateTitle();
     }
 
-
-    function removeCharsTillIndex(index) {
-        var input = $('#chatinput');
-        var start = input[0].selectionStart || input.val().length || 0;
-        if (index >= start)
-            return;
-        var before = input.val().substr(0, index);
-        var after = input.val().substr(start);
-
-        input.val(before + after);
-
-        if (input[0].selectionStart)
-            input[0].selectionEnd = input[0].selectionStart = before.length;
-    }
-
     function insertAtCursor(text) {
         var input = $('#chatinput');
         var start = input[0].selectionStart || input.val().length || 0;
@@ -493,7 +478,6 @@ $(function () {
         if (input[0].selectionStart)
             input[0].selectionEnd = input[0].selectionStart = before.length;
     }
-
 
     send = function (data) {
         if (ws && ws.readyState == ws.OPEN) {
@@ -829,12 +813,15 @@ $(function () {
         else if (e.keyCode == 9 /* TAB */) {
             // Tab complete nicknames starting with a whitespace
             e.preventDefault();
+
             var pos = e.target.selectionStart || 0;
             var text = e.target.value;
             var index = $(this).data("index") != null ? $(this).data("index") : text.substr(0, pos).lastIndexOf(' ') + 1;
+
             if (index >= 0) {
-                if (!typedNick)
+                if (!typedNick) {
                     typedNick = text.substring(index, pos);
+                }
                 var stub = typedNick.toLowerCase();
 
                 var nicks = [];
@@ -845,16 +832,24 @@ $(function () {
                 }
                 if (nicks.length === 0)
                     nicks = onlineUsers;
-                if (nicks.length > 0) {
+                else
                     nickTabIndex = (nickTabIndex + 1) % nicks.length; // loop through nicks
-                    removeCharsTillIndex(index);
-                    insertAtCursor(nicks[nickTabIndex] + " ");
-                }
+
+                var newText = replaceSequenceAtPosition(text, index, typedNick, nicks[nickTabIndex] + " ");
+
+                var input = $('#chatinput');
+                input.val(newText);
+
+                if (input[0].selectionStart)
+                    input[0].selectionEnd = input[0].selectionStart = index + nicks[nickTabIndex].length + 1;
             }
             $(this).data("index", index);
         }
     });
 
+    function replaceSequenceAtPosition(str, pos, seq, rep) {
+        return str.substring(0, pos) + rep + str.substring(pos + seq.length);
+    }
 
     /* sidebar */
     var firstSlide = true;
