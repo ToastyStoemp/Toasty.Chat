@@ -479,7 +479,6 @@ $(function () {
             input[0].selectionEnd = input[0].selectionStart = before.length;
     }
 
-
     send = function (data) {
         if (ws && ws.readyState == ws.OPEN) {
             ws.send(JSON.stringify(data));
