@@ -5,6 +5,7 @@ var whipser = function(bot, sender, args, data, client) {
     return bot.sendClient("Usage is .w [nick] [message]", client);
   var targetNick = args.splice(0, 1)[0];
   targetNick = targetNick.replace("@", "");
+  if (sender == targetNick) return;
   var friend = bot.chatServerBase.getClientOfChannel(targetNick, client.channel) ||
     null;
   if (friend != null) {
