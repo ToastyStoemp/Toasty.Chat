@@ -453,6 +453,7 @@ $(function() {
     textEl.innerHTML = textEl.innerHTML.replace(
       /(\?|https?:\/\/|ts3server:\/\/)\S+?(?=[,.!?:)]?\s|$)/g, parseLinks
     );
+    textEl.innerHTML = textEl.innerHTML.replace(/```(.|\s)*```/g, parseCode)
 
     //textEl.innerHTML = markdown.toHTML(textEl.innerHTML);
 
@@ -550,6 +551,17 @@ $(function() {
     a.innerHTML = g0;
     a.style.color = onlineUsers[args.nick];
     return a.outerHTML;
+  }
+
+  function parseCode(code) {
+    var codeEl = document.createElement('code')
+    codeEl.innerHTML = code.substr(4, code.length - 8);
+    var lineCount = code.split(/\r\n|\r|\n/).length;
+    if (lineCount > 15)
+      codeEl.classList.add('largeScript');
+    else
+      codeEl.classList.add('script');
+    return codeEl.outerHTML;
   }
 
   function parseLinks(g0) {
