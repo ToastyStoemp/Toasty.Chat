@@ -495,7 +495,7 @@ $(function() {
     }
 
     lastPoster = args.nick;
-    if (args.nick != '*' || args.nick != '!')
+    if (args.nick != '*')
       unread += 1;
     updateTitle();
   }
@@ -892,14 +892,8 @@ $(function() {
         var stub = typedNick.toLowerCase();
         if (stub != "") {
           if (stub == ".r" && lastWhisper != "") {
-            if (lastWhisper == "") {
-              removeCharsTillIndex(index);
-              insertAtCursor(".w ");
-            }
-            else {
-              removeCharsTillIndex(index);
-              insertAtCursor(".w @" + lastWhisper + " ");
-            }
+            removeCharsTillIndex(index);
+            insertAtCursor(".w @" + lastWhisper + " ");
           }
           else {
             var nicks = [];
