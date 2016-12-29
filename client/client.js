@@ -495,7 +495,7 @@ $(function() {
     }
 
     lastPoster = args.nick;
-    if (args.nick != '*')
+    if (args.nick != '*' || args.nick != '!')
       unread += 1;
     updateTitle();
   }
