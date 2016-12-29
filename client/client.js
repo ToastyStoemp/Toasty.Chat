@@ -457,7 +457,7 @@ $(function() {
           user.textContent = "@" + nick;
           user.style.color = onlineUsers[nick];
           try {
-            textEl.innerHTML = textEl.innerHTML.replace(matches[0], user.outerHTML);
+            textEl.innerHTML = textEl.innerHTML.replace(matches[2], user.outerHTML);
           } catch (err) {
             console.log(err.message);
           }
