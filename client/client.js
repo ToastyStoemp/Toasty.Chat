@@ -467,6 +467,11 @@ $(function() {
 
     //Mentioning
     if (myNick && args.nick != '*') {
+      if (args.nick == 'Bot' && args.text.indexOf('whispers')) {
+        messageEl.classList.add('whipser');
+        if ($('#notifications').is(":checked") && !document.hasFocus())
+          notifyMe(args.nick + " mentioned you", args.text, false);
+      } else
       if ((new RegExp("(\\s|^)(@?" + myNick + "\\b)|(\\s|^)(@\\*)\\s", "i"))
         .test(args.text)) {
         messageEl.classList.add('mention');
