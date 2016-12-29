@@ -2,6 +2,7 @@ var userIgnore;
 var send;
 
 var notifySound = new Audio('https://toastystoemp.com/public/notifi-sound.wav');
+var friendSound = new Audio('https://toastystoemp.com/public/friendSound.wav');
 
 
 $(function() {
@@ -416,7 +417,10 @@ $(function() {
       else if (args.nick != lastPoster && !args.whisperTo){
         nickLinkEl.textContent = args.nick;
         nickLinkEl.onclick = function() {
-          insertAtCursor("@" + args.nick + " ");
+          if (args.whisper)
+            insertAtCursor(".w @" + args.nick + " ");
+          else
+            insertAtCursor("@" + args.nick + " ");
           $('#chatinput').focus();
         }
       }
@@ -983,8 +987,16 @@ $(function() {
   if (localStorageGet('notifications') == 'false') {
     $("#notifications").prop('checked', false);
   }
+  if (localStorageGet('sounds') == 'false') {
+    $("#sounds").prop('checked', false);
+  }
   mSelector = (localStorageGet('mSelector') == 'true');
   bSelector = (localStorageGet('bSelector') == 'true');
+  var friends = localStorageGet('friends');
+  if (friends == "" || typeof friends == 'undefined')
+    friends = [];
+  else
+    friends = friends.split(' ');
 
   $('#auto-login').change(function(e) {
     localStorageSet('auto-login', !!e.target.checked);
@@ -998,6 +1010,9 @@ $(function() {
   $('#notifications').change(function(e) {
     localStorageSet('notifications', !!e.target.checked);
   });
+  $('#sounds').change(function(e) {
+    localStorageSet('sounds', !!e.target.checked);
+  });
 
   // User list
 
@@ -1005,16 +1020,78 @@ $(function() {
   var ignoredUsers = [];
 
   function userAdd(nick, trip) {
+    onlineUsers[nick] = colorRender(trip);
+    if (friends.indexOf(nick) != -1)
+      if ($('#sounds').is(":checked"))
+        friendSound.play();
     var user = document.createElement('a');
-    user.textContent = nick;
-    user.onclick = function(e) {
-      userInvite(nick);
+    if (nick != myNick.split('#')[0]) {
+      user.textContent = nick + ' ▾';
+      var menu = document.createElement('ul');
+      var friendUser = document.createElement('a');
+      if (friends.indexOf(nick) == -1)
+        friendUser.textContent = "Add Friend";
+      else
+        friendUser.textContent = "Remove Friend";
+      friendUser.onclick = function(e) {
+        if (friendUser.textContent == "Add Friend") {
+          friendUser.textContent = "Remove Friend";
+          friends.push(nick);
+          pushMessage({
+            nick: '*',
+            text: "User " + nick + " has been added to your friends list."
+          });
+        } else {
+          friendUser.textContent = "Add Friend";
+          friends.splice(friends.indexOf(nick), 1);
+          pushMessage({
+            nick: '*',
+            text: "User " + nick + " has been removed to your friends list."
+          });
+        }
+      }
+      var menuLi = document.createElement('li');
+      menuLi.appendChild(friendUser);
+      menuLi.classList.add('menuList');
+      menu.appendChild(menuLi);
+
+      var inviteUser = document.createElement('a');
+      inviteUser.textContent = "Invite";
+      inviteUser.onclick = function(e) {
+        userInvite(nick);
+      };
+      menuLi = document.createElement('li')
+      menuLi.appendChild(inviteUser)
+      menuLi.classList.add('menuList');
+      menu.appendChild(menuLi);
+
+      var ignoreUser = document.createElement('a');
+      ignoreUser.textContent = "Ignore";
+      ignoreUser.onclick = function(e) {
+        userIgnore(nick);
+        pushMessage({
+          nick: '*',
+          text: "User " + nick + " has been added to your ignore list."
+        });
+      }
+      menuLi = document.createElement('li')
+      menuLi.appendChild(ignoreUser)
+      menuLi.classList.add('menuList');
+      menu.appendChild(menuLi);
+
+      menu.classList.add('dropdown');
+      user.appendChild(menu);
     }
+    else
+      user.textContent = nick;
+    user.style.cssText = 'color:' + onlineUsers[nick];
+    user.classList.add('userList');
     var userLi = document.createElement('li');
     userLi.appendChild(user);
     $('#users').append(userLi);
-    onlineUsers[nick] = colorRender(trip);
+    //onlineUsers.push(nick);
   }
+
 
   function userRemove(nick) {
     var children = $('#users').children();
@@ -1024,6 +1101,15 @@ $(function() {
         users.removeChild(user);
     }
     delete onlineUsers[nick];
+  }
+
+  function userRemove(nick) {
+    var children = $('#users').children();
+    for (var i = 0; i < children.length; i++) {
+      var user = children[i]
+      if (user.textContent.substr(0, user.textContent.indexOf(' ')) == nick)
+        users.removeChild(user)
+    }
   }
 
   function usersClear() {
@@ -1061,7 +1147,8 @@ $(function() {
 
   function notifyMe(title, text, channel) {
     if (typeof text != 'undefined') {
-      notifySound.play();
+      if ($('#notifications').is(":checked"))
+        notifySound.play();
       var Channel = channel;
       var not = new Notification(title, {
         body: text,
@@ -1275,6 +1362,7 @@ $(function() {
   });
 
   window.onbeforeunload = function() {
+    localStorageSet('friends', friends.join(' '));
     localStorageSet('mSelector', mSelector);
     localStorageSet('bSelector', bSelector);
     if (wasConnected && myChannel != '' && $('#leave-warning').is(
