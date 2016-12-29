@@ -101,7 +101,18 @@ function Bot(chatServerBase) {
         client.send(null, botData);
         return true;
       }
-      console.log('missing parameter [client] in bot.sendAll()');
+      console.log('missing parameter [client] in bot.sendClient()');
+      return false;
+    }
+    this.sendWhisper = function (text, client, friend) {
+      if (client) {
+        var botData = {cmd: 'chat', text: text, nick: client.nick, target: friend.nick, whisper: true, whisperTo: true};
+        client.send(null, botData);
+        botData = {cmd: 'chat', text: text, nick: client.nick, whisper: true, whisperAt: true};
+        friend.send(null, botData);
+        return true;
+      }
+      console.log('missing parameter [client] in bot.sendWhisper()');
       return false;
     }
 }
