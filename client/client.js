@@ -494,7 +494,7 @@ $(function() {
       window.scrollTo(0, document.body.scrollHeight);
     }
 
-    lastPoster = args.nick;
+    lastPoster = args.whisper ? args.target : args.nick;
     if (args.nick != '*')
       unread += 1;
     updateTitle();
