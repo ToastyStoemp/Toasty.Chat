@@ -105,6 +105,7 @@ $(function() {
   var imageData = [];
   var mSelector = false;
   var bSelector = false;
+  var lastWhisper = "";
 
   // Timeout handling
   var connectTime = 0;
@@ -269,9 +270,8 @@ $(function() {
         });
     },
     chat: function(args) {
-      if (ignoredUsers.indexOf(args.nick) >= 0) {
+      if (ignoredUsers.indexOf(args.nick) >= 0)
         return;
-      }
       pushMessage(args);
     },
     action: function(args) {
@@ -373,7 +373,6 @@ $(function() {
       messageEl.classList.add('shout');
     }
 
-
     if (args.elementId) { // for referencing special message
       var oldElement = document.getElementById(args.elementId);
       if (oldElement) oldElement.removeAttribute('id');
@@ -398,7 +397,6 @@ $(function() {
     }
 
     if (args.nick && args.nick != lastPoster) {
-
       if (args.llama) {
         var llamaLinkEl = document.createElement('img');
         llamaLinkEl.src = "https://toastystoemp.com/m/1bb24b.png";
@@ -408,7 +406,10 @@ $(function() {
       }
 
       var nickLinkEl = document.createElement('a');
-      nickLinkEl.textContent = args.nick;
+      if (args.whisperTo)
+        nickLinkEl.textContent = "to " + args.target;
+      else
+        nickLinkEl.textContent = args.nick;
       nickLinkEl.onclick = function() {
         insertAtCursor("@" + args.nick + " ");
         $('#chatinput').focus();
@@ -465,19 +466,20 @@ $(function() {
       }
     }
 
-    //Mentioning
-    if (myNick && args.nick != '*') {
-      if (args.nick == 'Bot' && args.text.indexOf('whispers')) {
-        messageEl.classList.add('whipser');
-        if ($('#notifications').is(":checked") && !document.hasFocus())
-          notifyMe(args.nick + " mentioned you", args.text, false);
-      } else
+    //Mentioning + whispering
+    if (myNick && args.nick != '*' && !args.whisper) {
       if ((new RegExp("(\\s|^)(@?" + myNick + "\\b)|(\\s|^)(@\\*)\\s", "i"))
         .test(args.text)) {
         messageEl.classList.add('mention');
         if ($('#notifications').is(":checked") && !document.hasFocus())
           notifyMe(args.nick + " mentioned you", args.text, false);
       }
+    } else if (args.whisper) {
+      if (args.whisperAt)
+        lastWhisper = args.nick;
+      messageEl.classList.add('whisper');
+      if ($('#notifications').is(":checked") && !document.hasFocus())
+        notifyMe(args.nick + " mentioned you", args.text, false);
     }
 
     if (links.length != 0) {
@@ -889,18 +891,30 @@ $(function() {
           .length) : typedNick;
         var stub = typedNick.toLowerCase();
         if (stub != "") {
-          var nicks = [];
-          for (var nick in onlineUsers) {
-            var lowerNick = nick.toLowerCase();
-            if (lowerNick.indexOf(stub) === 0)
-              nicks.push(nick);
+          if (stub == ".r" && lastWhisper != "") {
+            if (lastWhisper == "") {
+              removeCharsTillIndex(index);
+              insertAtCursor(".w ");
+            }
+            else {
+              removeCharsTillIndex(index);
+              insertAtCursor(".w @" + lastWhisper + " ");
+            }
           }
-          if (nicks.length === 0)
-            nicks = onlineUsers;
-          if (nicks.length > 0) {
-            nickTabIndex = (nickTabIndex + 1) % nicks.length; // loop through nicks
-            removeCharsTillIndex(index);
-            insertAtCursor("@" + nicks[nickTabIndex] + " ");
+          else {
+            var nicks = [];
+            for (var nick in onlineUsers) {
+              var lowerNick = nick.toLowerCase();
+              if (lowerNick.indexOf(stub) === 0)
+                nicks.push(nick);
+            }
+            if (nicks.length === 0)
+              nicks = onlineUsers;
+            if (nicks.length > 0) {
+              nickTabIndex = (nickTabIndex + 1) % nicks.length; // loop through nicks
+              removeCharsTillIndex(index);
+              insertAtCursor("@" + nicks[nickTabIndex] + " ");
+            }
           }
         }
       }

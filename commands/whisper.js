@@ -1,17 +1,18 @@
-var whipser = function(bot, sender, args, data, client)
-{
-  if (args.length < 2) {
-    bot.sendClient("Usage is .w [nick] [message]", client);
-    return;
-  }
-  var targetNick = args.splice(0,1)[0];
+var whipser = function(bot, sender, args, data, client) {
+  if (args.length < 2)
+    return bot.sendClient("Usage is .w [nick] [message]", client);
+  if (!args[1])
+    return bot.sendClient("Usage is .w [nick] [message]", client);
+  var targetNick = args.splice(0, 1)[0];
   targetNick = targetNick.replace("@", "");
-  var friend = bot.chatServerBase.getClientOfChannel(targetNick, client.channel) || null;
-  if (friend != null){
-    bot.sendClient(sender + " whispers to " + friend.nick + ": " + args.join(' '), friend);
-    bot.sendClient("You wispered to " + friend.nick + ":", client);
+  var friend = bot.chatServerBase.getClientOfChannel(targetNick, client.channel) ||
+    null;
+  if (friend != null) {
+    bot.sendWhisper(args.join(' '), client, friend);
   } else
     bot.sendClient("User can not be found.", client);
 };
 
-module.exports = {w: whipser};
+module.exports = {
+  w: whipser
+};
