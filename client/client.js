@@ -396,8 +396,8 @@ $(function() {
       nickSpanEl.appendChild(tripEl);
     }
 
-    if (args.nick && args.nick != lastPoster) {
-      if (args.llama) {
+    if (args.nick) {
+      if (args.llama && args.nick != lastPoster) {
         var llamaLinkEl = document.createElement('img');
         llamaLinkEl.src = "https://toastystoemp.com/m/1bb24b.png";
         llamaLinkEl.style.marginRight = "4px";
@@ -406,13 +406,19 @@ $(function() {
       }
 
       var nickLinkEl = document.createElement('a');
-      if (args.whisperTo)
+      if (args.whisperTo && lastPoster.substr(0, 3) != "to ") {
         nickLinkEl.textContent = "to " + args.target;
-      else
+        nickLinkEl.onclick = function() {
+          insertAtCursor(".w @" + args.target + " ");
+          $('#chatinput').focus();
+        }
+      }
+      else if (args.nick != lastPoster && !args.whisperTo){
         nickLinkEl.textContent = args.nick;
-      nickLinkEl.onclick = function() {
-        insertAtCursor("@" + args.nick + " ");
-        $('#chatinput').focus();
+        nickLinkEl.onclick = function() {
+          insertAtCursor("@" + args.nick + " ");
+          $('#chatinput').focus();
+        }
       }
       var date = new Date(args.time || Date.now());
       nickLinkEl.title = date.toLocaleString();
