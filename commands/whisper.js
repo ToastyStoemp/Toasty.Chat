@@ -7,9 +7,10 @@ var whipser = function(bot, sender, args, data, client)
   var targetNick = args.splice(0,1)[0];
   targetNick = targetNick.replace("@", "");
   var friend = bot.chatServerBase.getClientOfChannel(targetNick, client.channel) || null;
-  if (friend != null)
-    bot.sendClient(sender + " whispers: " + args.join(' '), friend);
-  else
+  if (friend != null){
+    bot.sendClient(sender + " whispers to " + friend.nick + ": " + args.join(' '), friend);
+    bot.sendClient("You wispered to " + friend.nick + ":", client);
+  } else
     bot.sendClient("User can not be found.", client);
 };
 
