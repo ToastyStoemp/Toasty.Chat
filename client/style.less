@@ -94,11 +94,8 @@ button {
 
 .messages {
   border-left: 1px solid;
-}
-
-#messages {
   padding-top: 2em;
-  margin-bottom: 42px;;
+  margin-bottom: 42px;
 }
 
 .message {
@@ -133,19 +130,22 @@ button {
   float: left;
 }
 
-#chat {
+#chatManager {
   width: 100%;
-  float: right;
+  max-width: 1200px;
+  margin: auto;
 }
 
 #footer {
+  max-width: 600px;
   position: fixed;
   bottom: 0;
-  width: inherit;
+  width: 100%;
   margin: 0 auto;
 }
 
 #chatform {
+  border-left: 1px solid;
   border-top: 1px solid;
 }
 
@@ -192,9 +192,6 @@ button {
 @media only screen and (max-width: 600px) {
   .messages {
     border: none;
-  }
-
-  #messages {
     padding: 0.5em;
   }
 
@@ -317,4 +314,9 @@ ul li ul li a:hover {
   margin: 15px;
   vertical-align: top;
   overflow: auto;
+}
+
+.chat {
+  width: 50%;
+  float: left;
 }

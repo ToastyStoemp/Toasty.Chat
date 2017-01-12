@@ -4,7 +4,7 @@ html
         meta(name="viewport", content="width=device-width, initial-scale=1")
         meta(charset="utf-8")
         title Toasty.Chat
-        script(src="/googleanalytics.js")
+        //script(src="/googleanalytics.js")
         link(rel="stylesheet", href="/style.css")
         script(rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css")
         script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js")
@@ -12,7 +12,7 @@ html
         //script(src="/markdown.min.js")
         script(src="/data.js")
         script(src="/config.js")
-        script(src="/client.js")
+        script(src="/connect.js")
         link#scheme-link(rel="stylesheet", href="/schemes/solarized.css")
 
     body
@@ -23,59 +23,60 @@ html
                     label Enter nick and pass like this : nick#pass
                     input#nick(type="text",required,pattern="[a-zA-Z0-9_]{1,24}(#.+)?",autofocus, autocomplete="off",title="Nickname must consist of up to 24 letters, numbers, and underscores")
                     input(type="submit")
-        div#theatre
-            linkPop#link-block
-                p Enter link:
-                textarea#link-input(type="text", autocomplete="off", autofocus, data-autoresize)
-                button#load-link load
 
-        div#chat
-            nav#sidebar
-                img(src="https://toastystoemp.com/public/settingsicon.png")#settingsicon.settingsicon
-                #sidebar-content.sidebar-extra
-                    p
-                        a#favLink(title="Favorite this channel")
-                            img(src='https://toastystoemp.com/public/addFav.png')
-                    p
-                        a#link(href='https://trello.com/b/HTT7LQW4/toasty-chat', target="_blank") Trello!
+        nav#sidebar
+            img(src="https://toastystoemp.com/public/settingsicon.png")#settingsicon.settingsicon
+            #sidebar-content.sidebar-extra
+                p
+                    a#favLink(title="Favorite this channel")
+                        img(src='https://toastystoemp.com/public/addFav.png')
+                p
+                    a#link(href='https://trello.com/b/HTT7LQW4/toasty-chat', target="_blank") Trello!
+                h4 Settings
+                p
+                    input#auto-login(type="checkbox")
+                    label(for="auto-login") Auto login
+                p
+                    input#joined-left(type="checkbox", checked)
+                    label(for="joined-left") Join/left notify
+                p
+                    input#leave-warning(type="checkbox", checked)
+                    label(for="leave-warning") Leave warning
+                p
+                    input#notifications(type="checkbox", checked)
+                    label(for="notifications") Notifications
+                p
+                    input#sounds(type="checkbox", checked)
+                    label(for="sounds") Sounds
+                p
+                    input#llamas(type="checkbox")
+                    label(for="llamas") Llamas
+                p
+                    button#clear-messages Clear messages
+                p
+                    button#toggle-viewer Toggle viewer
+                h4 Color scheme
+                select#scheme-selector
+                h4 Users online
+                p (Click user to invite)
+                div#userbox
+                    ul#Users
 
-                    h4 Settings
-                    p
-                        input#auto-login(type="checkbox")
-                        label(for="auto-login") Auto login
-                    p
-                        input#joined-left(type="checkbox", checked)
-                        label(for="joined-left") Join/left notify
-                    p
-                        input#leave-warning(type="checkbox", checked)
-                        label(for="leave-warning") Leave warning
-                    p
-                        input#notifications(type="checkbox", checked)
-                        label(for="notifications") Notifications
-                    p
-                        input#sounds(type="checkbox", checked)
-                        label(for="sounds") Sounds
-                    p
-                        input#llamas(type="checkbox")
-                        label(for="llamas") Llamas
+        div#chatManager     
+            div.chat
+                article.container
+                    #messages.messages
 
-                    p
-                        button#clear-messages Clear messages
-                    p
-                        button#toggle-viewer Toggle viewer
-                    h4 Color scheme
-                    select#scheme-selector
-                    h4 Users online
-                    p (Click user to invite)
-                    div#userbox
-                        ul#users
-
-            a#tsLink(target="_blank") TeamSpeak!
-
-            article.container
-                #messages.messages
-
-            footer#footer
-                .container
-                    form#chatform.messages
-                        textarea#chatinput(type="text", autocomplete="off", autofocus, data-autoresize)
+                footer#footer
+                    .container
+                        form#chatform
+                            textarea#chatinput(type="text", autocomplete="off", autofocus, data-autoresize)
+            
+            div.chat
+                article.container
+                    #messages.messages
+                
+                footer#footer
+                    .container
+                        form#chatform
+                            textarea#chatinput(type="text", autocomplete="off", autofocus, data-autoresize)
