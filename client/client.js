@@ -1397,7 +1397,6 @@ $(function() {
 
 class MixedLoginPopup {
     constructor(root) {
-        super();
         this.realNick = "";
         this.keyPressedDown = false;
         let that = this;
@@ -1453,7 +1452,7 @@ class MixedLoginPopup {
     }
 
     open(channel) {
-        this.overlay.removeAttribute("hidden");
+        this.overlay.classList.remove("hidden");
         this.root.classList.add("open");
         let that = this;
         window.setTimeout(function () {
@@ -1467,7 +1466,7 @@ class MixedLoginPopup {
     }
 
     close() {
-        this.overlay.setAttribute("hidden", "true");
+        this.overlay.classList.add("hidden");
         this.input.value = "";
         this.realNick = "";
         document.removeEventListener("keyup", (function (e) {
