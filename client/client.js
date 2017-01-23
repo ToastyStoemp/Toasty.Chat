@@ -2,7 +2,7 @@ var userIgnore;
 var send;
 
 var notifySound = new Audio('https://toastystoemp.com/public/notifi-sound.wav');
-var friendSound = new Audio('https://toastystoemp.com/public/friendSound.wav');
+var friendSound = new Audio('https://toastystoemp.com/public/friendSound.wav')
 
 
 $(function() {
@@ -107,6 +107,16 @@ $(function() {
   var mSelector = false;
   var bSelector = false;
   var lastWhisper = "";
+
+    //Login
+  let mixedLogin = new MixedLoginPopup(document.querySelector("#login"));
+    mixedLogin.onsuccess = function (channel, nick, password) {
+        myNick = `${nick}#${password}`;
+        $(document).trigger("login", channel);
+    };
+    mixedLogin.ondone = function (channel) {
+      this.close();
+    };
 
   // Timeout handling
   var connectTime = 0;
@@ -223,14 +233,14 @@ $(function() {
 
     var autoLoginOk = $('#auto-login').is(":checked") && myNick != "";
     if (!wasConnected && !autoLoginOk) {
-      $("#loginOverlay").removeClass("hidden");
       var parts = myNick.split("#");
       var password = "";
       if (parts.length === 2) {
         password = parts[1].replace(/./g, "*");
       }
-      $("#nick").val(myNick.replace(/[#](.*)/, "#" + password)).data(
-        "realNick", myNick).data("channel", channel);
+      mixedLogin.input.value = myNick.replace(/[#](.*)/, "#" + password);
+      mixedLogin.realNick = myNick;
+      mixedLogin.open(channel);
     } else {
       $(document).trigger("login", channel);
     }
@@ -1382,63 +1392,137 @@ $(function() {
       return 'Are you sure you want to leave?';
     }
   };
-
-  //Login
-  $("#login form").submit(function(e) {
-    e.preventDefault();
-    var $nick = $(this).find("input#nick");
-    $("#loginOverlay").addClass("hidden");
-    myNick = $nick.data("realNick");
-    $nick.val("").data("realNick", "");
-    $(document).trigger("login", $nick.data("channel"));
-    $nick.data("channel", "");
-  }).find("input#nick").keydown(function(e) {
-    $(this).data("keyCode", e.keyCode);
-    if ((e.keyCode !== 8 && e.keyCode != 46) || $(this).data(
-        "selectionStart") == null) {
-      $(this).data("selectionEnd", e.currentTarget.selectionEnd);
-      $(this).data("selectionStart", e.currentTarget.selectionStart);
-    }
-  }).click(function(e) {
-    $(this).data("selectionEnd", e.currentTarget.selectionEnd);
-    $(this).data("selectionStart", e.currentTarget.selectionStart);
-  }).on("select", function(e) {
-    $(this).data("selectionEnd", e.currentTarget.selectionEnd);
-    $(this).data("selectionStart", e.currentTarget.selectionStart);
-  }).on("input", function(e) {
-    if ($(this).data("realNick") == null) {
-      $(this).data("realNick", "");
-    }
-    if ($(this).data("keyCode") == 8 || $(this).data("keyCode") == 46) {
-      var oldNick = $(this).data("realNick");
-      var before = oldNick;
-      switch ($(this).data("keyCode")) {
-        case 8: //BACKSPACE
-          before = oldNick.slice(0, $(this).data("selectionStart") - 1);
-          break;
-        case 46: //DELETE
-          var before = oldNick.slice(0, $(this).data("selectionStart"));
-          break;
-      }
-      var after = oldNick.slice($(this).data("selectionEnd") + 1);
-      $(this).data("realNick", before + after);
-    } else {
-      var nick = e.currentTarget.value;
-      var idxStart = $(this).data("selectionStart") || e.currentTarget.selectionStart -
-        1;
-      var idxEnd = $(this).data("selectionEnd") || e.currentTarget.selectionStart;
-      var newChar = nick[idxStart];
-      $(this).data("realNick", $(this).data("realNick").slice(0,
-        idxStart) + newChar + $(this).data("realNick").slice(idxEnd));
-      var matches = nick.match(/#(.+)/i);
-      if (matches !== null) {
-        var password = matches[1];
-        e.currentTarget.value = nick.replace(/#(.+)/, "#" + password.replace(
-          /./g, "*"));
-      }
-    }
-    $(this).data("selectionStart", null);
-    $(this).data("selectionEnd", null);
-    $(this).data("keyCode", null);
-  });
 });
+
+
+class MixedLoginPopup {
+    constructor(root) {
+        super();
+        this.realNick = "";
+        this.keyPressedDown = false;
+        let that = this;
+        this.root = root;
+        this.input = root.querySelector("#nick");
+        this.confirmButton = root.querySelector("[type='submit]");
+        this.overlay = document.querySelector("#loginOverlay");
+        this.loginForm = this.root.querySelector("form");
+        this.loginForm.onsubmit = function (ev) {
+            ev.preventDefault();
+            if (typeof that.onsuccess === "function") {
+                that.onsuccess(that.channel, that.realNick.split("#")[0], that.realNick.split("#")[1]);
+            }
+            if (typeof that.ondone === "function") {
+                that.ondone(that.channel);
+            }
+            that.realNick = "";
+        };
+        let selectionStart = 0;
+        let selectionEnd = 0;
+        this.input.addEventListener("textInput", this.keyInput.bind(this));
+        this.input.addEventListener("keydown", this.keyInput.bind(this));
+        this.input.addEventListener("keydown", function (e) {
+            selectionStart = e.currentTarget.selectionStart;
+            selectionEnd = e.currentTarget.selectionEnd;
+        });
+        this.input.addEventListener("keyup", function (ev) {
+            let key = null;
+            let target = ev.currentTarget;
+            if (target.value.length === 0) {
+                that.realNick = "";
+            }
+            else if (!that.keyPressedDown && target.value.length < that.realNick.length && navigator.userAgent.match(/Android/i)) {
+                if (selectionStart === target.selectionStart) {
+                    key = "Delete";
+                }
+                else if (selectionStart > target.selectionStart) {
+                    key = "Backspace";
+                }
+                that.applyComposition(key, selectionStart, selectionEnd);
+            }
+            that.keyPressedDown = false;
+        });
+        this.loginForm.addEventListener("reset", function () {
+            that.realNick = "";
+            if (typeof that.oncancel === "function") {
+                that.oncancel(that.channel);
+            }
+            if (typeof that.ondone === "function") {
+                that.ondone(that.channel);
+            }
+        });
+    }
+
+    open(channel) {
+        this.overlay.removeAttribute("hidden");
+        this.root.classList.add("open");
+        let that = this;
+        window.setTimeout(function () {
+            that.input.focus();
+        }, 100);
+        document.addEventListener("keyup", (function (e) {
+            if (e.key === "Escape") {
+                this.loginForm.reset();
+            }
+        }).bind(this));
+    }
+
+    close() {
+        this.overlay.setAttribute("hidden", "true");
+        this.input.value = "";
+        this.realNick = "";
+        document.removeEventListener("keyup", (function (e) {
+            if (e.key === "Escape") {
+                this.loginForm.reset();
+            }
+        }).bind(this));
+    }
+
+    keyInput(event) {
+        this.keyPressedDown = true;
+        let target = event.currentTarget;
+        let before;
+        let after;
+        let key = event.key || event.data;
+        switch (key) {
+            case "Backspace":
+            case "Delete":
+                this.applyComposition(key, target.selectionStart, target.selectionEnd);
+                break;
+            case "Enter":
+                break;
+            default:
+                if (key.length === 1) {
+                    event.preventDefault();
+                    before = this.realNick.substring(0, target.selectionStart);
+                    after = this.realNick.substring(target.selectionEnd);
+                    this.realNick = before + key + after;
+                    let matches = this.realNick.split("#");
+                    let oldSelectionStart = event.currentTarget.selectionStart;
+                    event.currentTarget.value = matches.length < 2 ? this.realNick : this.realNick.replace(/#(.+)/, `#${matches[1].replace(/./g, "*")}`);
+                    event.currentTarget.selectionStart = oldSelectionStart + 1;
+                    event.currentTarget.selectionEnd = oldSelectionStart + 1;
+                }
+                break;
+        }
+    }
+
+    applyComposition(key, selectionStart, selectionEnd) {
+        let before;
+        let after;
+        switch (key) {
+            case "Backspace":
+                before = this.realNick.substring(0, selectionStart - 1);
+                after = this.realNick.substring(selectionEnd);
+                this.realNick = before + after;
+                break;
+            case "Delete":
+                before = this.realNick.substring(0, selectionStart);
+                if (selectionStart === selectionEnd) {
+                    selectionEnd++;
+                }
+                after = this.realNick.substring(selectionEnd);
+                this.realNick = before + after;
+                break;
+        }
+    }
+}
