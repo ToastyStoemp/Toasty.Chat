@@ -2,7 +2,7 @@ var userIgnore;
 var send;
 
 var notifySound = new Audio('https://toastystoemp.com/public/notifi-sound.wav');
-var friendSound = new Audio('https://toastystoemp.com/public/friendSound.wav')
+var friendSound = new Audio('https://toastystoemp.com/public/friendSound.wav');
 
 
 $(function() {
