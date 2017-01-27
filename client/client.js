@@ -1448,6 +1448,7 @@ class MixedLoginPopup {
     }
 
     open(channel) {
+        this.channel = channel;
         this.overlay.classList.remove("hidden");
         this.root.classList.add("open");
         let that = this;
@@ -1470,6 +1471,7 @@ class MixedLoginPopup {
                 this.loginForm.reset();
             }
         }).bind(this));
+        this.channel = null;
     }
 
     keyInput(event) {
