@@ -9,19 +9,19 @@ var triplist = require("./data/trips.json");
 function MetaClient() {
     this.clients = [];
 }
-MetaClient.prototype.push = function (client) {
+MetaClient.prototype.push = function(client) {
     this.clients.push(client);
 };
-MetaClient.prototype.remove = function (client) {
+MetaClient.prototype.remove = function(client) {
     this.clients.splice(this.clients.indexOf(client), 1);
 };
-MetaClient.prototype.send = function () {
+MetaClient.prototype.send = function() {
     var args = arguments;
-    this.clients.forEach(function (c) {
+    this.clients.forEach(function(c) {
         c.send.apply(c, args);
     });
 };
-MetaClient.prototype.setClientConfigurationData = function (channel, nick, trip) {
+MetaClient.prototype.setClientConfigurationData = function(channel, nick, trip) {
     this.channel = channel;
     this.nick = nick;
     this.trip = trip;
@@ -29,39 +29,39 @@ MetaClient.prototype.setClientConfigurationData = function (channel, nick, trip)
 
 
 function ChatServerBase() {
-    this._connectedClients = {'': 0}; // map: channel -> (lowerCaseNick -> ChatClientBase)
-    this.bot = new (require('./bot.js'))(this);
+    this._connectedClients = { '': 0 }; // map: channel -> (lowerCaseNick -> ChatClientBase)
+    this.bot = new(require('./bot.js'))(this);
     this.bot.restrictCommandToChannels('ascii', ['ascii']);
 }
-module.exports = function () {
+module.exports = function() {
     return new ChatServerBase();
 };
-ChatServerBase.prototype.initialize = function (config, version, POLICE) {
+ChatServerBase.prototype.initialize = function(config, version, POLICE) {
     var that = this;
     that.POLICE = POLICE;
     that.config = config;
     that.version = version;
     that.nodes = [];
-    tor.fetch(function (err, data) {
+    tor.fetch(function(err, data) {
         if (err) return console.error(err);
         that.nodes = tor.parse(data);
     });
 };
-ChatServerBase.prototype.getEventQueue = function () {
+ChatServerBase.prototype.getEventQueue = function() {
     return this.eventQueue;
 };
-ChatServerBase.prototype.getChannelNames = function () {
+ChatServerBase.prototype.getChannelNames = function() {
     var channelNames = [];
     for (var i in this._connectedClients)
         if (i !== '') channelNames.push(i);
     return channelNames;
 };
-ChatServerBase.prototype.getClientsOfChannel = function (channel) {
+ChatServerBase.prototype.getClientsOfChannel = function(channel) {
     var clientsOfChannel = this._connectedClients[channel];
     if (clientsOfChannel !== void 0) return clientsOfChannel;
-    return {'': 0}; // return empty list
+    return { '': 0 }; // return empty list
 };
-ChatServerBase.prototype.getClientOfChannel = function (nick, channel) {
+ChatServerBase.prototype.getClientOfChannel = function(nick, channel) {
     var clientsOfChannel = this._connectedClients[channel];
     if (clientsOfChannel !== void 0)
         for (var i in clientsOfChannel)
@@ -69,11 +69,11 @@ ChatServerBase.prototype.getClientOfChannel = function (nick, channel) {
                 return clientsOfChannel[i];
     return;
 };
-ChatServerBase.prototype.addClientToChannel = function (channel, client, nick, trip) {
+ChatServerBase.prototype.addClientToChannel = function(channel, client, nick, trip) {
     var clientsOfChannel = this._connectedClients[channel];
     if (clientsOfChannel === void 0) {
         this._connectedClients[''] += 1; // increase channel count
-        clientsOfChannel = this._connectedClients[channel] = {'': 0}; // '' keeps the count of users
+        clientsOfChannel = this._connectedClients[channel] = { '': 0 }; // '' keeps the count of users
     }
 
     var existingMetaClient = clientsOfChannel[nick.toLowerCase()];
@@ -84,7 +84,7 @@ ChatServerBase.prototype.addClientToChannel = function (channel, client, nick, t
         clientsOfChannel[''] += 1;
         existingMetaClient = clientsOfChannel[nick.toLowerCase()] = new MetaClient();
         existingMetaClient.setClientConfigurationData(channel, nick, trip); // everything is ok, set data
-        this.broadcast(client, {cmd: 'onlineAdd', nick: nick, trip: trip}, channel);
+        this.broadcast(client, { cmd: 'onlineAdd', nick: nick, trip: trip }, channel);
     }
 
     client.setClientConfigurationData(channel, nick, trip); // everything is ok, set data
@@ -93,7 +93,7 @@ ChatServerBase.prototype.addClientToChannel = function (channel, client, nick, t
 
     return true;
 };
-ChatServerBase.prototype.removeClientFromChannel = function (channel, client) {
+ChatServerBase.prototype.removeClientFromChannel = function(channel, client) {
     var clientsOfChannel = this._connectedClients[channel];
     if (clientsOfChannel === void 0) return; // empty - nothing to do
 
@@ -101,7 +101,7 @@ ChatServerBase.prototype.removeClientFromChannel = function (channel, client) {
     if (metaClient !== void 0) {
         metaClient.remove(client);
         if (metaClient.clients.length <= 0) {
-            this.broadcast(client, {cmd: 'onlineRemove', nick: client.nick}, client.channel);
+            this.broadcast(client, { cmd: 'onlineRemove', nick: client.nick }, client.channel);
             delete clientsOfChannel[client.nick.toLowerCase()];
             clientsOfChannel[''] -= 1; // decrease channel count
             if (clientsOfChannel[''] <= 0) {
@@ -111,13 +111,13 @@ ChatServerBase.prototype.removeClientFromChannel = function (channel, client) {
         }
     }
 };
-ChatServerBase.prototype.onClose = function (client) {
+ChatServerBase.prototype.onClose = function(client) {
     this.removeClientFromChannel(client.channel, client);
 };
-ChatServerBase.prototype.onMessage = function (client, data) {
+ChatServerBase.prototype.onMessage = function(client, data) {
     try {
         if (this.POLICE.frisk(client.getIpAddress(), 0)) { // probe for rate limit
-            client.send(client, {cmd: 'warn', errCode: 'E001', text: "Your IP is being rate-limited or blocked."});
+            client.send(client, { cmd: 'warn', errCode: 'E001', text: "Your IP is being rate-limited or blocked." });
             return;
         }
 
@@ -133,19 +133,18 @@ ChatServerBase.prototype.onMessage = function (client, data) {
 
         var cmd = args.cmd;
         this.handleCommand(cmd, client, args);
-    }
-    catch (e) {
+    } catch (e) {
         console.warn(e.stack)
     }
 };
-ChatServerBase.prototype.broadcast = function (causingClient, data, channel) {
+ChatServerBase.prototype.broadcast = function(causingClient, data, channel) {
     var clientsOfChannel = this.getClientsOfChannel(channel);
     for (var i in clientsOfChannel) {
         if (i !== '')
             clientsOfChannel[i].send(causingClient, data);
     }
 };
-ChatServerBase.prototype.broadcastAll = function (causingClient, data) {
+ChatServerBase.prototype.broadcastAll = function(causingClient, data) {
     var channelNames = this.getChannelNames();
     for (var i in channelNames) {
         var clientsOfChannel = this.getClientsOfChannel(channelNames[i]);
@@ -155,41 +154,40 @@ ChatServerBase.prototype.broadcastAll = function (causingClient, data) {
         }
     }
 };
-ChatServerBase.prototype.validateNickName = function (nick) {
+ChatServerBase.prototype.validateNickName = function(nick) {
     return /^[a-zA-Z0-9_]{1,24}$/.test(nick); // Allow letters, numbers, and underscores
 };
-ChatServerBase.prototype.hashPassword = function (password) {
+ChatServerBase.prototype.hashPassword = function(password) {
     var sha = crypto.createHash('sha256');
     sha.update(password + this.config.salt);
     return sha.digest('base64').substr(0, 10);
 };
 
-ChatServerBase.prototype.generatePassword = function (nick) {
+ChatServerBase.prototype.generatePassword = function(nick) {
     var gPass = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     for (var i = 0; i < 21 + nick.length; i++)
         gPass += possible.charAt(Math.floor(Math.random() * possible.length));
     return gPass + "NEW";
 };
-ChatServerBase.prototype.handleCommand = function (command, client, args) {
+ChatServerBase.prototype.handleCommand = function(command, client, args) {
     var self = this;
 
     // Commands usable by all users
     switch (command) {
         case 'ping':
-            client.send(null, {cmd: 'pong'});
+            client.send(null, { cmd: 'pong' });
             return;
         case 'verify':
             if (self.nodes) {
                 if (self.nodes.indexOf(client.getIpAddress()) == -1)
-                    client.send(null, {cmd: 'verify', valid: (args.version == this.version)});
+                    client.send(null, { cmd: 'verify', valid: (args.version == this.version) });
                 else {
                     console.log("Tor client detected")
-                    client.send(null, {cmd: 'warn', text: "Connection could not be established"});
+                    client.send(null, { cmd: 'warn', text: "Connection could not be established" });
                 }
-            }
-            else {
-                client.send(null, {cmd: 'warn', errCode: '666', text: "Something went wrong trying again."});
+            } else {
+                client.send(null, { cmd: 'warn', errCode: '666', text: "Something went wrong trying again." });
             }
             return;
         case 'join':
@@ -224,13 +222,13 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
 
             if (lowerCaseNick === this.config.admin.toLowerCase()) {
                 if (args.pass !== this.config.password) {
-                    client.send(null, {cmd: 'warn', errCode: 'E004', text: "Cannot impersonate the admin"});
+                    client.send(null, { cmd: 'warn', errCode: 'E004', text: "Cannot impersonate the admin" });
                     return;
                 }
             }
 
             if (!this.addClientToChannel(channel, client, nick, trip)) {
-                client.send(null, {cmd: 'warn', errCode: 'E005', text: "Nickname taken"});
+                client.send(null, { cmd: 'warn', errCode: 'E005', text: "Nickname taken" });
                 return;
             }
 
@@ -245,7 +243,7 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                 trips.push(someClient.trip);
             }
 
-            client.send(null, {cmd: 'onlineSet', nicks: nicks, trips: trips});
+            client.send(null, { cmd: 'onlineSet', nicks: nicks, trips: trips });
 
             return;
         case 'chat':
@@ -325,7 +323,7 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
 
             var friend = this.getClientsOfChannel(client.channel)[nickToInvite.toLowerCase()];
             if (!friend) {
-                client.send(null, {cmd: 'warn', errCode: 'E008', text: "Could not find user in channel"});
+                client.send(null, { cmd: 'warn', errCode: 'E008', text: "Could not find user in channel" });
                 return
             }
             if (friend.nicks === client.nick) return; // Ignore silently
@@ -350,7 +348,7 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
             var ips = {};
             var numberOfIps = 0;
 
-            channelNames.forEach(function (channel) {
+            channelNames.forEach(function(channel) {
                 var clientsOfChannel = self.getClientsOfChannel(channel);
                 for (var i in clientsOfChannel) {
                     var someClient = clientsOfChannel[i];
@@ -379,11 +377,11 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
 
                 var badClient = this.getClientsOfChannel(client.channel)[nick.toLowerCase()];
                 if (!badClient) {
-                    client.send(null, {cmd: 'warn', errCode: 'E009', text: "Could not find " + nick});
+                    client.send(null, { cmd: 'warn', errCode: 'E009', text: "Could not find " + nick });
                     return;
                 }
                 if (this.POLICE.isMod(badClient)) {
-                    client.send(null, {cmd: 'warn', errCode: 'E010', text: "Cannot kick moderator"});
+                    client.send(null, { cmd: 'warn', errCode: 'E010', text: "Cannot kick moderator" });
                     return;
                 }
                 console.log(client.nick + " [" + client.trip + "] kicked " + nick + " in " + client.channel);
@@ -395,8 +393,8 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                 }, client.channel);
 
                 //Kick the client
-                badClient.clients.forEach(function (c) {
-                    c.send(null, {cmd: 'close'});
+                badClient.clients.forEach(function(c) {
+                    c.send(null, { cmd: 'close' });
                     self.POLICE.dump(c.getIpAddress(), args.time);
                 });
                 return;
@@ -406,11 +404,11 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
 
                 var badClient = this.getClientsOfChannel(client.channel)[nick.toLowerCase()];
                 if (!badClient) {
-                    client.send(null, {cmd: 'warn', errCode: 'E009', text: "Could not find " + nick});
+                    client.send(null, { cmd: 'warn', errCode: 'E009', text: "Could not find " + nick });
                     return;
                 }
                 if (this.POLICE.isMod(badClient)) {
-                    client.send(null, {cmd: 'warn', errCode: 'E010', text: "Cannot ban moderator"});
+                    client.send(null, { cmd: 'warn', errCode: 'E010', text: "Cannot ban moderator" });
                     return;
                 }
                 console.log(client.nick + " [" + client.trip + "] banned " + nick + " in " + client.channel);
@@ -422,9 +420,9 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
                 }, client.channel);
 
                 //Ban the client
-                badClient.clients.forEach(function (c) {
-                    c.send(null, {cmd: 'dataSet', bSet: true});
-                    c.send(null, {cmd: 'close'});
+                badClient.clients.forEach(function(c) {
+                    c.send(null, { cmd: 'dataSet', bSet: true });
+                    c.send(null, { cmd: 'close' });
                     self.POLICE.arrest(c.getIpAddress(), args.time);
                 });
                 return;
@@ -434,16 +432,16 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
 
                 var badClient = this.getClientsOfChannel(client.channel)[nick.toLowerCase()];
                 if (!badClient) {
-                    client.send(null, {cmd: 'warn', errCode: 'E009', text: "Could not find " + nick});
+                    client.send(null, { cmd: 'warn', errCode: 'E009', text: "Could not find " + nick });
                     return;
                 }
                 if (this.POLICE.isMod(badClient)) {
-                    client.send(null, {cmd: 'warn', errCode: 'E010', text: "Cannot mute moderator"});
+                    client.send(null, { cmd: 'warn', errCode: 'E010', text: "Cannot mute moderator" });
                     return;
                 }
 
-                badClient.clients.forEach(function (c) {
-                    c.send(null, {cmd: 'dataSet', mSet: true});
+                badClient.clients.forEach(function(c) {
+                    c.send(null, { cmd: 'dataSet', mSet: true });
                     self.POLICE.stfu(c.getIpAddress(), args.time);
                 });
                 console.log(client.nick + " [" + client.trip + "] muted  " + nick + " in " + client.channel);
@@ -455,7 +453,7 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
         switch (command) {
             case 'play':
                 var url = args.url.trim();
-                this.broadcast(client, {cmd: 'play', nick: client.nick, trip: client.trip, url: url}, client.channel);
+                this.broadcast(client, { cmd: 'play', nick: client.nick, trip: client.trip, url: url }, client.channel);
                 return;
             case 'listUsers':
                 var channelNames = this.getChannelNames();
@@ -463,7 +461,7 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
 
                 var lines = [];
                 channelNames.sort();
-                channelNames.forEach(function (channel) {
+                channelNames.forEach(function(channel) {
                     var clientNicks = [];
                     var clientsOfChannel = self.getClientsOfChannel(channel);
                     for (var i in clientsOfChannel) {
@@ -476,12 +474,12 @@ ChatServerBase.prototype.handleCommand = function (command, client, args) {
 
                 var text = clientCount + " users online:\n\n";
                 text += lines.join("\n");
-                client.send(null, {cmd: 'info', text: text});
+                client.send(null, { cmd: 'info', text: text });
 
                 return;
             case 'broadcast':
                 var text = args.join(' ');
-                this.broadcastAll(client, {cmd: 'shout', infoCode: 'S001', text: "Server broadcast: " + text});
+                this.broadcastAll(client, { cmd: 'shout', infoCode: 'S001', text: "Server broadcast: " + text });
                 return;
         }
     }
