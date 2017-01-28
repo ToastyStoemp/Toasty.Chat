@@ -28,9 +28,9 @@ function main() {
     console.log("Running version " + version);
 
     var chatServerBase = require("./server.ChatServerBase.js")();
-    var POLICE = require("./server.Police.js");
-    var police = new POLICE(config.base);
-    chatServerBase.initialize(config.base, version, police);
+    var AutoMod = require("./server.AutoMod.js");
+    var AutoMod = new AutoMod(config.base);
+    chatServerBase.initialize(config.base, version, AutoMod);
 
     if (config.webSocketServer && config.webSocketServer.enabled) {
         var webSocketServer = require("./server.WebSocketServer.js")();
@@ -55,7 +55,7 @@ function main() {
     }
     else if (config.bouncer && config.bouncer.enabled && config.bouncer.hasOwnProperty("wss")) {
         var bouncer = require("./server.Bouncer.js")();
-        bouncer.initialize(config.bouncer, police);
+        bouncer.initialize(config.bouncer, AutoMod);
         bouncer.run();
         if (config.bouncer.client) {
             var client = require("./server.client")();
@@ -71,7 +71,7 @@ function main() {
         persistent: false
     }, function () {
         config = JSON.parse(loadFile(configFileName));
-        chatServerBase.initialize(config.base, version, police);
+        chatServerBase.initialize(config.base, version, AutoMod);
         if (config.webSocketServer.enabled) webSocketServer.initialize(config.webSocketServer);
         if (config.ircServer.enabled) ircServer.initialize(config.ircServer);
     });
@@ -80,7 +80,7 @@ function main() {
     }, function () {
         version = loadFile(versionFileName).match(/"([0-9]+)"/)[1];
         console.log("Running version " + version);
-        chatServerBase.initialize(config.base, version, police);
+        chatServerBase.initialize(config.base, version, AutoMod);
         if (config.webSocketServer && config.webSocketServer.enabled) webSocketServer.initialize(config.webSocketServer);
         if (config.ircServer && config.ircServer.enabled) ircServer.initialize(config.ircServer);
         if (config.restApiServer && config.restApiServer.enabled) ircServer.initialize(config.ircServer);
