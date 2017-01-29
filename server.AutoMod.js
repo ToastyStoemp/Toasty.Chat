@@ -6,22 +6,6 @@ function AutoMod(config, chatServer) {
     this.config = config;
 }
 
-AutoMod.prototype.loadJail = function(filename) {
-    var ids;
-    try {
-        var text = fs.readFileSync(filename, 'utf8');
-        ids = text.split(/\r?\n/);
-    } catch (e) {
-        return
-    }
-    for (var i in ids) {
-        if (ids[i] && ids[i][0] != '#') {
-            this.arrest(id)
-        }
-    }
-    console.log("Loaded jail '" + filename + "'")
-};
-
 AutoMod.prototype.search = function(id) {
     var record = this.records[id];
     if (!record) {
@@ -46,7 +30,7 @@ AutoMod.prototype.frisk = function(id, deltaScore) {
     return record.score >= this.threshold;
 };
 
-AutoMod.prototype.arrest = function(id, time) {
+AutoMod.prototype.ban = function(id, time) {
     if (id == "127.0.0.1" || id == "::1") {
         return;
     }
@@ -60,7 +44,7 @@ AutoMod.prototype.arrest = function(id, time) {
     }
 };
 
-AutoMod.prototype.dump = function(id) {
+AutoMod.prototype.kick = function(id) {
     var record = this.search(id);
     if (record) {
         record.dumped = true;
@@ -70,7 +54,7 @@ AutoMod.prototype.dump = function(id) {
     }
 };
 
-AutoMod.prototype.silence = function(id, time) {
+AutoMod.prototype.mute = function(id, time) {
     if (id == "127.0.0.1" || id == "::1") {
         return;
     }
@@ -82,7 +66,7 @@ AutoMod.prototype.silence = function(id, time) {
     }
 };
 
-AutoMod.prototype.isSilenced = function(id) {
+AutoMod.prototype.isMuted = function(id) {
     var record = this.search(id);
     if (record)
         return record.isSilenced;
@@ -97,9 +81,6 @@ AutoMod.prototype.isMod = function(client) {
     if (!client.trip) return false;
     if (this.isAdmin(client)) return true;
     return this.config.mods && this.config.mods.indexOf(client.trip) >= 0;
-};
-AutoMod.prototype.isDonator = function(client) {
-    return typeof donatorlist[client.trip] != 'undefined';
 };
 
 module.exports = AutoMod;
