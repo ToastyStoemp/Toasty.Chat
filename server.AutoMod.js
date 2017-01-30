@@ -2,8 +2,11 @@
 var donatorlist = require("./data/donators.json"); //WTF?
 var responses = require("./data/responses.json");
 
-function AutoMod(config, chatServer) {
+function AutoMod(config, chatServerBase) {
+    this.records = []; //Global user data
     this.config = config;
+    this.userData = []; //An array of channels, with user message data user = {text, time, score} this is channel specific
+    this.chatServerBase = chatServerBase;
 }
 
 AutoMod.prototype.search = function(id) {
@@ -18,6 +21,7 @@ AutoMod.prototype.search = function(id) {
 };
 
 AutoMod.prototype.frisk = function(id, deltaScore) {
+    //Frisk works cross channels, while normal ScanMessage works per channel
     return false;
     var record = this.search(id);
     if (record.arrested || record.dumped) {
@@ -96,17 +100,16 @@ module.exports = AutoMod;
 // var HackChat = require("./hackchat.js");
 
 //Data
-var userStats = {}; //require("./userStats.json");
-var config;
+//var userStats = {}; //require("./userStats.json");
+//var config;
 var directResponses;
 var responses;
-reload();
+//reload();
 
 //Variables
-var users = {};
+//var users = {};
 var links = [];
 var connections = {};
-var afk = [];
 
 
 //----------
@@ -121,30 +124,31 @@ var afk = [];
 //events
 //---------
 
-AutoMod.prototype.ScanMessage = function(client) { //returns false if message is not spam
+AutoMod.prototype.ScanMessage = function(data, client) { //returns false if message is not spam
     if (client.isAdmin || client.isMod)
         return false;
 
-    nick = nick + " #" + trip;
-
     //inspect the user
-    if (config.ignore.indexOf(trip) == -1) {
+    if (this.config.ignoreTrips.indexOf(client.trip) == -1) {
         //push the image to the users' buffer
-        logMesage(nick, text, time);
+        this.logMesage(data, client);
 
         var outPutMessage = '';
         //outPutMessage += linkCheck(session, text, nick) || '';
-        outPutMessage += textCheck(nick) || '';
+        outPutMessage += this.textCheck(data, client) || '';
         if (outPutMessage !== '') {
-            session.sendMessage(outPutMessage);
+            var warningData = {cmd:'chat', text: outPutMessage, nick: 'AutoMod'};
+            client.send(null, warningData);
             return true;
         }
     }
 
-    //parse commands
-    //Should be merged with the normal Bot
-    if (text[0] == config.commandPrefix)
-        parseCommand(session, nick, text, config.mods.indexOf(trip) != -1);
+    // //parse commands
+    // //Should be merged with the normal Bot
+    // if (data.text[0] == this.config.commandPrefix)
+    //     this.parseCommand(data, client);
+
+    return false;
 };
 
 //--------------
@@ -152,48 +156,56 @@ AutoMod.prototype.ScanMessage = function(client) { //returns false if message is
 //--------------
 
 //addes the lattest message to a buffer
-function logMesage(nick, text, time) {
+AutoMod.prototype.logMesage = function (data, client) {
     //if user is not initialized yet, initialze it
-    if (userStats[nick] && users[nick])
-        users[nick].push({
-            "time": time,
-            "text": text
+    if (!this.userData[client.channel])
+        this.userData[client.channel] = [];
+    if (this.userData[client.channel][client.trip]) {
+        this.userData[client.channel][client.trip].push({
+            "time": Date.now(),
+            "text": data.text,
+            "score": 0
         }); //add the message to the users buffer
-    else {
-        if (!userStats[nick]) {
-            //initialize the userstats data
-            userStats[nick] = {
-                "banCount": 0,
-                "warningCount": 0
-            };
-        }
-
-        //initialize the users buffer
-        users[nick] = [{
-            "time": time,
-            "text": text
+    } else {
+        this.userData[client.channel][client.trip] = [{
+            "time": Date.now(),
+            "text": data.text,
+            "score": 0
         }];
     }
 
-    //Substract a message counter after 5 minutes for this user
+    //Substract a mesvsage counter after 5 minutes for this user
     setTimeout(function() {
-        users[nick].shift();
+        this.userData[client.channel][client.trip].shift();
     }, 5 * 60 * 1000);
 };
 
 //Give a user a warning
-function warnUser(nick, reason) {
-    userStats[nick].warningCount++;
-    console.log('User: ' + nick + ' ' + reason);
-    users[nick] = [];
+AutoMod.prototype.warnUser = function(client, reason) {
+
+    this.userData[client.channel][client.trip] = [];
+
+    //Handle user score
+    client.score++;
+    console.log('User: ' + client.nick + ' ' + reason);
     setTimeout(function() {
-        userStats[nick].warningCount--;
+        client.score--;
     }, 1 * 60 * 60 * 1000);
-    return ("@" + nick + " $\\color{orange}{warning}$ #" + userStats[nick].warningCount + ": " + reason + "\n");
+
+    //Handle canTalk
+    client.canTalk = false;
+    client.timeoutTime += client.score * 10; // in seconds
+    var timer =  setInterval(function() {
+        client.timeoutTime--;
+        if (client.timeoutTime == 0)
+            clearInterval(timer);
+    }, 1000);
+
+    return ("@" + client.nick + " warning #" + client.score + ": " + reason + "\n");
 }
 
 //return an arry with results from one nick name in the user stats
-function getName(nick) {
+AutoMod.prototype.getName = function(nick) {
     var matches = [];
     for (var user in userStats) {
         if (user.indexOf(nick) != -1)
@@ -202,96 +214,72 @@ function getName(nick) {
     return matches;
 }
 
-//Join a channel
-function join(channel) {
-    if (channel[0] == '?')
-        channel = channel.substr(1, channel.length);
-    if (!connections[channel]) {
-        connections[channel] = chat.join(channel, config.botName, config.botPass);
-        console.log("joined " + channel);
-    }
-}
-
-//Leave a channel
-function leave(session) {
-    if (session.channel == config.botChannel) {
-        session.sendMessage("Can't leave this channel");
-        return;
-    }
-    if (connections[session.channel]) {
-        connections[session.channel].leave();
-        console.log("left " + session.channel);
-    }
-}
-
-function reload() {
-    //config = loadFile("./config.json");
-    //directResponses = loadFile('./directResponses.json');
-    //responses = loadFile("./responses.json");
-}
-
 //-----------
 //spam detection functions
 //-----------
 
 //controll text
-function textCheck(nick) {
+AutoMod.prototype.textCheck = function(data, client) {
 
     //could be that link check already passed a warning
-    if (!(users[nick]))
+    if (!(this.userData[client.channel]))
+        return;
+    if (!(this.userData[client.channel][client.trip]))
         return;
 
+    var thisUserData = this.userData[client.channel][client.trip];
+
     //Spam Region
-    var maxMessages = 200; //Max amount of messages every 5 min
-    var maxAvgtime = 1000; //Max difference that just baerly triggers the warning
-    var maxSimilarityMultiLine = 0.75; //Max similarity between the first and third message
-    var maxSimilaritySingleLine = 0.70; //Max similarity between the words in the text
-    var maxLinecount = 8; //amount of lines a message can be max
-    var maxWordLength = 200;
-    var maxCharCount = 1500;
+    var maxMessages = this.config.maxMessagesPer5Min; //Max amount of messages every 5 min
+    var maxAvgtime = this.config.minMessageSpeed; //Max difference that just baerly triggers the warning
+    var maxSimilarityMultiLine = this.config.maxSimilarityMultiMessages; //Max similarity between the first and third message
+    var maxSimilaritySingleLine = this.config.maxSimilaritySingleMessage; //Max similarity between the words in the text
+    var maxLinecount = this.config.maxLinecount; //amount of lines a message can be max
+    var maxWordLength = this.config.maxWordLength;
+    var maxCharCount = this.config.maxCharCount;
 
-    var hasMulitpleMessages = users[nick].length > 2;
+    var hasMulitpleMessages = thisUserData.length > 2;
 
-    var lastMessage = users[nick][users[nick].length - 1]; //last message send
-    var thirdLastMessage = hasMulitpleMessages ? thirdLastMessage = users[nick][users[nick].length - 3] : ""; //third from last message send
+    var lastMessage = thisUserData[thisUserData.length - 1]; //last message send
+    var thirdLastMessage = hasMulitpleMessages ? thirdLastMessage = thisUserData[thisUserData.length - 3] : ""; //third from last message send
 
     if (lastMessage) {
 
         //checks if a series of words is not longer then maxLinecount thresh hold
         if (lastMessage.text.split(/\r\n|\r|\n/).length > maxLinecount)
-            return warnUser(nick, responses.longText); //long text
+            return this.warnUser(client, responses.longText); //long text
 
         //checks if there are not too many characters in a text
-        if (charCount(lastMessage.text) > maxCharCount)
-            return warnUser(nick, responses.longText); //long text 2
+        if (this.charCount(lastMessage.text) > maxCharCount)
+            return this.warnUser(client, responses.longText); //long text 2
 
         //check if a single word is not too long
-        if (longestWord(lastMessage.text).length > maxWordLength)
-            return warnUser(nick, responses.longWord); //long word
+        if (this.longestWord(lastMessage.text).length > maxWordLength)
+            return this.warnUser(client, responses.longWord); //long word
 
         //check if a word is too repetitive within a text ( spam spam spam ) for example
-        if (similar_inlineText(lastMessage.text, maxSimilaritySingleLine, maxSimilarityMultiLine))
-            return warnUser(nick, responses.similarWords); // similar words
+        if (this.similar_inlineText(lastMessage.text, maxSimilaritySingleLine, maxSimilarityMultiLine))
+            return this.warnUser(client, responses.similarWords); // similar words
 
         //check if the user did not post too many message in the last n minutes
-        if (users[nick].length > maxMessages)
-            return warnUser(nick, responses.longTermSpeed); // long term speed count
+        if (thisUserData.length > maxMessages)
+            return this.warnUser(client, responses.longTermSpeed); // long term speed count
 
         if (hasMulitpleMessages) { //spam checks that require multiple messages ( 3 )
 
             //check if this message is similar to the third from last message
-            if (similar_text(lastMessage.text, thirdLastMessage.text) >= maxSimilarityMultiLine)
-                return warnUser(nick, responses.similarMessage); // similar messages
+            if (this.similar_text(lastMessage.text, thirdLastMessage.text) >= maxSimilarityMultiLine)
+                return this.warnUser(client, responses.similarMessage); // similar messages
 
             //check the speed between the last and third from last is not too fast
             if (lastMessage.time - thirdLastMessage.time < maxAvgtime)
-                return warnUser(nick, responses.shortTermSpeed); // Short term speed count
+                return this.warnUser(client, responses.shortTermSpeed); // Short term speed count
         }
     }
 }
 
 //returns how similar 2 texts are
-function similar_text(first, second) {
+AutoMod.prototype.similar_text = function(first, second) {
     if (first == second)
         return 1;
 
@@ -321,7 +309,7 @@ function similar_text(first, second) {
 }
 
 //checks for repeating words within a text
-function similar_inlineText(text, maxWordOccurence, maxSimilarity) {
+AutoMod.prototype.similar_inlineText = function(text, maxWordOccurence, maxSimilarity) {
     var checkedWords = [];
     var textArr = text.split(' ');
     if (textArr.length < 7)
@@ -341,7 +329,7 @@ function similar_inlineText(text, maxWordOccurence, maxSimilarity) {
 }
 
 //returns the longers word in a text
-function longestWord(text) {
+AutoMod.prototype.longestWord = function(text) {
     var textArr = text.split(' ');
     var longest = textArr[0];
     for (var word of textArr) {
@@ -353,12 +341,12 @@ function longestWord(text) {
 };
 
 //returns the amount of characters a text is in length
-function charCount(text) {
+AutoMod.prototype.charCount = function(text) {
     return text.length;
 }
 
 //Controll links
-function linkCheck(session, text, nick) {
+AutoMod.prototype.linkCheck = function(session, text, nick) {
     var urls = text.match(/(https?:\/\/)\S+?(?=[,.!?:)]?\s|$)/g); //returns an array with all links in the current message
     if (urls) {
         for (var url of urls) {
@@ -481,7 +469,7 @@ function loadFile(name) {
 //commands
 //---------
 
-parseCommand = function(session, nick, message, isMod) {
+AutoMod.prototype.parseCommand = function(session, nick, message, isMod) {
     var args = message.split(" ");
     var command = String(args.splice(0, 1));
     command = command.substr(1, command.length);

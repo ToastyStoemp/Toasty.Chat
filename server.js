@@ -29,7 +29,7 @@ function main() {
 
     var chatServerBase = require("./server.ChatServerBase.js")();
     var AutoMod = require("./server.AutoMod.js");
-    var AutoMod = new AutoMod(config.base);
+    var AutoMod = new AutoMod(config.AutoMod);
     chatServerBase.initialize(config.base, version, AutoMod);
 
     if (config.webSocketServer && config.webSocketServer.enabled) {

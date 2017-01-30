@@ -25,6 +25,8 @@ MetaClient.prototype.setClientConfigurationData = function(channel, nick, trip) 
     this.channel = channel;
     this.nick = nick;
     this.trip = trip;
+    this.score = 0;
+    this.timeoutTime = 0;
 };
 
 
@@ -258,9 +260,8 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
             text = text.replace(/\n{3,}/g, "\n\n");
             if (!text) return;
 
-            if (this.AutoMod.isStfud(client.getIpAddress())) {
+            if (this.AutoMod.isMuted(client.getIpAddress()))
                 return;
-            }
 
             var score = text.length / 83 / 4;
             if (this.AutoMod.frisk(client.getIpAddress(), score) && !client.admin) {
@@ -278,9 +279,18 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 trip: client.trip,
                 text: text,
                 admin: this.AutoMod.isAdmin(client),
-                donator: this.AutoMod.isDonator(client),
+                //donator: this.AutoMod.isDonator(client),
                 llama: (Math.floor(Math.random() * 20) == 0 || client.nick.toLowerCase() == "llama")
             };
+            
+            if (client.timeoutTime != 0) { //if this user hasn't recieved a chat timeout
+                var warningData = {cmd:'chat', text: "You have to wait: " + client.timeoutTime + " seconds, before you can chat again." , nick: 'AutoMod'};
+                return client.send(null, warningData);
+            }
+            if (this.AutoMod && this.AutoMod.ScanMessage(data, client))
+                return;
+
+
             if (typeof triplist[data.trip] != 'undefined')
                 data.trip = triplist[data.trip];
             else
