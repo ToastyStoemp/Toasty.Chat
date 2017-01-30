@@ -318,7 +318,7 @@ AutoMod.prototype.similar_inlineText = function(text, maxWordOccurence, maxSimil
         var wordCount = 1;
         if (checkedWords.indexOf(textArr[i]) == -1) {
             for (var k = i + 1; k < textArr.length; k++)
-                if (textArr[i] == textArr[k] || similar_text(textArr[i], textArr[k]) > maxSimilarity)
+                if (textArr[i] == textArr[k] || this.similar_text(textArr[i], textArr[k]) > maxSimilarity)
                     wordCount++;
             if (wordCount / textArr.length >= maxWordOccurence)
                 return true;
