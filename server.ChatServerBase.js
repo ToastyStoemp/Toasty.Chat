@@ -25,6 +25,8 @@ MetaClient.prototype.setClientConfigurationData = function(channel, nick, trip) 
     this.channel = channel;
     this.nick = nick;
     this.trip = trip;
+    this.score = 0;
+    this.timeoutTime = 0;
 };
 
 
@@ -36,9 +38,9 @@ function ChatServerBase() {
 module.exports = function() {
     return new ChatServerBase();
 };
-ChatServerBase.prototype.initialize = function(config, version, POLICE) {
+ChatServerBase.prototype.initialize = function(config, version, AutoMod) {
     var that = this;
-    that.POLICE = POLICE;
+    that.AutoMod = AutoMod;
     that.config = config;
     that.version = version;
     that.nodes = [];
@@ -116,12 +118,12 @@ ChatServerBase.prototype.onClose = function(client) {
 };
 ChatServerBase.prototype.onMessage = function(client, data) {
     try {
-        if (this.POLICE.frisk(client.getIpAddress(), 0)) { // probe for rate limit
+        if (this.AutoMod.frisk(client.getIpAddress(), 0)) { // probe for rate limit
             client.send(client, { cmd: 'warn', errCode: 'E001', text: "Your IP is being rate-limited or blocked." });
             return;
         }
 
-        this.POLICE.frisk(client.getIpAddress(), 1); // Penalize here, but don't do anything about it
+        this.AutoMod.frisk(client.getIpAddress(), 1); // Penalize here, but don't do anything about it
 
         if (data.length > 65536) return; // ignore large packets
 
@@ -179,6 +181,8 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
             client.send(null, { cmd: 'pong' });
             return;
         case 'verify':
+            if (self.config.allowTor)
+                return client.send(null, { cmd: 'verify', valid: (args.version == this.version) });
             if (self.nodes) {
                 if (self.nodes.indexOf(client.getIpAddress()) == -1)
                     client.send(null, { cmd: 'verify', valid: (args.version == this.version) });
@@ -200,7 +204,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 args.pass = this.generatePassword(nick);
             var trip = this.hashPassword(args.pass);
 
-            // if (this.POLICE.frisk(client.getIpAddress(), 2) && !this.) {
+            // if (this.AutoMod.frisk(client.getIpAddress(), 2) && !this.) {
             // 	send(client, {cmd: 'warn', errCode: 'E002', text: "You are joining channels too fast. Wait a moment and try again."}, this)
             // 	return
             // }
@@ -258,12 +262,11 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
             text = text.replace(/\n{3,}/g, "\n\n");
             if (!text) return;
 
-            if (this.POLICE.isStfud(client.getIpAddress())) {
+            if (this.AutoMod.isMuted(client.getIpAddress()))
                 return;
-            }
 
             var score = text.length / 83 / 4;
-            if (this.POLICE.frisk(client.getIpAddress(), score) && !client.admin) {
+            if (this.AutoMod.frisk(client.getIpAddress(), score) && !client.admin) {
                 client.send(null, {
                     cmd: 'warn',
                     errCode: 'E006',
@@ -277,10 +280,19 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 nick: client.nick,
                 trip: client.trip,
                 text: text,
-                admin: this.POLICE.isAdmin(client),
-                donator: this.POLICE.isDonator(client),
+                admin: this.AutoMod.isAdmin(client),
+                //donator: this.AutoMod.isDonator(client),
                 llama: (Math.floor(Math.random() * 20) == 0 || client.nick.toLowerCase() == "llama")
             };
+            
+            if (client.timeoutTime != 0) { //if this user hasn't recieved a chat timeout
+                var warningData = {cmd:'chat', text: "You have to wait: " + client.timeoutTime + " seconds, before you can chat again." , nick: 'AutoMod'};
+                return client.send(null, warningData);
+            }
+            if (this.AutoMod && this.AutoMod.ScanMessage(data, client))
+                return;
+
+
             if (typeof triplist[data.trip] != 'undefined')
                 data.trip = triplist[data.trip];
             else
@@ -312,7 +324,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
             var nickToInvite = String(args.nick);
             if (!client.channel) return;
 
-            if (this.POLICE.frisk(client.getIpAddress(), 2)) {
+            if (this.AutoMod.frisk(client.getIpAddress(), 2)) {
                 client.send(null, {
                     cmd: 'warn',
                     errCode: 'E007',
@@ -369,7 +381,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
     }
 
     // Commands usable by all mods
-    if (this.POLICE.isMod(client)) {
+    if (this.AutoMod.isMod(client)) {
         switch (command) {
             case 'kick':
                 var nick = String(args);
@@ -380,7 +392,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                     client.send(null, { cmd: 'warn', errCode: 'E009', text: "Could not find " + nick });
                     return;
                 }
-                if (this.POLICE.isMod(badClient)) {
+                if (this.AutoMod.isMod(badClient)) {
                     client.send(null, { cmd: 'warn', errCode: 'E010', text: "Cannot kick moderator" });
                     return;
                 }
@@ -395,7 +407,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 //Kick the client
                 badClient.clients.forEach(function(c) {
                     c.send(null, { cmd: 'close' });
-                    self.POLICE.dump(c.getIpAddress(), args.time);
+                    self.AutoMod.dump(c.getIpAddress(), args.time);
                 });
                 return;
             case 'ban':
@@ -407,7 +419,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                     client.send(null, { cmd: 'warn', errCode: 'E009', text: "Could not find " + nick });
                     return;
                 }
-                if (this.POLICE.isMod(badClient)) {
+                if (this.AutoMod.isMod(badClient)) {
                     client.send(null, { cmd: 'warn', errCode: 'E010', text: "Cannot ban moderator" });
                     return;
                 }
@@ -423,7 +435,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 badClient.clients.forEach(function(c) {
                     c.send(null, { cmd: 'dataSet', bSet: true });
                     c.send(null, { cmd: 'close' });
-                    self.POLICE.arrest(c.getIpAddress(), args.time);
+                    self.AutoMod.arrest(c.getIpAddress(), args.time);
                 });
                 return;
             case 'mute':
@@ -435,21 +447,21 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                     client.send(null, { cmd: 'warn', errCode: 'E009', text: "Could not find " + nick });
                     return;
                 }
-                if (this.POLICE.isMod(badClient)) {
+                if (this.AutoMod.isMod(badClient)) {
                     client.send(null, { cmd: 'warn', errCode: 'E010', text: "Cannot mute moderator" });
                     return;
                 }
 
                 badClient.clients.forEach(function(c) {
                     c.send(null, { cmd: 'dataSet', mSet: true });
-                    self.POLICE.stfu(c.getIpAddress(), args.time);
+                    self.AutoMod.stfu(c.getIpAddress(), args.time);
                 });
                 console.log(client.nick + " [" + client.trip + "] muted  " + nick + " in " + client.channel);
         }
     }
 
     // Commands usable by all admins
-    if (this.POLICE.isAdmin(client)) {
+    if (this.AutoMod.isAdmin(client)) {
         switch (command) {
             case 'play':
                 var url = args.url.trim();
