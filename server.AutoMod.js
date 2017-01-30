@@ -175,8 +175,9 @@ AutoMod.prototype.logMesage = function (data, client) {
     }
 
     //Substract a mesvsage counter after 5 minutes for this user
+    var that = this;
     setTimeout(function() {
-        this.userData[client.channel][client.trip].shift();
+        that.userData[client.channel][client.trip].shift();
     }, 5 * 60 * 1000);
 };
 
