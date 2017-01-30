@@ -1112,17 +1112,6 @@ $(function() {
         //onlineUsers.push(nick);
     }
 
-
-    function userRemove(nick) {
-        var children = $('#users').children();
-        for (var i = 0; i < children.length; i++) {
-            var user = children[i];
-            if (user.textContent == nick)
-                users.removeChild(user);
-        }
-        delete onlineUsers[nick];
-    }
-
     function userRemove(nick) {
         var children = $('#users').children();
         for (var i = 0; i < children.length; i++) {
@@ -1130,6 +1119,7 @@ $(function() {
             if (user.textContent.substr(0, user.textContent.indexOf(' ')) == nick)
                 users.removeChild(user)
         }
+        delete onlineUsers[nick];
     }
 
     function usersClear() {
