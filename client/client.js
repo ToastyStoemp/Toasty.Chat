@@ -408,8 +408,8 @@ $(function() {
             nickSpanEl.appendChild(tripEl);
         }
 
-        if (args.nick) {
-            if (args.llama && args.nick != lastPoster) {
+        if (args.nick && args.nick != lastPoster) {
+            if (args.llama) {
                 var llamaLinkEl = document.createElement('img');
                 llamaLinkEl.src = "https://toastystoemp.com/m/1bb24b.png";
                 llamaLinkEl.style.marginRight = "4px";
@@ -424,7 +424,7 @@ $(function() {
                     insertAtCursor(".w @" + args.target + " ");
                     $('#chatinput').focus();
                 }
-            } else if (args.nick != lastPoster && !args.whisperTo) {
+            } else if (!args.whisperTo) {
                 nickLinkEl.textContent = args.nick;
                 nickLinkEl.onclick = function() {
                     if (args.whisper)
@@ -437,6 +437,7 @@ $(function() {
             nickLinkEl.title = date.toLocaleString();
             nickSpanEl.appendChild(nickLinkEl);
 
+            //Donator Icon
             if (args.donator) {
                 var donatorLinkEl = document.createElement('img');
                 donatorLinkEl.src =
