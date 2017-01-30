@@ -181,6 +181,8 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
             client.send(null, { cmd: 'pong' });
             return;
         case 'verify':
+            if (self.config.allowTor)
+                return client.send(null, { cmd: 'verify', valid: (args.version == this.version) });
             if (self.nodes) {
                 if (self.nodes.indexOf(client.getIpAddress()) == -1)
                     client.send(null, { cmd: 'verify', valid: (args.version == this.version) });
