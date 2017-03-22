@@ -79,16 +79,12 @@ AutoMod.prototype.isMuted = function(id) {
 
 AutoMod.prototype.isAdmin = function(client) {
     if (!client.trip) return false;
-    var res = (this.config.admin == client.nick);
-    console.log(client.nick + " is admin = " + res);
-    return res;
+    return (this.config.admin == client.nick);
 };
 AutoMod.prototype.isMod = function(client) {
     if (!client.trip) return false;
     if (this.isAdmin(client)) return true;
-    var res = this.config.mods && this.config.mods.indexOf(client.trip) >= 0;
-    console.log(client.nick + " is mod = " + res);
-    return res;
+    return this.config.mods && this.config.mods.indexOf(client.trip) >= 0;
 };
 
 module.exports = AutoMod;
