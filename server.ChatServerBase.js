@@ -210,7 +210,6 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
             // 	return
             // }
 
-
             if (client.nick) return; // Already joined
             if (channel === "") return; // Must join a non-blank channel
 
@@ -306,18 +305,48 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 self.broadcast(client, data, client.channel);
             }
 
+
             if (text[0] == '!' || text[0] == '.') {
                 try {
                     self.bot.parseCmd(data, client);
                 } catch (e) {
                     if (text[0] == '.') {
+                        data.text = e.toString();
                         self.broadcast(client, data, client.channel);
                     }
-
                     data.text = e.toString();
                     self.broadcast(client, data, client.channel);
                 }
             }
+
+            return;
+        case 'whisper':
+            var text = String(args.text);
+            var nickToWhisper = String(args.target);
+
+            var friend = this.getClientsOfChannel(client.channel)[nickToWhisper.toLowerCase()];
+            if (!friend) {
+                client.send(null, { cmd: 'warn', errCode: 'E008', text: "Could not find user in channel" });
+                return
+            }
+            if (friend.nick === client.nick) return; // Ignore silently
+
+            client.send(null, {
+                cmd: 'whisper',
+                channel: channel,
+                target: friend.nick,
+                nick: "to " + friend.nick,
+                text: text,
+                whisper: true
+            });
+            friend.send(null, {
+                cmd: 'whisper',
+                channel: channel,
+                owner: client.nick,
+                nick: "from " + client.nick,
+                text: text,
+                whisper: true
+            });
 
             return;
         case 'invite':
