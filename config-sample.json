@@ -5,7 +5,8 @@
     "mods": [
       "add-mod-tripcodes-here"
     ],
-    "salt": "insert-randomly-generated-string-here"
+    "salt": "insert-randomly-generated-string-here",
+    "allowTor": false
   },
   "webSocketServer": {
     "enabled": true,
@@ -52,5 +53,16 @@
     "mentionHold": true,
     "commandChar": "#",
     "client": true
+  },
+  "AutoMod": {
+    "enabled": true,
+    "ignoreTrips" : [],
+    "maxMessagesPer5Min" : 200,
+    "minMessageSpeed" : 1000,
+    "maxSimilarityMultiMessages" : 0.75,
+    "maxSimilaritySingleMessage" : 0.70,
+    "maxLineCount" : 8,
+    "maxWordLength" : 200,
+    "maxCharCount" : 1500
   }
 }

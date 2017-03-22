@@ -17,4 +17,6 @@ ChatClientBase.prototype.setClientConfigurationData = function(channel, nick, tr
 	this.channel = channel;
 	this.nick = nick;
 	this.trip = trip;
+	this.score = 0;
+	this.timeoutTime = 0;
 };

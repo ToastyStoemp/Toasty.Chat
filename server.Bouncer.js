@@ -56,14 +56,14 @@ Bouncer.prototype.openRelay = function (relayInfo) {
                     if (args.bSet) {
                         for (var socketId in this.sockets) {
                             if (this.sockets.hasOwnProperty(socketId)) {
-                                that.POLICE.arrest(this.sockets[socketId]);
+                                that.AutoMod.arrest(this.sockets[socketId]);
                             }
                         }
                     }
                     if(args.mSet){
                         for (var socketId in this.sockets) {
                             if (this.sockets.hasOwnProperty(socketId)) {
-                                that.POLICE.stfu(this.sockets[socketId]);
+                                that.AutoMod.stfu(this.sockets[socketId]);
                             }
                         }
                     }
@@ -173,9 +173,9 @@ Bouncer.prototype.openRelay = function (relayInfo) {
 }
 ;
 
-Bouncer.prototype.initialize = function (config, POLICE) {
+Bouncer.prototype.initialize = function (config, AutoMod) {
     this.config = config;
-    this.POLICE = POLICE;
+    this.AutoMod = AutoMod;
 };
 Bouncer.prototype.run = function () {
     var server = new ws.Server({host: this.config.host, port: this.config.socketPort});
@@ -187,11 +187,11 @@ Bouncer.prototype.run = function () {
     });
     server.on('connection', function (socket) {
         var client = new BouncerClient(socket);
-        if (that.POLICE.frisk(client.getIpAddress(), 0)) {
+        if (that.AutoMod.frisk(client.getIpAddress(), 0)) {
             return;
         }
         socket.on('message', function (data) {
-            if (that.POLICE.frisk(client.getIpAddress(), 0)) {
+            if (that.AutoMod.frisk(client.getIpAddress(), 0)) {
                 return;
             }
             var args = JSON.parse(data);
