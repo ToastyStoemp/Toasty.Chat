@@ -503,7 +503,7 @@ $(function() {
                     notifyMe(args.nick + " mentioned you", args.text, false);
             }
         } else if (args.whisper) {
-            if (!args.owner)
+            if (args.owner)
                 lastWhisper = args.nick;
             messageEl.classList.add('whisper');
             if ($('#notifications').is(":checked") && !document.hasFocus())
