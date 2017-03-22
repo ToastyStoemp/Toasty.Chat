@@ -242,7 +242,7 @@ AutoMod.prototype.textCheck = function(data, client) {
     var hasMulitpleMessages = thisUserData.length > 2;
 
     var lastMessage = thisUserData[thisUserData.length - 1]; //last message send
-    var secondlastMessage = hasMulitpleMessages ? users[nick][users[nick].length - 2] : ""; //second from last message send 
+    var secondlastMessage = hasMulitpleMessages ? thisUserData[thisUserData.length - 2] : ""; //second from last message send 
     var thirdLastMessage = hasMulitpleMessages ? thirdLastMessage = thisUserData[thisUserData.length - 3] : ""; //third from last message send
 
     if (lastMessage) {
