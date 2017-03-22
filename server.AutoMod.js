@@ -246,6 +246,7 @@ AutoMod.prototype.textCheck = function(data, client) {
     var hasMulitpleMessages = thisUserData.length > 2;
 
     var lastMessage = thisUserData[thisUserData.length - 1]; //last message send
+    var secondlastMessage = hasMulitpleMessages ? users[nick][users[nick].length - 2] : ""; //second from last message send 
     var thirdLastMessage = hasMulitpleMessages ? thirdLastMessage = thisUserData[thisUserData.length - 3] : ""; //third from last message send
 
     if (lastMessage) {
@@ -273,14 +274,22 @@ AutoMod.prototype.textCheck = function(data, client) {
         if (hasMulitpleMessages) { //spam checks that require multiple messages ( 3 )
 
             //check if this message is similar to the third from last message
-            if (this.similar_text(lastMessage.text, thirdLastMessage.text) >= maxSimilarityMultiLine)
+            if ((this.similar_text(lastMessage.text, secondlastMessage.text) + this.similar_text(lastMessage.text, thirdLastMessage.text)) / 2 >= maxSimilarityMultiLine)
                 return this.warnUser(client, responses.similarMessage); // similar messages
 
             //check the speed between the last and third from last is not too fast
             if (lastMessage.time - thirdLastMessage.time < maxAvgtime)
                 return this.warnUser(client, responses.shortTermSpeed); // Short term speed count
+
+            if (this.shortMessages(lastMessage.text, secondlastMessage.text, thirdLastMessage) && lastMessage.time - thirdLastMessage.time < maxAvgtime * 5)
+                return this.warnUser(nick, responses.shortTermSpeedSpam); // Short term speed count
         }
     }
+}
+
+//Check if all messages are too short
+AutoMod.prototype.shortMessages(first, second, third) {
+    return (first.length <= 3 && second.length <= 3 && third.length <= 3)
 }
 
 //returns how similar 2 texts are
@@ -338,7 +347,7 @@ AutoMod.prototype.longestWord = function(text) {
     var textArr = text.split(' ');
     var longest = textArr[0];
     for (var word of textArr) {
-        if (word.length > longest.length) {
+        if (word != "" && word.length > longest.length) {
             longest = word;
         }
     }
