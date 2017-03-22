@@ -4,6 +4,7 @@
 var crypto = require('crypto');
 var tor = require('tor-exits');
 var triplist = require("./data/trips.json");
+var donatorlist = require("./data/donators.json");
 
 // Keeps multiple connections for a client
 function MetaClient() {
@@ -86,7 +87,7 @@ ChatServerBase.prototype.addClientToChannel = function(channel, client, nick, tr
         clientsOfChannel[''] += 1;
         existingMetaClient = clientsOfChannel[nick.toLowerCase()] = new MetaClient();
         existingMetaClient.setClientConfigurationData(channel, nick, trip); // everything is ok, set data
-        this.broadcast(client, { cmd: 'onlineAdd', nick: nick, trip: trip }, channel);
+        this.broadcast(client, { cmd: 'onlineAdd', nick: nick, trip: trip, donator: donatorlist.hasOwnProperty(trip) }, channel);
     }
 
     client.setClientConfigurationData(channel, nick, trip); // everything is ok, set data
@@ -213,7 +214,6 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
             if (client.nick) return; // Already joined
             if (channel === "") return; // Must join a non-blank channel
 
-
             // Process nickname
             if (!this.validateNickName(nick)) {
                 client.send(null, {
@@ -281,7 +281,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 trip: client.trip,
                 text: text,
                 admin: self.AutoMod.isAdmin(client),
-                //donator: this.AutoMod.isDonator(client),
+                donator: donatorlist.hasOwnProperty(client.trip),
                 llama: (Math.floor(Math.random() * 20) == 0 || client.nick.toLowerCase() == "llama")
             };
 
