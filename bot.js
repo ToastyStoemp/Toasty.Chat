@@ -8,7 +8,7 @@ function Bot(chatServerBase) {
     this.channelRestrictedCommands = {};
     events.EventEmitter.call(this);
     var that = this;
-    fs.readdir("./commands", function (err, files) {
+    fs.readdir("./commands", function(err, files) {
         if (err)
             throw err;
 
@@ -36,8 +36,7 @@ function Bot(chatServerBase) {
                             throw "Invalid command " + files[i];
                         that.commands[key] = cmds[key];
                     }
-                }
-                catch (e) {
+                } catch (e) {
                     console.log("Error loading command " + files[i]);
                     console.log(e);
                 }
@@ -45,11 +44,11 @@ function Bot(chatServerBase) {
         }
     });
 
-    this.restrictCommandToChannels = function (cmd, channelList) {
+    this.restrictCommandToChannels = function(cmd, channelList) {
         this.channelRestrictedCommands[cmd] = channelList;
     };
 
-    this.parseCmd = function (data, client) {
+    this.parseCmd = function(data, client) {
         var msg = data.text;
         var cmd = msg.substr(1).split(" ")[0];
         var args = msg.substr(2 + cmd.length).split(" ");
@@ -70,7 +69,7 @@ function Bot(chatServerBase) {
         return;
     };
 
-    this.verify = function (that, cmd, data, client) {
+    this.verify = function(that, cmd, data, client) {
         if (that.perm[cmd] > 0) {
             if (data.mod || data.admin)
                 return true;
@@ -86,34 +85,34 @@ function Bot(chatServerBase) {
         return true;
     };
 
-    this.sendAll = function (text, client) {
-      if (client) {
-        var botData = {cmd: 'chat', text: text, nick: 'Bot'};
-        this.chatServerBase.broadcast(null, botData, client.channel);
-        return true;
-      }
-      console.log('missing parameter [client] in bot.sendAll()');
-      return false;
+    this.sendAll = function(text, client) {
+        if (client) {
+            var botData = { cmd: 'chat', text: text, nick: 'Bot' };
+            this.chatServerBase.broadcast(null, botData, client.channel);
+            return true;
+        }
+        console.log('missing parameter [client] in bot.sendAll()');
+        return false;
     };
-    this.sendClient = function (text, client) {
-      if (client) {
-        var botData = {cmd: 'chat', text: text, nick: 'Bot'};
-        client.send(null, botData);
-        return true;
-      }
-      console.log('missing parameter [client] in bot.sendClient()');
-      return false;
+    this.sendClient = function(text, client) {
+        if (client) {
+            var botData = { cmd: 'chat', text: text, nick: 'Bot' };
+            client.send(null, botData);
+            return true;
+        }
+        console.log('missing parameter [client] in bot.sendClient()');
+        return false;
     }
-    this.sendWhisper = function (text, client, friend) {
-      if (client) {
-        var botData = {cmd: 'chat', text: text, nick: client.nick, target: friend.nick, whisper: true, whisperTo: true};
-        client.send(null, botData);
-        botData = {cmd: 'chat', text: text, nick: client.nick, whisper: true, whisperAt: true};
-        friend.send(null, botData);
-        return true;
-      }
-      console.log('missing parameter [client] in bot.sendWhisper()');
-      return false;
+    this.sendWhisper = function(text, client, friend) {
+        if (client) {
+            var botData = { cmd: 'chat', text: text, nick: client.nick, target: friend.nick, whisper: true, whisperTo: true };
+            client.send(null, botData);
+            botData = { cmd: 'chat', text: text, nick: client.nick, whisper: true, whisperAt: true };
+            friend.send(null, botData);
+            return true;
+        }
+        console.log('missing parameter [client] in bot.sendWhisper()');
+        return false;
     }
 }
 util.inherits(Bot, events.EventEmitter);

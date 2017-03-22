@@ -262,11 +262,11 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
             text = text.replace(/\n{3,}/g, "\n\n");
             if (!text) return;
 
-            if (this.AutoMod.isMuted(client.getIpAddress()))
+            if (self.AutoMod.isMuted(client.getIpAddress()))
                 return;
 
             var score = text.length / 83 / 4;
-            if (this.AutoMod.frisk(client.getIpAddress(), score) && !client.admin) {
+            if (self.AutoMod.frisk(client.getIpAddress(), score) && !client.admin) {
                 client.send(null, {
                     cmd: 'warn',
                     errCode: 'E006',
@@ -280,16 +280,16 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 nick: client.nick,
                 trip: client.trip,
                 text: text,
-                admin: this.AutoMod.isAdmin(client),
+                admin: self.AutoMod.isAdmin(client),
                 //donator: this.AutoMod.isDonator(client),
                 llama: (Math.floor(Math.random() * 20) == 0 || client.nick.toLowerCase() == "llama")
             };
-            
+
             if (client.timeoutTime != 0) { //if this user hasn't recieved a chat timeout
-                var warningData = {cmd:'chat', text: "You have to wait: " + client.timeoutTime + " seconds, before you can chat again." , nick: 'AutoMod'};
+                var warningData = { cmd: 'chat', text: "You have to wait: " + client.timeoutTime + " seconds, before you can chat again.", nick: 'AutoMod' };
                 return client.send(null, warningData);
             }
-            if (this.AutoMod && this.AutoMod.ScanMessage(data, client))
+            if (self.AutoMod && self.AutoMod.ScanMessage(data, client))
                 return;
 
 
@@ -303,19 +303,19 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 data.cmd = 'action';
 
             if (text[0] != '.') {
-                this.broadcast(client, data, client.channel);
+                self.broadcast(client, data, client.channel);
             }
 
             if (text[0] == '!' || text[0] == '.') {
                 try {
-                    this.bot.parseCmd(data, client);
+                    self.bot.parseCmd(data, client);
                 } catch (e) {
                     if (text[0] == '.') {
-                        this.broadcast(client, data, client.channel);
+                        self.broadcast(client, data, client.channel);
                     }
 
                     data.text = e.toString();
-                    this.broadcast(client, data, client.channel);
+                    self.broadcast(client, data, client.channel);
                 }
             }
 
@@ -407,7 +407,8 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 //Kick the client
                 badClient.clients.forEach(function(c) {
                     c.send(null, { cmd: 'close' });
-                    self.AutoMod.dump(c.getIpAddress(), args.time);
+                    self.AutoMod.kick(c.getIpAddress(), args.time);
+                    console.log("IP: " + c.getIpAddress());
                 });
                 return;
             case 'ban':
@@ -435,7 +436,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 badClient.clients.forEach(function(c) {
                     c.send(null, { cmd: 'dataSet', bSet: true });
                     c.send(null, { cmd: 'close' });
-                    self.AutoMod.arrest(c.getIpAddress(), args.time);
+                    self.AutoMod.ban(c.getIpAddress(), args.time);
                 });
                 return;
             case 'mute':
@@ -454,7 +455,8 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
 
                 badClient.clients.forEach(function(c) {
                     c.send(null, { cmd: 'dataSet', mSet: true });
-                    self.AutoMod.stfu(c.getIpAddress(), args.time);
+                    self.AutoMod.mute(c.getIpAddress(), args.time);
+                    console.log("IP: " + c.getIpAddress());
                 });
                 console.log(client.nick + " [" + client.trip + "] muted  " + nick + " in " + client.channel);
         }

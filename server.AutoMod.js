@@ -79,12 +79,16 @@ AutoMod.prototype.isMuted = function(id) {
 
 AutoMod.prototype.isAdmin = function(client) {
     if (!client.trip) return false;
-    return this.config.admins && this.config.admins.indexOf(client.trip) >= 0;
+    var res = (this.config.admin == client.nick);
+    console.log(client.nick + " is admin = " + res);
+    return res;
 };
 AutoMod.prototype.isMod = function(client) {
     if (!client.trip) return false;
     if (this.isAdmin(client)) return true;
-    return this.config.mods && this.config.mods.indexOf(client.trip) >= 0;
+    var res = this.config.mods && this.config.mods.indexOf(client.trip) >= 0;
+    console.log(client.nick + " is mod = " + res);
+    return res;
 };
 
 module.exports = AutoMod;
@@ -137,7 +141,7 @@ AutoMod.prototype.ScanMessage = function(data, client) { //returns false if mess
         //outPutMessage += linkCheck(session, text, nick) || '';
         outPutMessage += this.textCheck(data, client) || '';
         if (outPutMessage !== '') {
-            var warningData = {cmd:'chat', text: outPutMessage, nick: 'AutoMod'};
+            var warningData = { cmd: 'chat', text: outPutMessage, nick: 'AutoMod' };
             client.send(null, warningData);
             return true;
         }
@@ -156,7 +160,7 @@ AutoMod.prototype.ScanMessage = function(data, client) { //returns false if mess
 //--------------
 
 //addes the lattest message to a buffer
-AutoMod.prototype.logMesage = function (data, client) {
+AutoMod.prototype.logMesage = function(data, client) {
     //if user is not initialized yet, initialze it
     if (!this.userData[client.channel])
         this.userData[client.channel] = [];
@@ -196,7 +200,7 @@ AutoMod.prototype.warnUser = function(client, reason) {
     //Handle canTalk
     client.canTalk = false;
     client.timeoutTime += client.score * 10; // in seconds
-    var timer =  setInterval(function() {
+    var timer = setInterval(function() {
         client.timeoutTime--;
         if (client.timeoutTime == 0)
             clearInterval(timer);
