@@ -79,16 +79,12 @@ AutoMod.prototype.isMuted = function(id) {
 
 AutoMod.prototype.isAdmin = function(client) {
     if (!client.trip) return false;
-    var res = (this.config.admin == client.nick);
-    console.log(client.nick + " is admin = " + res);
-    return res;
+    return (this.config.admin == client.nick);
 };
 AutoMod.prototype.isMod = function(client) {
     if (!client.trip) return false;
     if (this.isAdmin(client)) return true;
-    var res = this.config.mods && this.config.mods.indexOf(client.trip) >= 0;
-    console.log(client.nick + " is mod = " + res);
-    return res;
+    return this.config.mods && this.config.mods.indexOf(client.trip) >= 0;
 };
 
 module.exports = AutoMod;
@@ -246,7 +242,7 @@ AutoMod.prototype.textCheck = function(data, client) {
     var hasMulitpleMessages = thisUserData.length > 2;
 
     var lastMessage = thisUserData[thisUserData.length - 1]; //last message send
-    var secondlastMessage = hasMulitpleMessages ? users[nick][users[nick].length - 2] : ""; //second from last message send 
+    var secondlastMessage = hasMulitpleMessages ? thisUserData[thisUserData.length - 2] : ""; //second from last message send 
     var thirdLastMessage = hasMulitpleMessages ? thirdLastMessage = thisUserData[thisUserData.length - 3] : ""; //third from last message send
 
     if (lastMessage) {
@@ -288,7 +284,7 @@ AutoMod.prototype.textCheck = function(data, client) {
 }
 
 //Check if all messages are too short
-AutoMod.prototype.shortMessages(first, second, third) {
+AutoMod.prototype.shortMessages = function(first, second, third) {
     return (first.length <= 3 && second.length <= 3 && third.length <= 3)
 }
 

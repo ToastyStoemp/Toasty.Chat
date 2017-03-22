@@ -4,6 +4,7 @@
 var crypto = require('crypto');
 var tor = require('tor-exits');
 var triplist = require("./data/trips.json");
+var donatorlist = require("./data/donators.json");
 
 // Keeps multiple connections for a client
 function MetaClient() {
@@ -86,7 +87,7 @@ ChatServerBase.prototype.addClientToChannel = function(channel, client, nick, tr
         clientsOfChannel[''] += 1;
         existingMetaClient = clientsOfChannel[nick.toLowerCase()] = new MetaClient();
         existingMetaClient.setClientConfigurationData(channel, nick, trip); // everything is ok, set data
-        this.broadcast(client, { cmd: 'onlineAdd', nick: nick, trip: trip }, channel);
+        this.broadcast(client, { cmd: 'onlineAdd', nick: nick, trip: trip, donator: donatorlist.hasOwnProperty(trip) }, channel);
     }
 
     client.setClientConfigurationData(channel, nick, trip); // everything is ok, set data
@@ -209,10 +210,8 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
             // 	return
             // }
 
-
             if (client.nick) return; // Already joined
             if (channel === "") return; // Must join a non-blank channel
-
 
             // Process nickname
             if (!this.validateNickName(nick)) {
@@ -281,7 +280,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 trip: client.trip,
                 text: text,
                 admin: self.AutoMod.isAdmin(client),
-                //donator: this.AutoMod.isDonator(client),
+                donator: donatorlist.hasOwnProperty(client.trip),
                 llama: (Math.floor(Math.random() * 20) == 0 || client.nick.toLowerCase() == "llama")
             };
 
@@ -306,18 +305,48 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
                 self.broadcast(client, data, client.channel);
             }
 
+
             if (text[0] == '!' || text[0] == '.') {
                 try {
                     self.bot.parseCmd(data, client);
                 } catch (e) {
                     if (text[0] == '.') {
+                        data.text = e.toString();
                         self.broadcast(client, data, client.channel);
                     }
-
                     data.text = e.toString();
                     self.broadcast(client, data, client.channel);
                 }
             }
+
+            return;
+        case 'whisper':
+            var text = String(args.text);
+            var nickToWhisper = String(args.target);
+
+            var friend = this.getClientsOfChannel(client.channel)[nickToWhisper.toLowerCase()];
+            if (!friend) {
+                client.send(null, { cmd: 'warn', errCode: 'E008', text: "Could not find user in channel" });
+                return
+            }
+            if (friend.nick === client.nick) return; // Ignore silently
+
+            client.send(null, {
+                cmd: 'whisper',
+                channel: channel,
+                target: friend.nick,
+                nick: "to " + friend.nick,
+                text: text,
+                whisper: true
+            });
+            friend.send(null, {
+                cmd: 'whisper',
+                channel: channel,
+                owner: client.nick,
+                nick: "from " + client.nick,
+                text: text,
+                whisper: true
+            });
 
             return;
         case 'invite':

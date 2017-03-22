@@ -200,6 +200,8 @@ $(function() {
                 elementId: 'disconnect_message',
                 replaceIfSameAsLast: true
             }, false);
+            document.title = "⚡️ Disconnected";
+
 
             var timerEl = document.getElementById("reconnectTimer");
             var reconnectInterval = window.setInterval(function() {
@@ -281,6 +283,11 @@ $(function() {
                 });
         },
         chat: function(args) {
+            if (ignoredUsers.indexOf(args.nick) >= 0)
+                return;
+            pushMessage(args);
+        },
+        whisper: function(args) {
             if (ignoredUsers.indexOf(args.nick) >= 0)
                 return;
             pushMessage(args);
@@ -418,22 +425,21 @@ $(function() {
             }
 
             var nickLinkEl = document.createElement('a');
-            if (args.whisperTo && lastPoster.substr(0, 3) != "to ") {
-                nickLinkEl.textContent = "to " + args.target;
-                nickLinkEl.onclick = function() {
-                    insertAtCursor(".w @" + args.target + " ");
-                    $('#chatinput').focus();
-                }
-            } else if (!args.whisperTo) {
-                nickLinkEl.textContent = args.nick;
-                nickLinkEl.onclick = function() {
-                    if (args.whisper)
-                        insertAtCursor(".w @" + args.nick + " ");
-                    else
-                        insertAtCursor("@" + args.nick + " ");
-                    $('#chatinput').focus();
-                }
+            nickLinkEl.onclick = function() {
+                if (args.whisper) {
+                    if (args.target) {
+                        nickLinkEl.textContent = "to " + args.target;
+                        insertAtCursor(".w @" + args.target + " ");
+                    } else {
+                        nickLinkEl.textContent = "from " + args.owner;
+                        insertAtCursor(".w @" + args.owner + " ");
+                    }
+                } else
+                    insertAtCursor("@" + args.nick + " ");
+                $('#chatinput').focus();
             }
+            nickLinkEl.textContent = args.nick;
+
             nickLinkEl.title = date.toLocaleString();
             nickSpanEl.appendChild(nickLinkEl);
 
@@ -497,7 +503,7 @@ $(function() {
                     notifyMe(args.nick + " mentioned you", args.text, false);
             }
         } else if (args.whisper) {
-            if (args.whisperAt)
+            if (!args.owner)
                 lastWhisper = args.nick;
             messageEl.classList.add('whisper');
             if ($('#notifications').is(":checked") && !document.hasFocus())
@@ -516,10 +522,10 @@ $(function() {
             window.scrollTo(0, document.body.scrollHeight);
         }
 
-        lastPoster = args.whisper ? "to " + args.target : args.nick;
-        if (args.nick != '*')
+        lastPoster = args.nick;
+        if (args.nick != '*' || args.nick != '!')
             unread += 1;
-        updateTitle();
+        updateTitle(args.owner, args.text);
     }
 
 
@@ -836,7 +842,7 @@ $(function() {
             1);
     }
 
-    function updateTitle() {
+    function updateTitle(nick, message) {
         if (document.hasFocus() && isAtBottom())
             unread = 0;
 
@@ -848,6 +854,9 @@ $(function() {
 
         if (unread > 0)
             title = '(' + unread + ') ' + title;
+
+        if (nick)
+            title = "[W] " + nick + ": " + message;
 
         document.title = title;
     }
@@ -862,6 +871,30 @@ $(function() {
     var nickTabIndex = -1; // last presented username index for TAB autocompletion
     var lengthOfInsertedNick = 0; // used for TAB autocompletion
     $('#chatinput').keydown(function(e) {
+        if (e.keyCode == 13 /* ENTER */ && e.altKey) {
+            e.preventDefault();
+            // Submit whisper
+            if (e.target.value != '') {
+                var text = e.target.value.split(' ');
+                e.target.value = '';
+                var target = text.splice(0, 2)[1];
+                if (mSelector)
+                    pushMessage({
+                        nick: myNick,
+                        target: target,
+                        text: text,
+                        whisper: true
+                    });
+                else
+                    send({
+                        cmd: 'whisper',
+                        text: text
+                    });
+                lastSent[0] = text;
+                lastSent.unshift("");
+                lastSentPos = 0;
+            }
+        }
         if (e.keyCode == 13 /* ENTER */ && !e.shiftKey) {
             e.preventDefault();
             // Submit message
