@@ -288,7 +288,7 @@ AutoMod.prototype.textCheck = function(data, client) {
 }
 
 //Check if all messages are too short
-AutoMod.prototype.shortMessages(first, second, third) {
+AutoMod.prototype.shortMessages = function(first, second, third) {
     return (first.length <= 3 && second.length <= 3 && third.length <= 3)
 }
 
