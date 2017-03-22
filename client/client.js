@@ -200,6 +200,8 @@ $(function() {
                 elementId: 'disconnect_message',
                 replaceIfSameAsLast: true
             }, false);
+            document.title = "⚡️ Disconnected";
+
 
             var timerEl = document.getElementById("reconnectTimer");
             var reconnectInterval = window.setInterval(function() {
