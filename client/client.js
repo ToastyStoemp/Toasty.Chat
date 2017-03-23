@@ -884,14 +884,13 @@ $(function() {
                         text: text,
                         whisper: true
                     });
-                else
+                else if (lastWhisper)
                     send({
                         cmd: 'whisper',
                         text: text,
                         target: lastWhisper
                     });
 
-                command, client, args
                 lastSent[0] = text;
                 lastSent.unshift("");
                 lastSentPos = 0;
@@ -908,13 +907,14 @@ $(function() {
                         nick: myNick,
                         text: text
                     });
-                else if (text.substring(0, 3) == ".r ")
-                    send({
-                        cmd: 'whisper',
-                        text: text,
-                        target: lastWhisper
-                    });
-                else
+                else if (text.substring(0, 3) == ".r ") {
+                    if (lastWhisper)
+                        send({
+                            cmd: 'whisper',
+                            text: text,
+                            target: lastWhisper
+                        });
+                } else
                     send({
                         cmd: 'chat',
                         text: text
