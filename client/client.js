@@ -908,6 +908,12 @@ $(function() {
                         nick: myNick,
                         text: text
                     });
+                else if (text.substring(0, 3) == ".r ")
+                    send({
+                        cmd: 'whisper',
+                        text: text,
+                        target: lastWhisper
+                    });
                 else
                     send({
                         cmd: 'chat',
