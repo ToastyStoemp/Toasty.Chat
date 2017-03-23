@@ -911,7 +911,7 @@ $(function() {
                     if (lastWhisper)
                         send({
                             cmd: 'whisper',
-                            text: text,
+                            text: text.substring(3),
                             target: lastWhisper
                         });
                 } else
