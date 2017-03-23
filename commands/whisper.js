@@ -9,7 +9,7 @@ var whipser = function(bot, sender, args, data, client) {
         cmd: 'whisper',
         nick: client.nick,
         trip: client.trip,
-        text: args,
+        text: args.join(' '),
         target: targetNick
     };
     bot.chatServerBase.handleCommand("whisper", client, data);

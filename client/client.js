@@ -290,6 +290,8 @@ $(function() {
         whisper: function(args) {
             if (ignoredUsers.indexOf(args.nick) >= 0)
                 return;
+            if (args.owner)
+                lastWhisper = args.owner;
             pushMessage(args);
         },
         action: function(args) {
@@ -503,8 +505,6 @@ $(function() {
                     notifyMe(args.nick + " mentioned you", args.text, false);
             }
         } else if (args.whisper) {
-            if (!args.owner)
-                lastWhisper = args.nick;
             messageEl.classList.add('whisper');
             if ($('#notifications').is(":checked") && !document.hasFocus())
                 notifyMe(args.nick + " mentioned you", args.text, false);
@@ -875,9 +875,8 @@ $(function() {
             e.preventDefault();
             // Submit whisper
             if (e.target.value != '') {
-                var text = e.target.value.split(' ');
+                var text = e.target.value;
                 e.target.value = '';
-                var target = text.splice(0, 2)[1];
                 if (mSelector)
                     pushMessage({
                         nick: myNick,
@@ -885,11 +884,13 @@ $(function() {
                         text: text,
                         whisper: true
                     });
-                else
+                else if (lastWhisper)
                     send({
                         cmd: 'whisper',
-                        text: text
+                        text: text,
+                        target: lastWhisper
                     });
+
                 lastSent[0] = text;
                 lastSent.unshift("");
                 lastSentPos = 0;
@@ -906,7 +907,14 @@ $(function() {
                         nick: myNick,
                         text: text
                     });
-                else
+                else if (text.substring(0, 3) == ".r ") {
+                    if (lastWhisper)
+                        send({
+                            cmd: 'whisper',
+                            text: text.substring(3),
+                            target: lastWhisper
+                        });
+                } else
                     send({
                         cmd: 'chat',
                         text: text
@@ -957,7 +965,7 @@ $(function() {
                     .length) : typedNick;
                 var stub = typedNick.toLowerCase();
                 if (stub != "") {
-                    if (stub == ".r" && lastWhisper != "") {
+                    if ((stub == ".r" || stub == ".r ") && lastWhisper != "") {
                         removeCharsTillIndex(index);
                         insertAtCursor(".w @" + lastWhisper + " ");
                     } else {
