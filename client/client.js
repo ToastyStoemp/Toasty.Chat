@@ -875,7 +875,7 @@ $(function() {
             e.preventDefault();
             // Submit whisper
             if (e.target.value != '') {
-                var text = e.target.value.split(' ');
+                var text = e.target.value;
                 if (mSelector)
                     pushMessage({
                         nick: myNick,
