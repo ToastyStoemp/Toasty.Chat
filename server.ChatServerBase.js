@@ -201,7 +201,7 @@ ChatServerBase.prototype.handleCommand = function(command, client, args) {
             var lowerCaseNick = nick.toLowerCase();
 
             // dont allow invalid or empty passwords
-            if ((typeof args.pass) !== 'string' || args.pass === '' || args.pass == 'undefined' || args.pass == undefinded)
+            if ((typeof args.pass) !== 'string' || args.pass === '')
                 args.pass = this.generatePassword(nick);
             var trip = this.hashPassword(args.pass);
 
